@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 782ef43e85809b340bb4ef4c8e13c7c2, type: 3}
+  m_Name: Pastilla
+  m_EditorClassIdentifier: 
+  nombre: Pastillas
+  descripcion: Cura el dolor cabeza
+  icono: {fileID: 21300000, guid: 37be8b90ef8910642a70a540bbad8982, type: 3}
+  modeloEnMano: {fileID: 100000, guid: b1bf83d32e3fe924dbc796abdf91de06, type: 3}
