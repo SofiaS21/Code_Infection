@@ -931,7 +931,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4ab59101ad3a9e44943524ea1ea559f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvasE: {fileID: 0}
 --- !u!65 &628857970
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1456,7 +1455,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3b91e06dd3f6fc448e0f9a0686fdefe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mostrarInventario: {fileID: 2023281324}
 --- !u!1 &797176722
 GameObject:
   m_ObjectHideFlags: 0
@@ -1809,6 +1807,76 @@ Transform:
   - {fileID: 1892348249}
   m_Father: {fileID: 2053352675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &830403073 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8301348219256675487, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
+  m_PrefabInstance: {fileID: 2124287587}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &830403074 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8301348219256438975, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
+  m_PrefabInstance: {fileID: 2124287587}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &830403078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 830403073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volumeTrigger: {fileID: 830403074}
+  volumeLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  stopNaNPropagation: 1
+  finalBlitToCameraTarget: 0
+  antialiasingMode: 0
+  temporalAntialiasing:
+    jitterSpread: 0.75
+    sharpness: 0.25
+    stationaryBlending: 0.95
+    motionBlending: 0.85
+  subpixelMorphologicalAntialiasing:
+    quality: 2
+  fastApproximateAntialiasing:
+    fastMode: 0
+    keepAlpha: 0
+  fog:
+    enabled: 1
+    excludeSkybox: 1
+  debugLayer:
+    lightMeter:
+      width: 512
+      height: 256
+      showCurves: 1
+    histogram:
+      width: 512
+      height: 256
+      channel: 3
+    waveform:
+      exposure: 0.12
+      height: 256
+    vectorscope:
+      size: 256
+      exposure: 0.12
+    overlaySettings:
+      linearDepth: 0
+      motionColorIntensity: 4
+      motionGridSize: 64
+      colorBlindnessType: 0
+      colorBlindnessStrength: 1
+  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
+  m_ShowToolkit: 0
+  m_ShowCustomSorter: 0
+  breakBeforeColorGrading: 0
+  m_BeforeTransparentBundles: []
+  m_BeforeStackBundles: []
+  m_AfterStackBundles: []
 --- !u!1 &850420811
 GameObject:
   m_ObjectHideFlags: 0
@@ -2110,9 +2178,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f7453f721c9d494084a13b685321e13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvasE: {fileID: 0}
-  canvasGroup: {fileID: 0}
-  sistemaCamaras: {fileID: 1728822088}
 --- !u!1 &980363086
 GameObject:
   m_ObjectHideFlags: 0
@@ -2379,6 +2444,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1075575750}
+  - component: {fileID: 1075575751}
   m_Layer: 0
   m_Name: Post-process Volume
   m_TagString: Untagged
@@ -2401,6 +2467,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1075575751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1075575749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sharedProfile: {fileID: 11400000, guid: dd7aa57f8bc153646a5f0fc844144d2a, type: 2}
+  isGlobal: 1
+  blendDistance: 0
+  weight: 1
+  priority: 0
 --- !u!1 &1087917507
 GameObject:
   m_ObjectHideFlags: 0
@@ -2927,9 +3010,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f7453f721c9d494084a13b685321e13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvasE: {fileID: 1651280106}
-  canvasGroup: {fileID: 798588092}
-  sistemaCamaras: {fileID: 1728822088}
 --- !u!1 &1268673873
 GameObject:
   m_ObjectHideFlags: 0
@@ -3239,7 +3319,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4ab59101ad3a9e44943524ea1ea559f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvasE: {fileID: 0}
 --- !u!65 &1379809536
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3805,15 +3884,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d428ca82f0f4904a84619c0cdedc53b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camaras:
-  - {fileID: 1931342441}
-  - {fileID: 1903563107}
-  - {fileID: 1831736407}
-  - {fileID: 850420813}
-  - {fileID: 448859705}
-  panelCamaras: {fileID: 985315878}
-  panelInventario: {fileID: 2023281324}
-  textoNombreCamara: {fileID: 468329998}
 --- !u!4 &1728822089
 Transform:
   m_ObjectHideFlags: 0
@@ -4663,8 +4733,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f78edefb8cf51045a9f07f4aa576285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvasE: {fileID: 0}
-  item: {fileID: 0}
 --- !u!1001 &2124287587
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4749,7 +4817,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8301348219256438973, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2023281328}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8301348219256675487, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 830403078}
   m_SourcePrefab: {fileID: 100100000, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
 --- !u!1 &2142078076 stripped
 GameObject:
@@ -4789,8 +4860,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f78edefb8cf51045a9f07f4aa576285, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvasE: {fileID: 1883302623}
-  item: {fileID: 11400000, guid: df99f5c8fc1078d4ab8a1e4cc6437ad6, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
