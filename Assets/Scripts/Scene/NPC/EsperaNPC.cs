@@ -10,6 +10,8 @@ public class EsperaNPC : MonoBehaviour
     private Pacientes currentVisitor;
     public TMP_Text dialogueText;
 
+    public float velocidadCaminar = 2f;
+
     void Start()
     {
         foreach (var patient in patientList)
@@ -34,12 +36,6 @@ public class EsperaNPC : MonoBehaviour
     }
 
     public void DenegarAcceso()
-    {
-        if (currentVisitor == null) return;
-        ProximoPaciente();
-    }
-
-    public void AceptarAcceso()
     {
         if (currentVisitor == null) return;
         ProximoPaciente();

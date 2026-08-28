@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class DenegarAcceso : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public EsperaNPC esperaNPC;
+    public GameObject panelRechazar;
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (panelRechazar.activeSelf && Input.GetKeyDown(KeyCode.E))
+        {
+            esperaNPC.DenegarAcceso();
+            panelRechazar.SetActive(false);
+        }
     }
 }
