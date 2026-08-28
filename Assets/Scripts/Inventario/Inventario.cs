@@ -8,7 +8,7 @@ public class Inventario : MonoBehaviour
     public ItemData[] items; 
     public SlotUI[] slotsUI;
     public Transform objetoEnMano;     
-    public GameObject canvasInvLleno; 
+    public GameObject canvasInvLleno;
     private GameObject modelObjetoEquipado; 
 
     public static Inventario instancia;

@@ -6,6 +6,7 @@ public class NegarEntrada : MonoBehaviour
 {
 
     public GameObject canvasE;
+    public GameObject cam;
     private CanvasGroup canvasGroup;
 
     // Start is called before the first frame update

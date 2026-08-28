@@ -5,12 +5,10 @@ using TMPro;
 
 public class EsperaNPC : MonoBehaviour
 {
-
-    public List<Pacientes> patientList; // lista inicial de pacientes 
+    public List<Pacientes> patientList;
     private Queue<Pacientes> pacienteEspera = new Queue<Pacientes>();
     private Pacientes currentVisitor;
-
-    public TMP_Text dialogueText; 
+    public TMP_Text dialogueText;
 
     void Start()
     {
@@ -18,19 +16,17 @@ public class EsperaNPC : MonoBehaviour
         {
             pacienteEspera.Enqueue(patient);
         }
-        
+
         ProximoPaciente();
     }
 
     public void ProximoPaciente()
     {
-
         if (pacienteEspera.Count == 0)
         {
             currentVisitor = null;
             dialogueText.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
         }
-
         else
         {
             currentVisitor = pacienteEspera.Dequeue();
@@ -48,5 +44,4 @@ public class EsperaNPC : MonoBehaviour
         if (currentVisitor == null) return;
         ProximoPaciente();
     }
-
 }
