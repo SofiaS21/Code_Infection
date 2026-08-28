@@ -10,7 +10,7 @@ public class EsperaNPC : MonoBehaviour
     private Pacientes currentVisitor;
     public TMP_Text dialogueText;
 
-    public float velocidadCaminar = 2f;
+    public float velocidadCaminar = 3.5f;
 
     void Start()
     {
@@ -19,6 +19,20 @@ public class EsperaNPC : MonoBehaviour
             pacienteEspera.Enqueue(patient);
         }
 
+        ProximoPaciente();
+    }
+
+    public void DenegarAcceso()
+    {
+        if (currentVisitor == null) return;
+        currentVisitor.Rechazar();
+        ProximoPaciente();
+    }
+
+    public void AceptarAcceso()
+    {
+        if (currentVisitor == null) return;
+        currentVisitor.Aceptar();
         ProximoPaciente();
     }
 
@@ -35,9 +49,5 @@ public class EsperaNPC : MonoBehaviour
         }
     }
 
-    public void DenegarAcceso()
-    {
-        if (currentVisitor == null) return;
-        ProximoPaciente();
-    }
 }
+

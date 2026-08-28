@@ -7,12 +7,12 @@ public class DenegarAcceso : MonoBehaviour
     public EsperaNPC esperaNPC;
     public GameObject panelRechazar;
 
-    void Update()
+    void Update()   
     {
         if (panelRechazar.activeSelf && Input.GetKeyDown(KeyCode.E))
         {
             esperaNPC.DenegarAcceso();
-            panelRechazar.SetActive(false);
+            Debug.Log("Paciente rechazado");
         }
     }
 }

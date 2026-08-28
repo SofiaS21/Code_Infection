@@ -11,7 +11,7 @@ public class Pacientes : MonoBehaviour
 
     public Transform puertaSalida;
     private bool procesando = false;
-    public float velocidadCaminar = 2f;
+    public float velocidadCaminar = 3.5f;
 
 
     // Start is called before the first frame update
@@ -27,6 +27,14 @@ public class Pacientes : MonoBehaviour
     }
 
     public void Rechazar()
+    {
+        if (procesando) return;
+        procesando = true;
+        StopAllCoroutines();
+        StartCoroutine(CaminarHacia(puertaSalida, 1.5f, alLlegar: () => gameObject.SetActive(false)));
+    }
+
+    public void Aceptar()
     {
         if (procesando) return;
         procesando = true;
