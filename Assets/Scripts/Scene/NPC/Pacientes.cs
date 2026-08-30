@@ -10,6 +10,8 @@ public class Pacientes : MonoBehaviour
     public string dni;
 
     public Transform puertaSalida;
+    public Transform cuartoFacil1;
+
     private bool procesando = false;
     public float velocidadCaminar = 3.5f;
 
@@ -39,7 +41,7 @@ public class Pacientes : MonoBehaviour
         if (procesando) return;
         procesando = true;
         StopAllCoroutines();
-        StartCoroutine(CaminarHacia(puertaSalida, 1.5f, alLlegar: () => gameObject.SetActive(false)));
+        StartCoroutine(CaminarHacia(cuartoFacil1, 1.5f, alLlegar: () => gameObject.SetActive(false)));
     }
 
     IEnumerator CaminarHacia(Transform destino, float delayInicial, System.Action alLlegar)
