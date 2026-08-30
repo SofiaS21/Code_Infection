@@ -11,12 +11,12 @@ public class PickItem : MonoBehaviour
     private bool jugadorCerca;
 
     private Coroutine animacionActual;
-    private Vector3 escalaOriginal; // Guardamos la escala real del canvas
+    public float tiempoMensajeVisible = 5f; // <- nuevo, configurable desde el Inspector
 
     void Start()
     {
+        // Busca automáticamente el CanvasGroup
         canvasGroup = canvasE.GetComponent<CanvasGroup>();
-        escalaOriginal = canvasE.transform.localScale; // Se guarda una sola vez al inicio
 
         // Empieza oculto
         canvasE.SetActive(false);
@@ -32,13 +32,6 @@ public class PickItem : MonoBehaviour
             if (agregado)
             {
                 Debug.Log("Recogido " + gameObject.name);
-                // Si querés que el cartel desaparezca inmediatamente al agarrar el ítem:
-                jugadorCerca = false;
-                if (animacionActual != null) StopCoroutine(animacionActual);
-                animacionActual = StartCoroutine(Ocultar());
-
-                // Aquí probablemente quieras destruir el objeto o desactivarlo
-                // Destroy(gameObject, 0.5f); 
             }
             else
             {
@@ -69,49 +62,47 @@ public class PickItem : MonoBehaviour
             if (animacionActual != null)
                 StopCoroutine(animacionActual);
 
-            animacionActual = StartCoroutine(Ocultar()); // <- Ahora esto sí va a funcionar
+            animacionActual = StartCoroutine(Ocultar());
         }
     }
 
     IEnumerator Mostrar()
     {
         canvasE.SetActive(true);
+
         canvasGroup.alpha = 0;
 
-        Vector3 escalaInicial = escalaOriginal * 0.7f;
+        // Guardamos la escala original
+        Vector3 escalaFinal = canvasE.transform.localScale;
+
+        // Empieza un poquito más pequeño
+        Vector3 escalaInicial = escalaFinal * 0.7f;
+
         canvasE.transform.localScale = escalaInicial;
 
         float t = 0;
+
         while (t < 1)
         {
             t += Time.deltaTime * 5f;
+
+            // Fade in
             canvasGroup.alpha = Mathf.Lerp(0, 1, t);
-            canvasE.transform.localScale = Vector3.Lerp(escalaInicial, escalaOriginal, t);
+
+            // Mini animación de crecimiento
+            canvasE.transform.localScale =
+                Vector3.Lerp(escalaInicial, escalaFinal, t);
+
             yield return null;
         }
 
         canvasGroup.alpha = 1;
-        canvasE.transform.localScale = escalaOriginal;
-    }
-
-    IEnumerator Ocultar()
-    {
-        float t = 0;
-        float alphaInicial = canvasGroup.alpha;
-        Vector3 escalaInicial = canvasE.transform.localScale;
-        Vector3 escalaFinal = escalaOriginal * 0.7f;
-
-        while (t < 1)
-        {
-            t += Time.deltaTime * 5f;
-            canvasGroup.alpha = Mathf.Lerp(alphaInicial, 0, t);
-            canvasE.transform.localScale = Vector3.Lerp(escalaInicial, escalaFinal, t);
-            yield return null;
-        }
-
-        canvasGroup.alpha = 0;
         canvasE.transform.localScale = escalaFinal;
-
-        canvasE.SetActive(false); // Apaga el objeto completo al terminar la animación
     }
-}
+
+    IEnumerator OcultarDespuesDe(float segundos)
+    {
+        yield return new WaitForSeconds(segundos);
+        dialogueText.gameObject.SetActive(false);
+    }
+}   

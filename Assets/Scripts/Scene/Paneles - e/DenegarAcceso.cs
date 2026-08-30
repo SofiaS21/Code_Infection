@@ -5,7 +5,6 @@ using UnityEngine;
 public class DenegarAcceso : MonoBehaviour
 {
     public EsperaNPC esperaNPC;
-
     public GameObject canvasE;
     private CanvasGroup canvasGroup;
     private Coroutine animacionActual;
@@ -19,6 +18,7 @@ public class DenegarAcceso : MonoBehaviour
         canvasE.SetActive(false);
         canvasGroup.alpha = 0;
     }
+
     void Update()   
     {
         if (canvasE.activeSelf && Input.GetKeyDown(KeyCode.E))
