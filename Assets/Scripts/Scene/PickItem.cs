@@ -49,7 +49,7 @@ public class PickItem : MonoBehaviour
             if (animacionActual != null)
                 StopCoroutine(animacionActual);
 
-            animacionActual = StartCoroutine(Mostrar());
+            animacionActual = StartCoroutine(MostrarCartelE());
         }
     }
 
@@ -62,11 +62,11 @@ public class PickItem : MonoBehaviour
             if (animacionActual != null)
                 StopCoroutine(animacionActual);
 
-            animacionActual = StartCoroutine(Ocultar());
+            animacionActual = StartCoroutine(OcultarCartelE ());
         }
     }
 
-    IEnumerator Mostrar()
+    IEnumerator MostrarCartelE()
     {
         canvasE.SetActive(true);
 
@@ -100,7 +100,18 @@ public class PickItem : MonoBehaviour
         canvasE.transform.localScale = escalaFinal;
     }
 
-    IEnumerator OcultarDespuesDe(float segundos)
+    IEnumerator OcultarCartelE()
+    {
+        while (canvasGroup.alpha > 0)
+        {
+            canvasGroup.alpha -= Time.deltaTime * 6f;
+            yield return null;
+        }
+        canvasGroup.alpha = 0;
+        canvasE.SetActive(false);
+    }
+
+    IEnumerator OcultarMensajeDespuesDe(float segundos)
     {
         yield return new WaitForSeconds(segundos);
         dialogueText.gameObject.SetActive(false);

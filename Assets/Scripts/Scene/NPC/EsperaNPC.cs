@@ -11,6 +11,7 @@ public class EsperaNPC : MonoBehaviour
 
     public TMP_Text dialogueText;
     public GameObject panelDialogue;
+    public GameObject inventario;
     public float tiempoMensajeVisible = 5f;
 
     public float velocidadCaminar = 3.5f;
@@ -44,9 +45,11 @@ public class EsperaNPC : MonoBehaviour
     {
         if (pacienteEspera.Count == 0)
         {
+            panelDialogue.SetActive(true);
+            inventario.SetActive(false);
+
             currentVisitor = null;
             dialogueText.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
-            panelDialogue.SetActive(true);
 
             StopAllCoroutines();
             StartCoroutine(OcultarDespuesDe(tiempoMensajeVisible));
@@ -56,6 +59,8 @@ public class EsperaNPC : MonoBehaviour
         {
             currentVisitor = pacienteEspera.Dequeue();
             panelDialogue.SetActive(false);
+            inventario.SetActive(true);
+
         }
     }
 
@@ -64,6 +69,8 @@ public class EsperaNPC : MonoBehaviour
     {
         yield return new WaitForSeconds(segundos);
         panelDialogue.SetActive(false);
+        inventario.SetActive(true);
+
     }
 }
 
