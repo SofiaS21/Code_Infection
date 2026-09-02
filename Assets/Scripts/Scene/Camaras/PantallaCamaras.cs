@@ -3,7 +3,6 @@
 public class PantallaCamaras : MonoBehaviour
 {
     public GameObject canvasE;
-    public CanvasGroup canvasGroup;
     public ControlCamaras sistemaCamaras;
 
     bool jugadorCerca;
@@ -12,7 +11,6 @@ public class PantallaCamaras : MonoBehaviour
     void Start()
     {
         canvasE.SetActive(false);
-        canvasGroup.alpha = 0;
     }
 
     void Update()

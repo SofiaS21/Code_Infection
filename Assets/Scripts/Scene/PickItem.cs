@@ -2,100 +2,60 @@
 using UnityEngine;
 using TMPro;
 
-public class PickItem : MonoBehaviour
+public class PickItem : MonoBehaviour, IInteractable
 {
     public GameObject canvasE;
     public ItemData item;
     public TMP_Text dialogueText;
     private CanvasGroup canvasGroup;
-    private bool jugadorCerca;
-
     private Coroutine animacionActual;
-    public float tiempoMensajeVisible = 5f; // <- nuevo, configurable desde el Inspector
+    public float tiempoMensajeVisible = 5f;
 
     void Start()
     {
-        // Busca automáticamente el CanvasGroup
         canvasGroup = canvasE.GetComponent<CanvasGroup>();
-
-        // Empieza oculto
         canvasE.SetActive(false);
         canvasGroup.alpha = 0;
     }
 
-    void Update()
+    public void OnFocus()
     {
-        if (jugadorCerca && Input.GetKeyDown(KeyCode.E))
-        {
-            bool agregado = Inventario.instancia.AgregarItem(item);
-
-            if (agregado)
-            {
-                Debug.Log("Recogido " + gameObject.name);
-            }
-            else
-            {
-                Debug.Log("Inventario lleno");
-            }
-        }
+        if (animacionActual != null)
+            StopCoroutine(animacionActual);
+        animacionActual = StartCoroutine(MostrarCartelE());
     }
 
-    void OnTriggerEnter(Collider other)
+    public void OnUnfocus()
     {
-        if (other.CompareTag("Player"))
-        {
-            jugadorCerca = true;
-
-            if (animacionActual != null)
-                StopCoroutine(animacionActual);
-
-            animacionActual = StartCoroutine(MostrarCartelE());
-        }
+        if (animacionActual != null)
+            StopCoroutine(animacionActual);
+        animacionActual = StartCoroutine(OcultarCartelE());
     }
 
-    void OnTriggerExit(Collider other)
+    public void Interact()
     {
-        if (other.CompareTag("Player"))
-        {
-            jugadorCerca = false;
-
-            if (animacionActual != null)
-                StopCoroutine(animacionActual);
-
-            animacionActual = StartCoroutine(OcultarCartelE ());
-        }
+        bool agregado = Inventario.instancia.AgregarItem(item);
+        if (agregado)
+            Debug.Log("Recogido " + gameObject.name);
+        else
+            Debug.Log("Inventario lleno");
     }
 
     IEnumerator MostrarCartelE()
     {
         canvasE.SetActive(true);
-
         canvasGroup.alpha = 0;
-
-        // Guardamos la escala original
         Vector3 escalaFinal = canvasE.transform.localScale;
-
-        // Empieza un poquito más pequeño
         Vector3 escalaInicial = escalaFinal * 0.7f;
-
         canvasE.transform.localScale = escalaInicial;
-
         float t = 0;
-
         while (t < 1)
         {
             t += Time.deltaTime * 5f;
-
-            // Fade in
             canvasGroup.alpha = Mathf.Lerp(0, 1, t);
-
-            // Mini animación de crecimiento
-            canvasE.transform.localScale =
-                Vector3.Lerp(escalaInicial, escalaFinal, t);
-
+            canvasE.transform.localScale = Vector3.Lerp(escalaInicial, escalaFinal, t);
             yield return null;
         }
-
         canvasGroup.alpha = 1;
         canvasE.transform.localScale = escalaFinal;
     }
@@ -116,4 +76,4 @@ public class PickItem : MonoBehaviour
         yield return new WaitForSeconds(segundos);
         dialogueText.gameObject.SetActive(false);
     }
-}   
+}
