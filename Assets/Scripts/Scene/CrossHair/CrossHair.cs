@@ -15,7 +15,7 @@ public class CrossHair : MonoBehaviour
     private const float maxSize = 6;
     private const float growSpeed = 15;
 
-    private IInteractable objetoActual; // <- nuevo: guarda a qué objeto le estamos apuntando
+    private IInteractable objetoActual; // <- nuevo: guarda a quï¿½ objeto le estamos apuntando
 
     void Start()
     {
@@ -37,7 +37,7 @@ public class CrossHair : MonoBehaviour
             currentSize = Mathf.MoveTowards(currentSize, maxSize, growSpeed * Time.deltaTime);
             crossHairIntRect.sizeDelta = new Vector2(currentSize, currentSize);
 
-            // --- lógica nueva de interacción ---
+            // --- lï¿½gica nueva de interacciï¿½n ---
             IInteractable interactuable = hit.collider.GetComponent<IInteractable>();
 
             if (interactuable != objetoActual)
@@ -49,6 +49,7 @@ public class CrossHair : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.E))
                 objetoActual?.Interact();
+                
         }
         else
         {
@@ -57,7 +58,7 @@ public class CrossHair : MonoBehaviour
             isInteracting = false;
             currentSize = 4f;
 
-            // dejamos de apuntar a lo que sea que teníamos
+            // dejamos de apuntar a lo que sea que tenï¿½amos
             if (objetoActual != null)
             {
                 objetoActual.OnUnfocus();

@@ -5,8 +5,8 @@ using UnityEngine;
 public class Pacientes : MonoBehaviour
 {
     public string nombre;
-    public sprite imagenCamara;
-    public string dniImagen;
+    public string imagenCamara;
+    public Sprite dniImagen;
     public string dni;
 
     public Transform puertaSalida;
@@ -16,16 +16,11 @@ public class Pacientes : MonoBehaviour
     public float velocidadCaminar = 3.5f;
 
 
-    // Start is called before the first frame update
-    void Start()
+    void OnEnable()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // Cuando este paciente aparece/activa, mostramos su DNI en la UI
+        if (DniDisplay.Instancia != null)   
+            DniDisplay.Instancia.Mostrar(dniImagen);
     }
 
     public void Rechazar()
