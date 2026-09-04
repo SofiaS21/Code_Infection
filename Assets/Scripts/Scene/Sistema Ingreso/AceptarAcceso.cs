@@ -1,7 +1,7 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
-public class DenegarAcceso : MonoBehaviour, IInteractable
+public class AceptarAcceso : MonoBehaviour , IInteractable
 {
     public EsperaNPC esperaNPC;
     public GameObject canvasE;
@@ -31,13 +31,13 @@ public class DenegarAcceso : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        esperaNPC.DenegarAcceso();
-        Debug.Log("Paciente rechazado");
+        esperaNPC.AceptarAcceso();
+        Debug.Log("Paciente Aceptado");
     }
 
     IEnumerator Mostrar()
     {
-        canvasE.SetActive(true);
+        canvasE.SetActive(false);
         canvasGroup.alpha = 0;
         Vector3 escalaFinal = canvasE.transform.localScale;
         Vector3 escalaInicial = escalaFinal * 0.7f;

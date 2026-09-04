@@ -5,7 +5,7 @@ using UnityEngine;
 public class Pacientes : MonoBehaviour
 {
     public string nombre;
-    public string imagenCamara;
+    public sprite imagenCamara;
     public string dniImagen;
     public string dni;
 
