@@ -6,8 +6,7 @@ public class Pacientes : MonoBehaviour
 {
     public string nombre;
     public string imagenCamara;
-    public Sprite dniImagen;
-    public string dni;
+    public Texture dniImagen;
 
     public Transform puertaSalida;
     public Transform cuartoFacil1;

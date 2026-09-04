@@ -7,25 +7,25 @@ public class DniDisplay : MonoBehaviour
 {
  public static DniDisplay Instancia;
 
-    public Image imagenDniUI; // arrastrá acá el Image de tu Canvas donde va la foto del DNI
+    public RawImage imagenDniUI; // arrastrá acá el Image de tu Canvas donde va la foto del DNI
 
     void Awake()
     {
         Instancia = this;
     }
 
-    public void Mostrar(Sprite sprite)
+    public void Mostrar(Texture textura)
     {
         if (imagenDniUI == null) return;
 
-        if (sprite == null)
+        if (textura == null)
         {
             // Todavía no tenés la imagen final, se oculta para no romper nada
             imagenDniUI.enabled = false;
             return;
         }
 
-        imagenDniUI.sprite = sprite;
+        imagenDniUI.texture = textura;
         imagenDniUI.enabled = true;
     }
 

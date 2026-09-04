@@ -11,7 +11,8 @@ public class DniMostrar : MonoBehaviour , IInteractable
     public void Interact()
     {
         dniUI.SetActive(true);
-
+        
+        Debug.Log("Mostrar DNI");
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
