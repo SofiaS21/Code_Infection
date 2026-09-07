@@ -2,60 +2,49 @@
 
 public class PantallaCamaras : MonoBehaviour
 {
-    public GameObject canvasE;
     public ControlCamaras sistemaCamaras;
 
-    bool jugadorCerca;
-    bool viendoCamaras;
+    [Header("Detección por Crosshair")]
+    public Camera camaraJugador;
+    public float distanciaMaxima = 3f;
+    public LayerMask capaInteractuable;
 
-    void Start()
-    {
-        canvasE.SetActive(false);
-    }
+    bool mirandoTele;
+    bool viendoCamaras;
 
     void Update()
     {
-        if (jugadorCerca && Input.GetKeyDown(KeyCode.E))
-        {
-            if (!viendoCamaras) EntrarCamaras();
-            else SalirCamaras();
-        }
+        DetectarConCrosshair();
 
-        if (!jugadorCerca && viendoCamaras)
-            SalirCamaras();
+        // Click izquierdo = "tocar" la tele
+        if (mirandoTele && !viendoCamaras && Input.GetMouseButtonDown(0))
+        {
+            EntrarCamaras();
+        }
+    }
+
+    void DetectarConCrosshair()
+    {
+        if (camaraJugador == null) return;
+
+        Ray ray = camaraJugador.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, distanciaMaxima, capaInteractuable))
+            mirandoTele = hit.collider.gameObject == this.gameObject;
+        else
+            mirandoTele = false;
     }
 
     void EntrarCamaras()
     {
         viendoCamaras = true;
         sistemaCamaras.Activar();
-        canvasE.SetActive(false);
     }
 
-    void SalirCamaras()
+    public void SalirCamaras()
     {
         viendoCamaras = false;
         sistemaCamaras.Desactivar();
-
-        if (jugadorCerca)
-            canvasE.SetActive(true);
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            jugadorCerca = true;
-            if (!viendoCamaras) canvasE.SetActive(true);
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            jugadorCerca = false;
-            canvasE.SetActive(false);
-        }
     }
 }

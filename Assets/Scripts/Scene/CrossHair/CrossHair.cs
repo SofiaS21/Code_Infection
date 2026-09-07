@@ -47,8 +47,10 @@ public class CrossHair : MonoBehaviour
                 objetoActual?.OnFocus();
             }
 
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.E))
+            {
                 objetoActual?.Interact();
+            }
                 
         }
         else
