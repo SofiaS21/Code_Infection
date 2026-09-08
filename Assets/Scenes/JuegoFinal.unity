@@ -539,7 +539,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b8770666fdf65cc41b4c8838c8626d1a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 7.902221
+      value: 7.728
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b8770666fdf65cc41b4c8838c8626d1a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1380,7 +1380,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10.682221
+      value: 10.573
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1449,7 +1449,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f859823c25e2a594bac4a9877652828b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.7
+      value: 4.52
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f859823c25e2a594bac4a9877652828b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2948,6 +2948,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mesa lobby
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: afaae83194c33fc44a04ffffb99f51c0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3308,6 +3312,80 @@ Transform:
   - {fileID: 1892348249}
   m_Father: {fileID: 2053352675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &812065018
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2053352675}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.27062148
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.2634147
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.34268916
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -184.67
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -37.81
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -21.63
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.000000014901161
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.000000044703484
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.000000029802322
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+      propertyPath: m_Name
+      value: mesa nueva
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+--- !u!4 &812065019 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 11d85492e83205f40ba3685aeda3290a, type: 3}
+  m_PrefabInstance: {fileID: 812065018}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &812243101 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b8770666fdf65cc41b4c8838c8626d1a, type: 3}
@@ -6154,6 +6232,14 @@ PrefabInstance:
       value: 1.431
       objectReference: {fileID: 0}
     - target: {fileID: 8006904619469120601, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
+      propertyPath: m_textAlignment
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 8006904619469120601, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8006904619469120601, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
       propertyPath: m_textInfo.lineCount
       value: 0
       objectReference: {fileID: 0}
@@ -6164,6 +6250,10 @@ PrefabInstance:
     - target: {fileID: 8006904619469120601, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
       propertyPath: m_textInfo.wordCount
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8006904619469120601, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8006904619469120601, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
       propertyPath: m_textInfo.spaceCount
@@ -7269,6 +7359,7 @@ Transform:
   m_Children:
   - {fileID: 810269240}
   - {fileID: 2034191631}
+  - {fileID: 812065019}
   - {fileID: 742246484}
   - {fileID: 14692752}
   m_Father: {fileID: 2017805144}
