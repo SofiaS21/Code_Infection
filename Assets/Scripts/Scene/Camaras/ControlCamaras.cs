@@ -40,7 +40,7 @@ public class ControlCamaras : MonoBehaviour
     {
         camaras[indiceActual].enabled = false;
         panelCamaras.SetActive(false);
-        panelInventario.SetActive(false);
+        panelInventario.SetActive(true);
     }
 
     void CambiarCamara(int direccion)

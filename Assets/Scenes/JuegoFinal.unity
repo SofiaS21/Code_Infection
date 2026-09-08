@@ -1123,6 +1123,10 @@ PrefabInstance:
       value: PantallaCamaras
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 1319cc14e562fe1458fcc6c5fec8918e, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1319cc14e562fe1458fcc6c5fec8918e, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
@@ -1132,7 +1136,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1319cc14e562fe1458fcc6c5fec8918e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 614814299}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1319cc14e562fe1458fcc6c5fec8918e, type: 3}
       insertIndex: -1
@@ -1945,6 +1952,89 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3890201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &614814298
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 614814299}
+  - component: {fileID: 614814302}
+  - component: {fileID: 614814301}
+  m_Layer: 3
+  m_Name: Punto de atencion
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &614814299
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 614814298}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -32.3, y: -14.2, z: 0}
+  m_LocalScale: {x: 89.6082, y: 12.5483, z: 162.77148}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 681161071}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &614814301
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 614814298}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &614814302
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 614814298}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &651515186
 GameObject:
   m_ObjectHideFlags: 0
@@ -2123,10 +2213,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sistemaCamaras: {fileID: 1728822088}
   camaraJugador: {fileID: 830403085}
-  distanciaMaxima: 3
+  distanciaMaxima: 10
   capaInteractuable:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
+  player: {fileID: 1699343872}
+  puntoAtencion: {fileID: 614814299}
+  distanciaSalida: 4
 --- !u!65 &681161075
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2146,8 +2239,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 103.07721, y: 5.701247, z: 175.6087}
-  m_Center: {x: -34.36313, y: -0.4539911, z: -0.2371612}
+  m_Size: {x: 103.0772, y: 31.819233, z: 175.6087}
+  m_Center: {x: -34.36318, y: -13.51301, z: -0.23715965}
 --- !u!1001 &691785634
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3074,7 +3167,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!225 &798588092
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3810,6 +3903,9 @@ MonoBehaviour:
   capaInteractuable:
     serializedVersion: 2
     m_Bits: 0
+  player: {fileID: 0}
+  puntoAtencion: {fileID: 0}
+  distanciaSalida: 4
 --- !u!1 &980363086
 GameObject:
   m_ObjectHideFlags: 0

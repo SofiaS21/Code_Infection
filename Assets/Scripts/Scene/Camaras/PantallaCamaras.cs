@@ -9,6 +9,11 @@ public class PantallaCamaras : MonoBehaviour
     public float distanciaMaxima = 3f;
     public LayerMask capaInteractuable;
 
+    [Header("Salida por distancia")]
+    public Transform player;
+    public Transform puntoAtencion;
+    public float distanciaSalida = 4f;
+
     bool mirandoTele;
     bool viendoCamaras;
 
@@ -21,30 +26,53 @@ public class PantallaCamaras : MonoBehaviour
         {
             EntrarCamaras();
         }
-    }
 
-    void DetectarConCrosshair()
-    {
-        if (camaraJugador == null) return;
+        if (mirandoTele && !viendoCamaras && Input.GetMouseButtonDown(0))
+        {
+            EntrarCamaras();
+        }
 
-        Ray ray = camaraJugador.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        RaycastHit hit;
+        if (viendoCamaras)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                SalirCamaras();
+                return;
+            }
 
-        if (Physics.Raycast(ray, out hit, distanciaMaxima, capaInteractuable))
-            mirandoTele = hit.collider.gameObject == this.gameObject;
-        else
-            mirandoTele = false;
-    }
+            if (player != null && puntoAtencion != null)
+            {
+                float distancia = Vector3.Distance(player.position, puntoAtencion.position);
+                if (distancia > distanciaSalida)
+                    SalirCamaras();
+            }
 
-    void EntrarCamaras()
-    {
-        viendoCamaras = true;
-        sistemaCamaras.Activar();
-    }
+        }
 
-    public void SalirCamaras()
-    {
-        viendoCamaras = false;
-        sistemaCamaras.Desactivar();
+        void DetectarConCrosshair()
+        {
+            if (camaraJugador == null) return;
+
+            Ray ray = camaraJugador.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, distanciaMaxima, capaInteractuable))
+                mirandoTele = hit.collider.gameObject == this.gameObject;
+            else
+                mirandoTele = false;
+        }
+
+
+        void EntrarCamaras()
+        {
+            viendoCamaras = true;
+            sistemaCamaras.Activar();
+        }
+
+        void SalirCamaras()
+        {
+            viendoCamaras = false;
+            sistemaCamaras.Desactivar();
+        }
     }
 }
