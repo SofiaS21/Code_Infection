@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+
 
 public class Pacientes : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class Pacientes : MonoBehaviour
     public string nombre;
     public string imagenCamara;
     public Texture dniImagen;
+    public string dniFechaVencimiento;
 
     public Transform puertaSalida;
     public Transform cuartoFacil1;

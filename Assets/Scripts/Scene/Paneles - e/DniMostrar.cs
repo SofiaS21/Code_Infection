@@ -28,9 +28,15 @@ public class DniMostrar : MonoBehaviour, IInteractable
 
     void Abrir()
     {
-        if (Pacientes.Actual == null) return; // no hay paciente activo, no mostramos nada
 
-        DniDisplay.Instancia.Mostrar(Pacientes.Actual.dniImagen); // carga la textura del paciente actual
+        if (Pacientes.Actual == null) return;
+
+        DniDisplay.Instancia.Mostrar(
+            Pacientes.Actual.dniImagen,
+            Pacientes.Actual.nombre,
+            Pacientes.Actual.dniFechaVencimiento
+        );
+
         dniUI.SetActive(true);
         abierto = true;
 
