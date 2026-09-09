@@ -1,20 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-
-public class DniMostrar : MonoBehaviour , IInteractable
+public class DniMostrar : MonoBehaviour, IInteractable
 {
     public GameObject dniUI;
 
     [Header("Cierre automático al alejarse")]
-    public Transform jugador;       // arrastrá tu FPSController acá
+    public Transform jugador;
     public float distanciaMaxima = 3f;
+
+    bool abierto;
 
     void Update()
     {
-        if (dniUI != null && dniUI.activeSelf && jugador != null)
+        if (abierto && jugador != null)
         {
             float distancia = Vector3.Distance(jugador.position, transform.position);
             if (distancia > distanciaMaxima)
@@ -24,28 +22,30 @@ public class DniMostrar : MonoBehaviour , IInteractable
 
     public void Interact()
     {
-        if (dniUI.activeSelf)
-            Cerrar();
-        else
-            Abrir();
+        if (abierto) Cerrar();
+        else Abrir();
     }
 
     void Abrir()
     {
+        if (Pacientes.Actual == null) return; // no hay paciente activo, no mostramos nada
+
+        DniDisplay.Instancia.Mostrar(Pacientes.Actual.dniImagen); // carga la textura del paciente actual
         dniUI.SetActive(true);
-        Debug.Log("Mostrar DNI");
+        abierto = true;
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
     }
 
     void Cerrar()
     {
         dniUI.SetActive(false);
-        Debug.Log("Ocultar DNI");
+        DniDisplay.Instancia.Ocultar();
+        abierto = false;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
     }
 
     public void OnFocus() { }

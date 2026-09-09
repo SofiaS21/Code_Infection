@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Pacientes : MonoBehaviour
 {
+    public static Pacientes Actual;
+
     public string nombre;
     public string imagenCamara;
     public Texture dniImagen;
@@ -14,12 +16,15 @@ public class Pacientes : MonoBehaviour
     private bool procesando = false;
     public float velocidadCaminar = 3.5f;
 
-
     void OnEnable()
     {
-        // Cuando este paciente aparece/activa, mostramos su DNI en la UI
-        if (DniDisplay.Instancia != null)   
-            DniDisplay.Instancia.Mostrar(dniImagen);
+        Actual = this; // este paciente pasa a ser "el actual"
+    }
+
+    private void OnDisable()
+    {
+        if (Actual == this)
+            Actual = null;
     }
 
     public void Rechazar()
