@@ -12,6 +12,7 @@ public class EsperaNPC : MonoBehaviour
     public TMP_Text dialogueText;
     public GameObject panelDialogue;
     public GameObject inventario;
+    public Animator anim;
     public float tiempoMensajeVisible = 5f;
 
     public float velocidadCaminar = 3.5f;
@@ -22,6 +23,8 @@ public class EsperaNPC : MonoBehaviour
         {
             pacienteEspera.Enqueue(patient);
         }
+
+        anim = GetComponent<Animator>();
 
         panelDialogue.gameObject.SetActive(false);
         ProximoPaciente();

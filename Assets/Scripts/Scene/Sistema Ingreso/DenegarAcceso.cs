@@ -6,6 +6,7 @@ public class DenegarAcceso : MonoBehaviour, IInteractable
     public EsperaNPC esperaNPC;
     public GameObject canvasE;
     private CanvasGroup canvasGroup;
+    public Animator anim;   
     private Coroutine animacionActual;
 
     private void Start()
@@ -13,6 +14,9 @@ public class DenegarAcceso : MonoBehaviour, IInteractable
         canvasGroup = canvasE.GetComponent<CanvasGroup>();
         canvasE.SetActive(false);
         canvasGroup.alpha = 0;
+
+        if (anim == null)
+            anim = GetComponent<Animator>();
     }
 
     public void OnFocus()
@@ -32,6 +36,7 @@ public class DenegarAcceso : MonoBehaviour, IInteractable
     public void Interact()
     {
         esperaNPC.DenegarAcceso();
+        StartCoroutine(AnimarBoton())
         Debug.Log("Paciente rechazado");
     }
 

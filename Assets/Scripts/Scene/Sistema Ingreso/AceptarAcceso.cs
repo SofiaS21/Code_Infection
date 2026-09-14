@@ -6,6 +6,7 @@ public class AceptarAcceso : MonoBehaviour , IInteractable
     public EsperaNPC esperaNPC;
     public GameObject canvasE;
     private CanvasGroup canvasGroup;
+    public Animator anim;
     private Coroutine animacionActual;
 
     private void Start()
@@ -13,6 +14,9 @@ public class AceptarAcceso : MonoBehaviour , IInteractable
         canvasGroup = canvasE.GetComponent<CanvasGroup>();
         canvasE.SetActive(false);
         canvasGroup.alpha = 0;
+
+        if (anim == null)
+            anim = GetComponent<Animator>();
     }
 
     public void OnFocus()
@@ -32,7 +36,15 @@ public class AceptarAcceso : MonoBehaviour , IInteractable
     public void Interact()
     {
         esperaNPC.AceptarAcceso();
+        StartCoroutine(AnimarBoton());  
         Debug.Log("Paciente Aceptado");
+    }
+
+    IEnumerator AnimarBoton()
+    {
+        anim.SetBool("Presionar", true);
+        yield return new WaitForSeconds(0.3f); 
+        anim.SetBool("Presionar", false);
     }
 
     IEnumerator Mostrar()
