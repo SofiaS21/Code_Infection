@@ -2989,7 +2989,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   esperaNPC: {fileID: 542792553}
   canvasE: {fileID: 573544234}
-  anim: {fileID: 0}
+  animadorBoton: {fileID: 0}
+  triggerPresionar: Presionar
 --- !u!135 &739735967
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -7339,7 +7340,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   esperaNPC: {fileID: 542792553}
   canvasE: {fileID: 886300728}
-  anim: {fileID: 2118733828}
+  animadorBoton: {fileID: 2118733828}
+  triggerPresionar: Presionar
 --- !u!135 &2000288800
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -7734,7 +7736,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 79df7c41242249a488767971050c70bc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.04000175
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 79df7c41242249a488767971050c70bc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -7742,7 +7744,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 79df7c41242249a488767971050c70bc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.15688562
+      value: 0.16
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 79df7c41242249a488767971050c70bc, type: 3}
       propertyPath: m_LocalRotation.w

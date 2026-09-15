@@ -1,12 +1,18 @@
 using System.Collections;
 using UnityEngine;
 
-public class AceptarAcceso : MonoBehaviour , IInteractable
+public class AceptarAcceso : MonoBehaviour, IInteractable
 {
     public EsperaNPC esperaNPC;
     public GameObject canvasE;
+
+    [Header("Animacion del boton")]
+    [Tooltip("Arrastra aca el Animator del boton (el que tiene la animacion de presionado). Si lo dejas vacio, se busca automaticamente en este objeto o en sus hijos.")]
+    public Animator animadorBoton;
+    [Tooltip("Nombre del parametro Trigger del Animator Controller que dispara la animacion.")]
+    public string triggerPresionar = "Presionar";
+
     private CanvasGroup canvasGroup;
-    public Animator anim;
     private Coroutine animacionActual;
 
     private void Start()
@@ -15,8 +21,8 @@ public class AceptarAcceso : MonoBehaviour , IInteractable
         canvasE.SetActive(false);
         canvasGroup.alpha = 0;
 
-        if (anim == null)
-            anim = GetComponent<Animator>();
+        if (animadorBoton == null)
+            animadorBoton = GetComponentInChildren<Animator>();
     }
 
     public void OnFocus()
@@ -35,16 +41,11 @@ public class AceptarAcceso : MonoBehaviour , IInteractable
 
     public void Interact()
     {
-        esperaNPC.AceptarAcceso();
-        StartCoroutine(AnimarBoton());  
-        Debug.Log("Paciente Aceptado");
-    }
+        if (animadorBoton != null)
+            animadorBoton.SetTrigger(triggerPresionar);
 
-    IEnumerator AnimarBoton()
-    {
-        anim.SetBool("Presionar", true);
-        yield return new WaitForSeconds(0.3f); 
-        anim.SetBool("Presionar", false);
+        esperaNPC.AceptarAcceso();
+        Debug.Log("Paciente Aceptado");
     }
 
     IEnumerator Mostrar()
