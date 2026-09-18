@@ -18,6 +18,8 @@ public class Pacientes : MonoBehaviour
 
     private bool procesando = false;
     public float velocidadCaminar = 3.5f;
+
+    public Animator anim;
     public Animator animAceptar;
     public Animator animRechazar;
 
@@ -56,12 +58,18 @@ public class Pacientes : MonoBehaviour
     {
         yield return new WaitForSeconds(delayInicial);
 
+        if (anim != null)
+            anim.SetBool("Caminando", true);
+
         while (Vector3.Distance(transform.position, destino.position) > 0.15f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destino.position, velocidadCaminar * Time.deltaTime);
             transform.rotation = Quaternion.LookRotation(destino.position - transform.position);
             yield return null;
         }
+
+        if (anim != null)
+            anim.SetBool("Caminando", false);
 
         alLlegar?.Invoke();
     }

@@ -2824,8 +2824,9 @@ MonoBehaviour:
   puertaSalida: {fileID: 1214151433}
   cuartoFacil1: {fileID: 1325839677}
   velocidadCaminar: 3.5
-  animAceptar: {fileID: 0}
-  animRechazar: {fileID: 0}
+  anim: {fileID: 718439239}
+  animAceptar: {fileID: 2118733828}
+  animRechazar: {fileID: 1445169705}
 --- !u!114 &718439236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2888,6 +2889,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!95 &718439239
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 704820616}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a5aa68abc98bd6b40839a85355fa8a01, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &723698182
 GameObject:
   m_ObjectHideFlags: 0
@@ -3784,6 +3806,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f4e58bbdcef45e248b19ca73c4f288ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 718439238}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f4e58bbdcef45e248b19ca73c4f288ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 718439239}
   m_SourcePrefab: {fileID: 100100000, guid: f4e58bbdcef45e248b19ca73c4f288ca, type: 3}
 --- !u!1 &830403073 stripped
 GameObject:
