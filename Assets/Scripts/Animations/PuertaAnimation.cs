@@ -4,27 +4,51 @@ using UnityEngine;
 
 public class PuertaAnimation : MonoBehaviour
 {
-
     public Animator anim;
-    public float distanciaMaxima = 3f;
+
+    [Header("Rango de interacción")]
+    public float rangoFrente = 3f;   // alcance hacia adelante/atrás (más largo)
+    public float rangoCostado = 1f;  // alcance hacia los lados (más corto)
 
     private Transform jugador;
+    private bool puertaAbierta = false;
 
-    // Start is called before the first frame update
     void Start()
     {
         anim = GetComponent<Animator>();
-        jugador = GameObject.FindGameObjectWithTag("Player").transform; 
+        jugador = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnMouseDown()
     {
-        float distancia = Vector3.Distance(transform.position, jugador.position);
-
-        if (distancia <= distanciaMaxima)
+        if (Input.GetMouseButtonDown(0))
         {
-            anim.SetTrigger("Presionar");
+            if (JugadorEnRango())
+            {
+                puertaAbierta = !puertaAbierta;
+                anim.SetBool("PuertaAbierta", puertaAbierta);
+            }
+            else
+            {
+                Debug.Log("Estás muy lejos o de costado a la puerta");
+            }
         }
+    }
+
+    bool JugadorEnRango()
+    {
+
+        Vector3 posLocal = transform.InverseTransformPoint(jugador.position);
+        bool dentroFrente = Mathf.Abs(posLocal.z) <= rangoFrente;
+        bool dentroCostado = Mathf.Abs(posLocal.x) <= rangoCostado;
+
+        return dentroFrente && dentroCostado;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.matrix = transform.localToWorldMatrix;
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(rangoCostado * 2, 2f, rangoFrente * 2));
     }
 }

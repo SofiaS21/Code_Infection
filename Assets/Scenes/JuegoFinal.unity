@@ -2825,8 +2825,6 @@ MonoBehaviour:
   cuartoFacil1: {fileID: 1325839677}
   velocidadCaminar: 3.5
   anim: {fileID: 718439239}
-  animAceptar: {fileID: 2118733828}
-  animRechazar: {fileID: 1445169705}
 --- !u!114 &718439236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2898,7 +2896,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 704820616}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
+  m_Avatar: {fileID: 9000000, guid: f4e58bbdcef45e248b19ca73c4f288ca, type: 3}
   m_Controller: {fileID: 9100000, guid: a5aa68abc98bd6b40839a85355fa8a01, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0

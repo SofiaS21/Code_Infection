@@ -20,8 +20,6 @@ public class Pacientes : MonoBehaviour
     public float velocidadCaminar = 3.5f;
 
     public Animator anim;
-    public Animator animAceptar;
-    public Animator animRechazar;
 
     void OnEnable()
     {
@@ -40,8 +38,8 @@ public class Pacientes : MonoBehaviour
         procesando = true;
         StopAllCoroutines();
         StartCoroutine(CaminarHacia(puertaSalida, 1.5f, alLlegar: () => gameObject.SetActive(false)));
-        if (animRechazar != null)
-            animRechazar.SetTrigger("Golpe");
+        if (anim != null)
+            anim.SetTrigger("Golpe");
     }
 
     public void Aceptar()
@@ -50,16 +48,17 @@ public class Pacientes : MonoBehaviour
         procesando = true;
         StopAllCoroutines();
         StartCoroutine(CaminarHacia(cuartoFacil1, 1.5f, alLlegar: () => gameObject.SetActive(false)));
-        if (animAceptar != null)
-            animAceptar.SetTrigger("Bailar");
+        if (anim != null)
+            anim.SetTrigger("Bailar");
     }
 
     IEnumerator CaminarHacia(Transform destino, float delayInicial, System.Action alLlegar)
     {
-        yield return new WaitForSeconds(delayInicial);
 
         if (anim != null)
             anim.SetBool("Caminando", true);
+
+        yield return new WaitForSeconds(delayInicial);
 
         while (Vector3.Distance(transform.position, destino.position) > 0.15f)
         {
