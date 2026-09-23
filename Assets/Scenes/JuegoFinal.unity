@@ -283,7 +283,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 651515187}
-  - {fileID: 481672014}
   m_Father: {fileID: 670183774}
   m_LocalEulerAnglesHint: {x: 0, y: 81.449, z: 180}
   m_AnchorMin: {x: 0, y: 0}
@@ -1602,17 +1601,17 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 481672013}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.00003450421}
-  m_LocalScale: {x: 3.3951428, y: 1.8768061, z: 1.8768064}
+  m_LocalPosition: {x: 0, y: 0, z: -0.000028119906}
+  m_LocalScale: {x: 7.8166056, y: 4.320953, z: 4.320954}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 97967566}
   - {fileID: 333570486}
-  m_Father: {fileID: 46044424}
+  m_Father: {fileID: 651515187}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -204.13138, y: 0}
+  m_AnchoredPosition: {x: 1.9998932, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &481672015
@@ -2123,6 +2122,7 @@ MonoBehaviour:
   dialogueText: {fileID: 537699767}
   panelDialogue: {fileID: 1073806488}
   inventario: {fileID: 2023281324}
+  tarjetaDNI: {fileID: 670183770}
   anim: {fileID: 542792555}
   tiempoMensajeVisible: 4
   velocidadCaminar: 2
@@ -2373,7 +2373,7 @@ GameObject:
   - component: {fileID: 651515189}
   - component: {fileID: 651515188}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: PanelDNI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2390,7 +2390,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.43435, y: 0.43435, z: 0.43435}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 481672014}
   m_Father: {fileID: 46044424}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2513,8 +2514,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dniUI: {fileID: 46044420}
+  panelRect: {fileID: 651515187}
   jugador: {fileID: 830403074}
   distanciaMaxima: 3.5
+  escalaMinima: 0.4
+  velocidadEscala: 8
 --- !u!1 &681161070 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1319cc14e562fe1458fcc6c5fec8918e, type: 3}
@@ -2575,6 +2579,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2104117195}
     m_Modifications:
+    - target: {fileID: 8006904619094157215, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
+      propertyPath: m_Name
+      value: Panel e
+      objectReference: {fileID: 0}
     - target: {fileID: 8006904619469120601, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
       propertyPath: m_text
       value: 'e
@@ -4559,6 +4567,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6373448117581457551, guid: bef2ac14d10f087499981c9c1fd1ba7b, type: 3}
+      propertyPath: m_Name
+      value: Panel rechazar
+      objectReference: {fileID: 0}
     - target: {fileID: 7570297617185795172, guid: bef2ac14d10f087499981c9c1fd1ba7b, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -6016,7 +6028,7 @@ GameObject:
   - component: {fileID: 1466254916}
   - component: {fileID: 1466254915}
   m_Layer: 0
-  m_Name: Panel
+  m_Name: Panel camaras
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6403,7 +6415,7 @@ GameObject:
   - component: {fileID: 1651280109}
   - component: {fileID: 1651280108}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Panel mirarcamaras
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6634,6 +6646,10 @@ PrefabInstance:
     - target: {fileID: 8006904619094157214, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.27701357
+      objectReference: {fileID: 0}
+    - target: {fileID: 8006904619094157215, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
+      propertyPath: m_Name
+      value: Panel recolectar
       objectReference: {fileID: 0}
     - target: {fileID: 8006904619469120598, guid: 4927c6e51645a974e907eeac0034c02f, type: 3}
       propertyPath: m_LocalScale.x
@@ -7233,6 +7249,10 @@ PrefabInstance:
     - target: {fileID: 4171615313703932298, guid: 1de698e1c6ae9bb499736779312e8c0b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5800742885678696622, guid: 1de698e1c6ae9bb499736779312e8c0b, type: 3}
+      propertyPath: m_Name
+      value: Panel acceptar
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

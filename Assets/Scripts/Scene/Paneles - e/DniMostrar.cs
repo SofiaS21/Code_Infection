@@ -3,21 +3,40 @@ using UnityEngine;
 public class DniMostrar : MonoBehaviour, IInteractable
 {
     public GameObject dniUI;
+    public RectTransform panelRect; // el RectTransform del panel que se agranda/achica
 
     [Header("Cierre automático al alejarse")]
     public Transform jugador;
     public float distanciaMaxima = 3f;
 
+    [Header("Animación de escala")]
+    public float escalaMinima = 0.4f;   
+    public float velocidadEscala = 8f; 
+
     bool abierto;
 
     void Update()
     {
-        if (abierto && jugador != null)
+        if (!abierto) return;
+
+        if (jugador == null) return;
+
+        float distancia = Vector3.Distance(jugador.position, transform.position);
+
+        if (distancia > distanciaMaxima)
         {
-            float distancia = Vector3.Distance(jugador.position, transform.position);
-            if (distancia > distanciaMaxima)
-                Cerrar();
+            Cerrar();
+            return;
         }
+
+        float factor = 1f - (distancia / distanciaMaxima); // 1 = pegado, 0 = en el límite
+        float escalaObjetivo = Mathf.Lerp(escalaMinima, 1f, factor);
+
+        panelRect.localScale = Vector3.Lerp(
+            panelRect.localScale,
+            Vector3.one * escalaObjetivo,
+            Time.deltaTime * velocidadEscala
+        );
     }
 
     public void Interact()
@@ -28,7 +47,6 @@ public class DniMostrar : MonoBehaviour, IInteractable
 
     void Abrir()
     {
-
         if (Pacientes.Actual == null) return;
 
         DniDisplay.Instancia.Mostrar(
@@ -37,6 +55,7 @@ public class DniMostrar : MonoBehaviour, IInteractable
             Pacientes.Actual.dniFechaVencimiento
         );
 
+        panelRect.localScale = Vector3.zero; // arranca invisible/chiquito -> el Update lo hace "crecer"
         dniUI.SetActive(true);
         abierto = true;
 

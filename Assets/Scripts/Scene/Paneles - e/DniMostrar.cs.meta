@@ -3,7 +3,10 @@ guid: a6ce525bf2ab02a4c953e68f2ed03af3
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - dniUI: {instanceID: 0}
+  - panelRect: {instanceID: 0}
+  - jugador: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -12,6 +12,7 @@ public class EsperaNPC : MonoBehaviour
     public TMP_Text dialogueText;
     public GameObject panelDialogue;
     public GameObject inventario;
+    public GameObject tarjetaDNI;
     public Animator anim;
     public float tiempoMensajeVisible = 5f;
 
@@ -32,13 +33,16 @@ public class EsperaNPC : MonoBehaviour
 
     public void DenegarAcceso()
     {
+        tarjetaDNI.gameObject.SetActive(false);
         if (currentVisitor == null) return;
         currentVisitor.Rechazar();
         ProximoPaciente();
+
     }
 
     public void AceptarAcceso()
     {
+        tarjetaDNI.gameObject.SetActive(false);
         if (currentVisitor == null) return;
         currentVisitor.Aceptar();
         ProximoPaciente();
