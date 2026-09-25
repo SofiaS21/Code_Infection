@@ -4,7 +4,6 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.AI;
 
-
 public class Pacientes : MonoBehaviour
 {
     public static Pacientes Actual;
@@ -18,34 +17,56 @@ public class Pacientes : MonoBehaviour
     public Transform cuartoFacil1;
     public Transform counter;
 
+    [Tooltip("Rotacion (en grados, Euler) que va a tener el personaje al llegar al counter")]
+    public Vector3 rotacionEnCounter = new Vector3(0f, 90f, 0f);
+
     private bool procesando = false;
     public float velocidadCaminar = 3.5f;
     private bool dialogoEntrada = false;
     private NavMeshAgent agent;
 
-
-    public Animator anim; 
+    public Animator anim;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
 
-        if (agent != null && counter != null);
-            agent.SetDestination(counter.position);
-    }
-
-    private void Update()
-    {
-        if(!dialogoEntrada && counter  != null)
+        if (agent != null)
         {
-            float distancia = Vector3.Distance(transform.position, counter.position);
-            if (distancia <= 0.3f)
-            {
-                dialogoEntrada = true;
+            agent.speed = velocidadCaminar;
 
-                
+            if (counter != null)
+            {
+                StartCoroutine(IrHaciaCounter());
             }
         }
+    }
+
+    IEnumerator IrHaciaCounter()
+    {
+        agent.isStopped = false;
+        agent.SetDestination(counter.position);
+
+        if (anim != null)
+            anim.SetBool("Caminando", true);
+
+        // Esperamos a que Unity termine de calcular el path antes de medir distancia
+        yield return null;
+        while (agent.pathPending)
+            yield return null;
+
+        while (agent.remainingDistance > agent.stoppingDistance)
+            yield return null;
+
+        agent.isStopped = true;
+        transform.rotation = Quaternion.Euler(rotacionEnCounter); // fuerza la rotacion al llegar
+
+        dialogoEntrada = true;
+
+        if (anim != null)
+            anim.SetBool("Caminando", false); // vuelve a Idle
+
+        // Aca podes disparar el dialogo de recepcion (ej: abrir UI, llamar a otro metodo, etc)
     }
 
     void OnEnable()
@@ -82,7 +103,7 @@ public class Pacientes : MonoBehaviour
 
     IEnumerator EsperarAnimacionYCaminar(Transform destino, System.Action alLlegar)
     {
-        // Esperamos un frame para que el Animator procese la transición del trigger
+        // Esperamos un frame para que el Animator procese la transicion del trigger
         yield return null;
 
         if (anim != null)
@@ -96,11 +117,35 @@ public class Pacientes : MonoBehaviour
         if (anim != null)
             anim.SetBool("Caminando", true);
 
-        while (Vector3.Distance(transform.position, destino.position) > 0.15f)
+        if (agent != null && destino != null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, destino.position, velocidadCaminar * Time.deltaTime);
-            transform.rotation = Quaternion.LookRotation(destino.position - transform.position);
+            agent.isStopped = false;
+            agent.SetDestination(destino.position);
+
+            // Esperamos un frame extra a que Unity termine de calcular el path
             yield return null;
+            while (agent.pathPending)
+            {
+                yield return null;
+            }
+
+            // Reciï¿½n ahora remainingDistance refleja el path nuevo, no el anterior
+            while (agent.remainingDistance > agent.stoppingDistance)
+            {
+                yield return null;
+            }
+
+            agent.isStopped = true;
+        }
+        else
+        {
+            // Fallback por si no hay NavMeshAgent en este objeto
+            while (Vector3.Distance(transform.position, destino.position) > 0.15f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, destino.position, velocidadCaminar * Time.deltaTime);
+                transform.rotation = Quaternion.LookRotation(destino.position - transform.position);
+                yield return null;
+            }
         }
 
         if (anim != null)
