@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.AI;
 
 
 public class Pacientes : MonoBehaviour
@@ -15,11 +16,37 @@ public class Pacientes : MonoBehaviour
 
     public Transform puertaSalida;
     public Transform cuartoFacil1;
+    public Transform counter;
 
     private bool procesando = false;
     public float velocidadCaminar = 3.5f;
+    private bool dialogoEntrada = false;
+    private NavMeshAgent agent;
 
-    public Animator anim;
+
+    public Animator anim; 
+
+    void Start()
+    {
+        agent = GetComponent<NavMeshAgent>();
+
+        if (agent != null && counter != null);
+            agent.SetDestination(counter.position);
+    }
+
+    private void Update()
+    {
+        if(!dialogoEntrada && counter  != null)
+        {
+            float distancia = Vector3.Distance(transform.position, counter.position);
+            if (distancia <= 0.3f)
+            {
+                dialogoEntrada = true;
+
+                
+            }
+        }
+    }
 
     void OnEnable()
     {
