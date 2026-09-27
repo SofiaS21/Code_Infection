@@ -12,10 +12,13 @@ public class Pacientes : MonoBehaviour
     public string imagenCamara;
     public Texture dniImagen;
     public string dniFechaVencimiento;
+    public GameObject tarjetaDNI;
+
 
     public Transform puertaSalida;
     public Transform cuartoFacil1;
     public Transform counter;
+
 
     [Tooltip("Rotacion (en grados, Euler) que va a tener el personaje al llegar al counter")]
     public Vector3 rotacionEnCounter = new Vector3(0f, 90f, 0f);
@@ -29,6 +32,9 @@ public class Pacientes : MonoBehaviour
 
     void Start()
     {
+
+        tarjetaDNI.gameObject.SetActive(false);
+
         agent = GetComponent<NavMeshAgent>();
 
         if (agent != null)
@@ -50,7 +56,6 @@ public class Pacientes : MonoBehaviour
         if (anim != null)
             anim.SetBool("Caminando", true);
 
-        // Esperamos a que Unity termine de calcular el path antes de medir distancia
         yield return null;
         while (agent.pathPending)
             yield return null;
@@ -59,12 +64,15 @@ public class Pacientes : MonoBehaviour
             yield return null;
 
         agent.isStopped = true;
-        transform.rotation = Quaternion.Euler(rotacionEnCounter); // fuerza la rotacion al llegar
+        transform.rotation = Quaternion.Euler(0f, -90f, 0f); 
 
         dialogoEntrada = true;
 
         if (anim != null)
-            anim.SetBool("Caminando", false); // vuelve a Idle
+            anim.SetBool("Caminando", false);
+
+        tarjetaDNI.gameObject.SetActive(true);
+
 
         // Aca podes disparar el dialogo de recepcion (ej: abrir UI, llamar a otro metodo, etc)
     }
@@ -98,7 +106,7 @@ public class Pacientes : MonoBehaviour
         StopAllCoroutines();
         if (anim != null)
             anim.SetTrigger("Bailar");
-        StartCoroutine(EsperarAnimacionYCaminar(cuartoFacil1, alLlegar: () => gameObject.SetActive(false)));
+        StartCoroutine(EsperarAnimacionYCaminar(cuartoFacil1, alLlegar: () => gameObject.SetActive(true)));
     }
 
     IEnumerator EsperarAnimacionYCaminar(Transform destino, System.Action alLlegar)
