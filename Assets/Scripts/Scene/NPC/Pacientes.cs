@@ -24,6 +24,8 @@ public class Pacientes : MonoBehaviour
     public Transform cuartoFacil1;
     public Transform counter;
 
+    public bool llegoAlCounter = false;
+
     //lo que va a girar el personaje al llegar
     public Vector3 rotacionEnCounter = new Vector3(0f, 90f, 0f);
 
@@ -38,12 +40,12 @@ public class Pacientes : MonoBehaviour
     {
 
         tarjetaDNI.gameObject.SetActive(false);
-
         agent = GetComponent<NavMeshAgent>();
 
         if (agent != null)
         {
             agent.speed = velocidadCaminar;
+
 
             if (counter != null)
             {
@@ -59,6 +61,9 @@ public class Pacientes : MonoBehaviour
 
         int posVencimiento = Random.Range(0, fechasVencimientoPosibles.Length);
         dniFechaVencimiento = fechasVencimientoPosibles[posVencimiento];
+
+        if (textoNombre != null) textoNombre.text = nombre;
+        if (fechaVencimiento != null) fechaVencimiento.text = dniFechaVencimiento;
     }
 
     IEnumerator IrHaciaCounter()
@@ -88,12 +93,15 @@ public class Pacientes : MonoBehaviour
 
         if (textoNombre != null) textoNombre.text = nombre;
         if (fechaVencimiento != null) fechaVencimiento.text = dniFechaVencimiento;
+        llegoAlCounter = true;
     }
 
     void OnEnable()
     {
         Actual = this;
         procesando = false;
+        llegoAlCounter = false;
+
     }
 
     private void OnDisable()

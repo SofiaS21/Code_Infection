@@ -16,6 +16,7 @@ public class EsperaNPC : MonoBehaviour
     public Animator anim;
     public float tiempoMensajeVisible = 5f;
 
+    public float tiempoEntrePacientes = 10f;
     public float velocidadCaminar = 3.5f;
 
     void Start()
@@ -33,8 +34,8 @@ public class EsperaNPC : MonoBehaviour
 
     public void DenegarAcceso()
     {
+        if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
         tarjetaDNI.gameObject.SetActive(false);
-        if (currentVisitor == null) return;
         currentVisitor.Rechazar();
         ProximoPaciente();
 
@@ -42,8 +43,8 @@ public class EsperaNPC : MonoBehaviour
 
     public void AceptarAcceso()
     {
+        if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
         tarjetaDNI.gameObject.SetActive(false);
-        if (currentVisitor == null) return;
         currentVisitor.Aceptar();
         ProximoPaciente();
     }
@@ -64,13 +65,22 @@ public class EsperaNPC : MonoBehaviour
 
         else
         {
-            currentVisitor = pacienteEspera.Dequeue();
-            panelDialogue.SetActive(false);
-            inventario.SetActive(true);
-
+            StartCoroutine(SiguientePaciente());
         }
     }
 
+    IEnumerator SiguientePaciente()
+    {
+        currentVisitor = null; 
+        panelDialogue.SetActive(false);
+        inventario.SetActive(true);
+
+        yield return new WaitForSeconds(tiempoEntrePacientes);
+
+        currentVisitor = pacienteEspera.Dequeue();
+        currentVisitor.GenerarDatos();
+        currentVisitor.gameObject.SetActive(true);
+    }
 
     IEnumerator OcultarDespuesDe(float segundos)
     {
