@@ -14,13 +14,17 @@ public class Pacientes : MonoBehaviour
     public string dniFechaVencimiento;
     public GameObject tarjetaDNI;
 
+    public TMP_Text textoNombre;
+    public TMP_Text fechaVencimiento;
+
+    public string[] textoNombrePosibles = { "QuiQui", "Pumis", "Kirk", "Titi", "Jeffrey" };
+    public string[] fechasVencimientoPosibles = { "03/23/28", "05/19/27", "07/01/30", "11/21/29", "09/25/31" };
 
     public Transform puertaSalida;
     public Transform cuartoFacil1;
     public Transform counter;
 
-
-    [Tooltip("Rotacion (en grados, Euler) que va a tener el personaje al llegar al counter")]
+    //lo que va a girar el personaje al llegar
     public Vector3 rotacionEnCounter = new Vector3(0f, 90f, 0f);
 
     private bool procesando = false;
@@ -48,6 +52,15 @@ public class Pacientes : MonoBehaviour
         }
     }
 
+    public void GenerarDatos()
+    {
+        int posNombre = Random.Range(0, textoNombrePosibles.Length);
+        nombre = textoNombrePosibles[posNombre];
+
+        int posVencimiento = Random.Range(0, fechasVencimientoPosibles.Length);
+        dniFechaVencimiento = fechasVencimientoPosibles[posVencimiento];
+    }
+
     IEnumerator IrHaciaCounter()
     {
         agent.isStopped = false;
@@ -73,8 +86,8 @@ public class Pacientes : MonoBehaviour
 
         tarjetaDNI.gameObject.SetActive(true);
 
-
-        // Aca podes disparar el dialogo de recepcion (ej: abrir UI, llamar a otro metodo, etc)
+        if (textoNombre != null) textoNombre.text = nombre;
+        if (fechaVencimiento != null) fechaVencimiento.text = dniFechaVencimiento;
     }
 
     void OnEnable()
