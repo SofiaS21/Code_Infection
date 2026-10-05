@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.AI;
@@ -8,60 +7,73 @@ public class Pacientes : MonoBehaviour
 {
     public static Pacientes Actual;
 
+    // Datos del paciente
     public string nombre;
     public string imagenCamara;
     public Texture dniImagen;
     public string dniFechaVencimiento;
-    public GameObject tarjetaDNI;
 
+    // Tarjeta DNI (objetos de la escena)
+    public GameObject tarjetaDNI;
     public TMP_Text textoNombre;
     public TMP_Text fechaVencimiento;
 
-    public string[] textoNombrePosibles = { "QuiQui", "Pumis", "Kirk", "Titi", "Jeffrey" };
+    // Listas para elegir al azar
+    public string[] textoNombrePosibles = { "QuiQui", "Pumis", "Kirk Charles", "Titi", "Jeffrey", "Alfonso Amat", "Patrick Jane", "Gregory House", "Ted" };
     public string[] fechasVencimientoPosibles = { "03/23/28", "05/19/27", "07/01/30", "11/21/29", "09/25/31" };
 
+    // Lugares a los que camina
     public Transform puertaSalida;
     public Transform cuartoFacil1;
     public Transform counter;
 
-    public bool llegoAlCounter = false;
-
-    //lo que va a girar el personaje al llegar
     public Vector3 rotacionEnCounter = new Vector3(0f, 90f, 0f);
-
-    private bool procesando = false;
     public float velocidadCaminar = 3.5f;
-    private bool dialogoEntrada = false;
-    private NavMeshAgent agent;
-
     public Animator anim;
 
-    void Start()
+    // EsperaNPC lee esto para saber si ya se pueden usar los botones
+    public bool llegoAlCounter = false;
+
+    private bool procesando = false;
+    private NavMeshAgent agent;
+
+    void Awake()
     {
-
-        tarjetaDNI.gameObject.SetActive(false);
         agent = GetComponent<NavMeshAgent>();
+    }
 
-        if (agent != null)
+    // Se ejecuta en el momento exacto en que se activa el paciente
+    void OnEnable()
+    {
+        Actual = this;
+        procesando = false;
+        llegoAlCounter = false;
+
+        tarjetaDNI.SetActive(false);
+
+        if (agent != null && counter != null)
         {
             agent.speed = velocidadCaminar;
-
-
-            if (counter != null)
-            {
-                StartCoroutine(IrHaciaCounter());
-            }
+            StartCoroutine(IrHaciaCounter());
         }
     }
 
+    void OnDisable()
+    {
+        if (Actual == this)
+            Actual = null;
+    }
+
+    // EsperaNPC la llama ANTES de activar al paciente
     public void GenerarDatos()
     {
         int posNombre = Random.Range(0, textoNombrePosibles.Length);
         nombre = textoNombrePosibles[posNombre];
 
-        int posVencimiento = Random.Range(0, fechasVencimientoPosibles.Length);
-        dniFechaVencimiento = fechasVencimientoPosibles[posVencimiento];
+        int posFecha = Random.Range(0, fechasVencimientoPosibles.Length);
+        dniFechaVencimiento = fechasVencimientoPosibles[posFecha];
 
+        // Se escriben en la tarjeta ya mismo
         if (textoNombre != null) textoNombre.text = nombre;
         if (fechaVencimiento != null) fechaVencimiento.text = dniFechaVencimiento;
     }
@@ -74,50 +86,34 @@ public class Pacientes : MonoBehaviour
         if (anim != null)
             anim.SetBool("Caminando", true);
 
+        // Esperamos a que Unity calcule el camino
         yield return null;
         while (agent.pathPending)
             yield return null;
 
-        while (agent.remainingDistance > agent.stoppingDistance)
+        // Esperamos hasta estar a menos de 0.3 metros del counter
+        while (agent.remainingDistance > 0.3f)
             yield return null;
 
         agent.isStopped = true;
-        transform.rotation = Quaternion.Euler(0f, -90f, 0f); 
-
-        dialogoEntrada = true;
+        transform.rotation = Quaternion.Euler(0f, -90f, 0f);
 
         if (anim != null)
             anim.SetBool("Caminando", false);
 
-        tarjetaDNI.gameObject.SetActive(true);
-
-        if (textoNombre != null) textoNombre.text = nombre;
-        if (fechaVencimiento != null) fechaVencimiento.text = dniFechaVencimiento;
         llegoAlCounter = true;
     }
-
-    void OnEnable()
-    {
-        Actual = this;
-        procesando = false;
-        llegoAlCounter = false;
-
-    }
-
-    private void OnDisable()
-    {
-        if (Actual == this)
-            Actual = null;
-    }
-
     public void Rechazar()
     {
         if (procesando) return;
         procesando = true;
         StopAllCoroutines();
+
         if (anim != null)
             anim.SetTrigger("Golpe");
-        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, alLlegar: () => gameObject.SetActive(false)));
+
+        // Camina a la puerta y desaparece
+        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, () => gameObject.SetActive(false)));
     }
 
     public void Aceptar()
@@ -125,22 +121,23 @@ public class Pacientes : MonoBehaviour
         if (procesando) return;
         procesando = true;
         StopAllCoroutines();
+
         if (anim != null)
             anim.SetTrigger("Bailar");
-        StartCoroutine(EsperarAnimacionYCaminar(cuartoFacil1, alLlegar: () => gameObject.SetActive(true)));
+
+        // Camina al cuarto y se queda ahí
+        StartCoroutine(EsperarAnimacionYCaminar(cuartoFacil1, null));
     }
 
     IEnumerator EsperarAnimacionYCaminar(Transform destino, System.Action alLlegar)
     {
-        // Esperamos un frame para que el Animator procese la transicion del trigger
+        // Un frame para que el Animator procese el trigger
         yield return null;
 
         if (anim != null)
         {
             while (anim.GetCurrentAnimatorStateInfo(0).IsTag("Reaccion"))
-            {
                 yield return null;
-            }
         }
 
         if (anim != null)
@@ -151,35 +148,20 @@ public class Pacientes : MonoBehaviour
             agent.isStopped = false;
             agent.SetDestination(destino.position);
 
-            // Esperamos un frame extra a que Unity termine de calcular el path
             yield return null;
             while (agent.pathPending)
-            {
                 yield return null;
-            }
 
-            // Reci�n ahora remainingDistance refleja el path nuevo, no el anterior
-            while (agent.remainingDistance > agent.stoppingDistance)
-            {
+            while (agent.remainingDistance > 0.3f)
                 yield return null;
-            }
 
             agent.isStopped = true;
-        }
-        else
-        {
-            // Fallback por si no hay NavMeshAgent en este objeto
-            while (Vector3.Distance(transform.position, destino.position) > 0.15f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, destino.position, velocidadCaminar * Time.deltaTime);
-                transform.rotation = Quaternion.LookRotation(destino.position - transform.position);
-                yield return null;
-            }
         }
 
         if (anim != null)
             anim.SetBool("Caminando", false);
 
-        alLlegar?.Invoke();
+        if (alLlegar != null)
+            alLlegar.Invoke();
     }
 }

@@ -14,55 +14,57 @@ public class EsperaNPC : MonoBehaviour
     public GameObject inventario;
     public GameObject tarjetaDNI;
     public Animator anim;
-    public float tiempoMensajeVisible = 5f;
 
+    public float tiempoMensajeVisible = 5f;
     public float tiempoEntrePacientes = 10f;
     public float velocidadCaminar = 3.5f;
+
+    private bool esElPrimero = true;
+    private bool dniMostrado = false;
 
     void Start()
     {
         foreach (var patient in patientList)
-        {
             pacienteEspera.Enqueue(patient);
-        }
 
         anim = GetComponent<Animator>();
 
-        panelDialogue.gameObject.SetActive(false);
+        panelDialogue.SetActive(false);
         ProximoPaciente();
     }
 
     public void DenegarAcceso()
     {
+        // Si no hay paciente o todavía no llegó, no hace nada
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
-        tarjetaDNI.gameObject.SetActive(false);
+
+        tarjetaDNI.SetActive(false);
         currentVisitor.Rechazar();
         ProximoPaciente();
-
     }
 
     public void AceptarAcceso()
     {
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
-        tarjetaDNI.gameObject.SetActive(false);
+
+        tarjetaDNI.SetActive(false);
         currentVisitor.Aceptar();
         ProximoPaciente();
     }
 
     public void ProximoPaciente()
     {
+        StopAllCoroutines();
+
         if (pacienteEspera.Count == 0)
         {
+            currentVisitor = null;
             panelDialogue.SetActive(true);
             inventario.SetActive(false);
-
-            currentVisitor = null;
             dialogueText.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
 
-            StopAllCoroutines();
             StartCoroutine(OcultarDespuesDe(tiempoMensajeVisible));
         }
-
         else
         {
             StartCoroutine(SiguientePaciente());
@@ -71,23 +73,39 @@ public class EsperaNPC : MonoBehaviour
 
     IEnumerator SiguientePaciente()
     {
-        currentVisitor = null; 
-        panelDialogue.SetActive(false);
-        inventario.SetActive(true);
+        currentVisitor = null;
+        inventario.SetActive(false);
+        panelDialogue.SetActive(true);
 
-        yield return new WaitForSeconds(tiempoEntrePacientes);
+        // El primero sale al instante, los demás esperan
+        if (!esElPrimero)
+            yield return new WaitForSeconds(tiempoEntrePacientes);
+
+        esElPrimero = false;
+        dniMostrado = false; 
+
 
         currentVisitor = pacienteEspera.Dequeue();
-        currentVisitor.GenerarDatos();
+        currentVisitor.GenerarDatos();                
         currentVisitor.gameObject.SetActive(true);
+
     }
 
+    public void MostrarDNI()
+    {
+        if (currentVisitor != null || !currentVisitor.llegoAlCounter) return;
+        if (dniMostrado) return;
+
+        dniMostrado = true;
+
+        tarjetaDNI.SetActive(true);
+        panelDialogue.SetActive(true);
+        dialogueText.text = "Hola, mi nombre es " + currentVisitor.nombre;
+    }
     IEnumerator OcultarDespuesDe(float segundos)
     {
         yield return new WaitForSeconds(segundos);
         panelDialogue.SetActive(false);
         inventario.SetActive(true);
-
     }
 }
-

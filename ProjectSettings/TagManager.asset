@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Collectable
   - Interactuable
+  - Npcs
   layers:
   - Default
   - TransparentFX

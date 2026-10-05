@@ -29,7 +29,7 @@ public class CrossHair : MonoBehaviour
     {
         RaycastHit hit;
         if (Physics.Raycast(Camera.transform.position, Camera.transform.forward, out hit, isInteracting ? 5.5f : 5f)
-            && hit.collider.CompareTag("Interactuable"))
+            && (hit.collider.CompareTag("Interactuable") || hit.collider.CompareTag("Npcs") || hit.collider.CompareTag("Collectable")))
         {
             crossHairInt.SetActive(true);
             crossHair.SetActive(false);
