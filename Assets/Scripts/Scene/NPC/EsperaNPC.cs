@@ -21,6 +21,7 @@ public class EsperaNPC : MonoBehaviour
 
     private bool esElPrimero = true;
     private bool dniMostrado = false;
+    private Coroutine corrutinaOcultarDialogo;
 
     void Start()
     {
@@ -35,7 +36,6 @@ public class EsperaNPC : MonoBehaviour
 
     public void DenegarAcceso()
     {
-        // Si no hay paciente o todavía no llegó, no hace nada
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
 
         tarjetaDNI.SetActive(false);
@@ -77,31 +77,44 @@ public class EsperaNPC : MonoBehaviour
         inventario.SetActive(false);
         panelDialogue.SetActive(true);
 
-        // El primero sale al instante, los demás esperan
         if (!esElPrimero)
             yield return new WaitForSeconds(tiempoEntrePacientes);
 
         esElPrimero = false;
-        dniMostrado = false; 
-
+        dniMostrado = false;
 
         currentVisitor = pacienteEspera.Dequeue();
-        currentVisitor.GenerarDatos();                
+        currentVisitor.GenerarDatos();
         currentVisitor.gameObject.SetActive(true);
-
     }
 
     public void MostrarDNI()
     {
-        if (currentVisitor != null || !currentVisitor.llegoAlCounter) return;
-        if (dniMostrado) return;
+        if (currentVisitor == null) return;
 
-        dniMostrado = true;
+        if (!currentVisitor.llegoAlCounter)
+            dniMostrado = true;
 
         tarjetaDNI.SetActive(true);
         panelDialogue.SetActive(true);
+        inventario.SetActive(false);
         dialogueText.text = "Hola, mi nombre es " + currentVisitor.nombre;
+
+        // Si ya hay un conteo en marcha (ej: presionaste MostrarDNI de nuevo), lo reinicia
+        if (corrutinaOcultarDialogo != null)
+            StopCoroutine(corrutinaOcultarDialogo);
+
+        // Oculta únicamente el diálogo después de 5 segundos
+        corrutinaOcultarDialogo = StartCoroutine(OcultarDialogoDespuesDe(5f));
     }
+
+    IEnumerator OcultarDialogoDespuesDe(float segundos)
+    {
+        yield return new WaitForSeconds(segundos);
+        panelDialogue.SetActive(false);
+        inventario.SetActive(true);
+    }
+
     IEnumerator OcultarDespuesDe(float segundos)
     {
         yield return new WaitForSeconds(segundos);

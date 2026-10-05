@@ -28,7 +28,7 @@ public class CrossHair : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
-        if (Physics.Raycast(Camera.transform.position, Camera.transform.forward, out hit, isInteracting ? 5.5f : 5f)
+        if (Physics.Raycast(Camera.transform.position, Camera.transform.forward, out hit, isInteracting ? 5.5f : 5f , ~0, QueryTriggerInteraction.Collide)
             && (hit.collider.CompareTag("Interactuable") || hit.collider.CompareTag("Npcs") || hit.collider.CompareTag("Collectable")))
         {
             crossHairInt.SetActive(true);
@@ -38,7 +38,7 @@ public class CrossHair : MonoBehaviour
             crossHairIntRect.sizeDelta = new Vector2(currentSize, currentSize);
 
             // --- l�gica nueva de interacci�n ---
-            IInteractable interactuable = hit.collider.GetComponent<IInteractable>();
+            IInteractable interactuable = hit.collider.GetComponentInParent<IInteractable>();
 
             if (interactuable != objetoActual)
             {

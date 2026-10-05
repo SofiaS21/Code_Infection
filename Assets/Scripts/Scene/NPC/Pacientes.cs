@@ -3,7 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.AI;
 
-public class Pacientes : MonoBehaviour
+public class Pacientes : MonoBehaviour, IInteractable
 {
     public static Pacientes Actual;
 
@@ -64,6 +64,16 @@ public class Pacientes : MonoBehaviour
             Actual = null;
     }
 
+
+    public void Interact()
+    {
+        Debug.Log("1. Interact llamado en " + name);
+        FindObjectOfType<EsperaNPC>().MostrarDNI();
+    }
+
+    public void OnFocus() { }
+    public void OnUnfocus() { }
+        
     // EsperaNPC la llama ANTES de activar al paciente
     public void GenerarDatos()
     {
