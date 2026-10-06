@@ -2543,7 +2543,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 537699765}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 0.93069184, y: 3.0875325, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2551,7 +2551,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.9, y: -3}
+  m_AnchoredPosition: {x: 104, y: -104}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &537699767
@@ -2637,7 +2637,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -268.9502, y: -37.70184, z: -272.7328, w: -34.68571}
+  m_margin: {x: -268.9502, y: -37.70184, z: -46.139587, w: 3.8400688}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2692,6 +2692,7 @@ MonoBehaviour:
   tiempoMensajeVisible: 4
   tiempoEntrePacientes: 20
   velocidadCaminar: 2
+  velocidadTexto: 0.05
 --- !u!4 &542792554
 Transform:
   m_ObjectHideFlags: 0
@@ -4439,6 +4440,8 @@ MonoBehaviour:
   crossHairInt: {fileID: 59279686}
   Camera: {fileID: 830403073}
   isInteracting: 1
+  alcancePacientes: 12
+  alcanceNormal: 5.5
 --- !u!20 &830403085 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 8301348219254906557, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
@@ -5140,7 +5143,6 @@ GameObject:
   - component: {fileID: 1037274077}
   - component: {fileID: 1037274080}
   - component: {fileID: 1037274079}
-  - component: {fileID: 1037274078}
   m_Layer: 0
   m_Name: Counter
   m_TagString: Untagged
@@ -5163,27 +5165,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2053352675}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
---- !u!65 &1037274078
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1037274076}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1037274079
 MeshRenderer:
   m_ObjectHideFlags: 0

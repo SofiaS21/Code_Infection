@@ -19,9 +19,13 @@ public class EsperaNPC : MonoBehaviour
     public float tiempoEntrePacientes = 10f;
     public float velocidadCaminar = 3.5f;
 
+    public float velocidadTexto = 0.05f;
+
     private bool esElPrimero = true;
     private bool dniMostrado = false;
     private Coroutine corrutinaOcultarDialogo;
+    private Coroutine corrutinaEscribiendo;
+
 
     void Start()
     {
@@ -98,13 +102,13 @@ public class EsperaNPC : MonoBehaviour
         tarjetaDNI.SetActive(true);
         panelDialogue.SetActive(true);
         inventario.SetActive(false);
-        dialogueText.text = "Hola, mi nombre es " + currentVisitor.nombre;
+        if (corrutinaEscribiendo != null) StopCoroutine(corrutinaEscribiendo);
+        corrutinaEscribiendo = StartCoroutine(EscribirTexto("Hola, mi nombre es " + currentVisitor.nombre));
 
-        // Si ya hay un conteo en marcha (ej: presionaste MostrarDNI de nuevo), lo reinicia
         if (corrutinaOcultarDialogo != null)
             StopCoroutine(corrutinaOcultarDialogo);
 
-        // Oculta únicamente el diálogo después de 5 segundos
+        // Oculta diálogo después de 5 segundos
         corrutinaOcultarDialogo = StartCoroutine(OcultarDialogoDespuesDe(5f));
     }
 
@@ -113,6 +117,17 @@ public class EsperaNPC : MonoBehaviour
         yield return new WaitForSeconds(segundos);
         panelDialogue.SetActive(false);
         inventario.SetActive(true);
+    }
+
+    IEnumerator EscribirTexto(string textoCompleto)
+    {
+        dialogueText.text = "";
+
+        foreach (char letra in textoCompleto)
+        {
+            dialogueText.text += letra;
+            yield return new WaitForSeconds(velocidadTexto);
+        }
     }
 
     IEnumerator OcultarDespuesDe(float segundos)

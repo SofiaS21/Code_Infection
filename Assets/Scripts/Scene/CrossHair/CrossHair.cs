@@ -9,13 +9,18 @@ public class CrossHair : MonoBehaviour
     public GameObject crossHairInt;
     public GameObject Camera;
     public bool isInteracting;
+
+    [Header("Alcance")]
+    public float alcancePacientes = 15f;   
+    public float alcanceNormal = 5.5f;
+
     private RectTransform crossHairIntRect;
     private float currentSize = 4;
 
     private const float maxSize = 6;
     private const float growSpeed = 15;
 
-    private IInteractable objetoActual; // <- nuevo: guarda a qu� objeto le estamos apuntando
+    private IInteractable objetoActual;
 
     void Start()
     {
@@ -28,8 +33,23 @@ public class CrossHair : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
-        if (Physics.Raycast(Camera.transform.position, Camera.transform.forward, out hit, isInteracting ? 5.5f : 5f , ~0, QueryTriggerInteraction.Collide)
-            && (hit.collider.CompareTag("Interactuable") || hit.collider.CompareTag("Npcs") || hit.collider.CompareTag("Collectable")))
+        bool pego = Physics.Raycast(Camera.transform.position, Camera.transform.forward, out hit, alcancePacientes, ~0, QueryTriggerInteraction.Collide);
+
+        bool valido = false;
+        if (pego)
+        {
+            if (hit.collider.CompareTag("Npcs"))
+            {
+                valido = true;   //de lejos
+            }
+            else if (hit.distance <= alcanceNormal &&
+                    (hit.collider.CompareTag("Interactuable") || hit.collider.CompareTag("Collectable")))
+            {
+                valido = true;   //solo de cerca
+            }
+        }
+
+        if (valido)
         {
             crossHairInt.SetActive(true);
             crossHair.SetActive(false);
@@ -37,7 +57,6 @@ public class CrossHair : MonoBehaviour
             currentSize = Mathf.MoveTowards(currentSize, maxSize, growSpeed * Time.deltaTime);
             crossHairIntRect.sizeDelta = new Vector2(currentSize, currentSize);
 
-            // --- l�gica nueva de interacci�n ---
             IInteractable interactuable = hit.collider.GetComponentInParent<IInteractable>();
 
             if (interactuable != objetoActual)
@@ -51,7 +70,6 @@ public class CrossHair : MonoBehaviour
             {
                 objetoActual?.Interact();
             }
-                
         }
         else
         {
@@ -60,7 +78,6 @@ public class CrossHair : MonoBehaviour
             isInteracting = false;
             currentSize = 4f;
 
-            // dejamos de apuntar a lo que sea que ten�amos
             if (objetoActual != null)
             {
                 objetoActual.OnUnfocus();
