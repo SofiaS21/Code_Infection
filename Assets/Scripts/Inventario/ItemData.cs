@@ -7,11 +7,16 @@ public enum Enfermedad { DolorCabeza, Hemorragia, Infeccion }
 
 public class ItemData : ScriptableObject
 {
-
     public string nombre;
     [TextArea] public string descripcion;
+
     public Sprite icono;
     public GameObject modeloEnMano;
+
+    public float escalaEnMano = 1f;
+    public Vector3 rotacionEnMano = Vector3.zero;
+
     public Enfermedad queCura;
+
 
 }

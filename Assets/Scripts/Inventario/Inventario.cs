@@ -8,11 +8,18 @@ public class Inventario : MonoBehaviour
     public ItemData[] items; 
     public SlotUI[] slotsUI;
     public Transform objetoEnMano;     
+
     public GameObject canvasInvLleno;
     private GameObject modelObjetoEquipado; 
 
+    private int indiceEquipado = -1;
+    public ItemData ItemEquipado
+    {
+        get { return indiceEquipado >= 0 ? items[indiceEquipado] : null; }
+    }
+
     public static Inventario instancia;
-    
+
     void Start()
     {
         canvasInvLleno.SetActive(false);
@@ -34,24 +41,36 @@ public class Inventario : MonoBehaviour
     {
         if (items[index] == null) return; // si hay slot vacio
 
-        if (modelObjetoEquipado != null)
+        if (indiceEquipado == index)
         {
-            Destroy(modelObjetoEquipado);
+            if (modelObjetoEquipado != null) Destroy(modelObjetoEquipado);
+            indiceEquipado = -1;
+            return;
         }
+
+        if (modelObjetoEquipado != null) Destroy(modelObjetoEquipado);
+
+        indiceEquipado = index;
 
         // Si el item tiene modelo asignado
         if (items[index].modeloEnMano != null)
         {
-            modelObjetoEquipado = Instantiate(
-                items[index].modeloEnMano,
-                objetoEnMano.position,
-                objetoEnMano.rotation,
-                objetoEnMano
-            );
+            modelObjetoEquipado = Instantiate(items[index].modeloEnMano, objetoEnMano);
+            modelObjetoEquipado.transform.localPosition = Vector3.zero;
+            modelObjetoEquipado.transform.localRotation = Quaternion.Euler(items[index].rotacionEnMano);
+            modelObjetoEquipado.transform.localScale *= items[index].escalaEnMano;
         }
     }
 
-     void Awake()
+    public void ConsumirEquipado()
+    {
+        if (indiceEquipado >= 0) return;
+        if (modelObjetoEquipado != null) Destroy(modelObjetoEquipado);
+        QuitarItem(indiceEquipado);
+        indiceEquipado = -1;
+    }
+
+    void Awake()
     {
         instancia = this;
     }

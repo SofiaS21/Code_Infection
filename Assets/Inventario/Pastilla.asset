@@ -16,3 +16,6 @@ MonoBehaviour:
   descripcion: Cura el dolor cabeza
   icono: {fileID: 21300000, guid: 37be8b90ef8910642a70a540bbad8982, type: 3}
   modeloEnMano: {fileID: 100000, guid: b1bf83d32e3fe924dbc796abdf91de06, type: 3}
+  escalaEnMano: 0.09
+  rotacionEnMano: {x: -90, y: 0, z: 0}
+  queCura: 0
