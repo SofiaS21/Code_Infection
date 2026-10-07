@@ -19,7 +19,7 @@ public class Pacientes : MonoBehaviour, IInteractable
     public TMP_Text fechaVencimiento;
 
     // Listas para elegir al azar
-    public string[] textoNombrePosibles = { "QuiQui", "Pumis", "Kirk Charles", "Titi", "Jeffrey", "Alfonso Amat", "Patrick Jane", "Gregory House", "Ted" };
+    public string[] textoNombrePosibles = { "QuiQui", "Pumis", "Kirk Charles", "Titi Liss", "Jeffrey", "Alfonso Amat", "Patrick Jane", "Gregory House", "Ted" };
     public string[] fechasVencimientoPosibles = { "03/23/28", "05/19/27", "07/01/30", "11/21/29", "09/25/31" };
 
     // Lugares a los que camina
@@ -33,7 +33,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     // EsperaNPC lee esto para saber si ya se pueden usar los botones
     public bool llegoAlCounter = false;
-
+    public bool PuedeInteractuar { get { return llegoAlCounter && !procesando; } }
     private bool procesando = false;
     private NavMeshAgent agent;
 
@@ -67,8 +67,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        Debug.Log("1. Interact llamado en " + name);
-        FindObjectOfType<EsperaNPC>().MostrarDNI();
+        FindObjectOfType<EsperaNPC>().MostrarDNI(this);
     }
 
     public void OnFocus() { }
@@ -113,6 +112,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         llegoAlCounter = true;
     }
+
     public void Rechazar()
     {
         if (procesando) return;

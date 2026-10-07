@@ -23,6 +23,7 @@ public class EsperaNPC : MonoBehaviour
 
     private bool esElPrimero = true;
     private bool dniMostrado = false;
+    private bool pacienteHablando = false;
     private Coroutine corrutinaOcultarDialogo;
     private Coroutine corrutinaEscribiendo;
 
@@ -92,24 +93,43 @@ public class EsperaNPC : MonoBehaviour
         currentVisitor.gameObject.SetActive(true);
     }
 
-    public void MostrarDNI()
+    public void MostrarDNI(Pacientes quien)
     {
-        if (currentVisitor == null) return;
+        if (currentVisitor == null || quien != currentVisitor) return;
+        if (!currentVisitor.PuedeInteractuar) return;
+        if (pacienteHablando) return;
+
+        panelDialogue.SetActive(true);
+
+        if (!dniMostrado)
+        {
+            dniMostrado = true;
+            tarjetaDNI.SetActive(true);
+            inventario.SetActive(false);
+            Decir("Hola, mi nombre es " + currentVisitor.nombre);
+        }
+
+        else
+        {
+            inventario.SetActive(false);
+            Decir("Ehmm.. ya te dije que mi nombre es " + currentVisitor.nombre);
+        }
 
         if (!currentVisitor.llegoAlCounter)
             dniMostrado = true;
-
-        tarjetaDNI.SetActive(true);
-        panelDialogue.SetActive(true);
-        inventario.SetActive(false);
-        if (corrutinaEscribiendo != null) StopCoroutine(corrutinaEscribiendo);
-        corrutinaEscribiendo = StartCoroutine(EscribirTexto("Hola, mi nombre es " + currentVisitor.nombre));
 
         if (corrutinaOcultarDialogo != null)
             StopCoroutine(corrutinaOcultarDialogo);
 
         // Oculta diálogo después de 5 segundos
         corrutinaOcultarDialogo = StartCoroutine(OcultarDialogoDespuesDe(5f));
+    }
+
+    void Decir(string texto)
+    {
+        //Textos no se superponen
+        if (corrutinaEscribiendo != null) StopCoroutine(corrutinaEscribiendo);
+        corrutinaEscribiendo = StartCoroutine(EscribirTexto(texto));
     }
 
     IEnumerator OcultarDialogoDespuesDe(float segundos)
@@ -121,13 +141,18 @@ public class EsperaNPC : MonoBehaviour
 
     IEnumerator EscribirTexto(string textoCompleto)
     {
-        dialogueText.text = "";
+        pacienteHablando = true;
 
-        foreach (char letra in textoCompleto)
+        dialogueText.text = textoCompleto;
+        dialogueText.maxVisibleCharacters = 0; 
+
+        for (int i = 1; i <= textoCompleto.Length; i++)
         {
-            dialogueText.text += letra;
+            dialogueText.maxVisibleCharacters = i;
             yield return new WaitForSeconds(velocidadTexto);
         }
+
+        pacienteHablando = false;
     }
 
     IEnumerator OcultarDespuesDe(float segundos)

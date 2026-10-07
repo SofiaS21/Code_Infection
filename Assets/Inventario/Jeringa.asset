@@ -18,3 +18,4 @@ MonoBehaviour:
 '
   icono: {fileID: 21300000, guid: 1f7602de028f7d146a8a5a317b74d243, type: 3}
   modeloEnMano: {fileID: 100004, guid: 7025db2be36ed6548b3fbfaea47cc7c6, type: 3}
+  queCura: 2

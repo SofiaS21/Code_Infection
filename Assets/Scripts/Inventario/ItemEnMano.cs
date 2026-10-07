@@ -1,18 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Search;
 using UnityEngine;
 
 public class ItemEnMano : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    private int indiceEquipado = -1;
+    public ItemData ItemEquipado
     {
-        
+        get { return indiceEquipado >= 0 ? items[indiceEquipado] : null; }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ConsumirEquipado()
     {
-        
-    }
+        if (indiceEquipado >= 0) return;
+        if (modelObjetoEquipado != null) Destroy(modelObjetoEquipado);
+        QuitarItem(indiceEquipado);
+        indiceEquipado = -1;
+    } 
 }
