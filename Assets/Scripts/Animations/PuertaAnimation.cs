@@ -10,6 +10,7 @@ public class PuertaAnimation : MonoBehaviour, IInteractable
     public bool usarRangoRectangular = true;
     public float rangoFrente = 3f;   // alcance hacia adelante/atrás (más largo)
     public float rangoCostado = 1f;  // alcance hacia los lados (más corto)
+    public float rangoLongitud = 3f;
 
     private Transform jugador;
     private bool puertaAbierta = false;
@@ -44,7 +45,8 @@ public class PuertaAnimation : MonoBehaviour, IInteractable
         Vector3 posLocal = transform.InverseTransformPoint(jugador.position);
         bool dentroFrente = Mathf.Abs(posLocal.z) <= rangoFrente;
         bool dentroCostado = Mathf.Abs(posLocal.x) <= rangoCostado;
-        return dentroFrente && dentroCostado;
+        bool dentroLongitud = Mathf.Abs(posLocal.y) <= rangoLongitud;
+        return dentroFrente && dentroCostado && dentroLongitud;
     }
 
     void OnDrawGizmosSelected()

@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-public class Pacientes : MonoBehaviour
+public class Pacientes : MonoBehaviour , IInteractable
 {
     public static Pacientes Actual;
 
@@ -47,14 +47,25 @@ public class Pacientes : MonoBehaviour
 
     public Enfermedad queEnfermedadtiene;
 
-    void Start()
-    {
-        itemData = FindObjectsOfType<ItemData>();
-    }
+    public void OnFocus() { }
+    public void OnUnfocus() { }
 
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
+        medicamentos = new int[6];
+    }
+
+    public void Iniciar()
+    {
+        Actual = this;
+        procesando = false;
+        llegoAlCounter = false;
+        tarjetaDNI.SetActive(false);
+
+        agent.speed = velocidadCaminar;
+        StartCoroutine(IrHaciaCounter());
     }
 
     public void Inicializar(EsperaNPC npcManager, Transform counter, Transform puertaSalida, Transform cuartoFacil1, GameObject tarjetaDNI, TMP_Text textoNombre, TMP_Text fechaVencimiento)
@@ -68,8 +79,6 @@ public class Pacientes : MonoBehaviour
         this.fechaVencimiento = fechaVencimiento;
     }
     
-
-
     public void Interact()
     {
         npcManager.MostrarDNI(this);

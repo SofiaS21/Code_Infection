@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using UnityEngine.AI;
 
 public class EsperaNPC : MonoBehaviour
 {
@@ -129,10 +130,17 @@ public class EsperaNPC : MonoBehaviour
 
         esElPrimero = false;
         dniMostrado = false;
+        pacientesRestantes--;
 
-        currentVisitor = pacienteEspera.Dequeue();
+        Pacientes prefab = prefabsPacientes[Random.Range(0, prefabsPacientes.Length)];
+        currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
+
+        var agent = currentVisitor.GetComponent<NavMeshAgent>();
+        if (agent != null) agent.Warp(puntoSpawn.position);
+
+        currentVisitor.Inicializar(this, counter, puertaSalida, cuartoFacil1, tarjetaDNI, textoNombreDNI, fechaVencimientoDNI);
         currentVisitor.GenerarDatos();
-        currentVisitor.gameObject.SetActive(true);
+        currentVisitor.Iniciar();
     }
 
     public void MostrarDNI(Pacientes quien)
