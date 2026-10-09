@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PuertaAnimation : MonoBehaviour
+public class PuertaAnimation : MonoBehaviour, IInteractable
 {
     public Animator anim;
 
     [Header("Rango de interacción")]
+    public bool usarRangoRectangular = true;
     public float rangoFrente = 3f;   // alcance hacia adelante/atrás (más largo)
     public float rangoCostado = 1f;  // alcance hacia los lados (más corto)
 
@@ -15,25 +16,27 @@ public class PuertaAnimation : MonoBehaviour
 
     void Start()
     {
-        anim = GetComponent<Animator>();
+        if (anim == null)
+            anim = GetComponent<Animator>();
+
         jugador = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    void OnMouseDown()
+    public void Interact()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0)) return;
+        
+        if (usarRangoRectangular && !JugadorEnRango())
         {
-            if (JugadorEnRango())
-            {
-                puertaAbierta = !puertaAbierta;
-                anim.SetBool("PuertaAbierta", puertaAbierta);
-            }
-            else
-            {
-                Debug.Log("Estás muy lejos o de costado a la puerta");
-            }
+            Debug.Log("Estás muy lejos o de costado a la puerta");
+            return;
         }
+        puertaAbierta = !puertaAbierta;
+        anim.SetBool("PuertaAbierta", puertaAbierta);
     }
+
+    public void OnFocus() { }
+    public void OnUnfocus() { }
 
     bool JugadorEnRango()
     {
@@ -41,7 +44,6 @@ public class PuertaAnimation : MonoBehaviour
         Vector3 posLocal = transform.InverseTransformPoint(jugador.position);
         bool dentroFrente = Mathf.Abs(posLocal.z) <= rangoFrente;
         bool dentroCostado = Mathf.Abs(posLocal.x) <= rangoCostado;
-
         return dentroFrente && dentroCostado;
     }
 

@@ -9,7 +9,15 @@ public class EsperaNPC : MonoBehaviour
     [Header("Spawn")]
     public Pacientes[] prefabsPacientes;
     public Transform puntoSpawn;
-    public int pacientesPorDia = 5;
+    public class RangoDia
+    {
+        public int minPacientes = 2;
+        public int maxPacientes = 6;
+    }
+
+    [Header("Dificultad por día")]
+    public RangoDia[] rangosPorDia;     // posición 0 = día 1, posición 1 = día 2...
+    public int diaActual = 1;
 
     [Header("Referencias de escena que se le pasan al paciente")]
     public Transform counter;
@@ -24,12 +32,14 @@ public class EsperaNPC : MonoBehaviour
     private Queue<Pacientes> pacienteEspera = new Queue<Pacientes>();
     private Pacientes currentVisitor;
 
+    [Header("Variables")]
     public TMP_Text dialogueText;
     public GameObject panelDialogue;
     public GameObject inventario;
     public GameObject tarjetaDNI;
     public Animator anim;
 
+    [Header("Tiempos")]
     public float tiempoMensajeVisible = 5f;
     public float tiempoEntrePacientes = 10f;
     public float velocidadCaminar = 3.5f;
@@ -52,6 +62,23 @@ public class EsperaNPC : MonoBehaviour
 
         panelDialogue.SetActive(false);
         ProximoPaciente();
+    }
+
+    public void IniciarDia()
+    {
+        int i = Mathf.Clamp(diaActual - 1, 0, rangosPorDia.Length - 1);
+        RangoDia rango = rangosPorDia[i];
+
+        pacientesRestantes = Random.Range(rango.minPacientes, rango.maxPacientes + 1);
+        esElPrimero = true;
+
+        ProximoPaciente();
+    }
+
+    public void SiguienteDia()
+    {
+        diaActual++;
+        IniciarDia();
     }
 
     public void DenegarAcceso()
