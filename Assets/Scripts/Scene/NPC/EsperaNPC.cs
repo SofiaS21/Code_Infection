@@ -5,6 +5,21 @@ using TMPro;
 
 public class EsperaNPC : MonoBehaviour
 {
+
+    [Header("Spawn")]
+    public Pacientes[] prefabsPacientes;
+    public Transform puntoSpawn;
+    public int pacientesPorDia = 5;
+
+    [Header("Referencias de escena que se le pasan al paciente")]
+    public Transform counter;
+    public Transform puertaSalida;
+    public Transform cuartoFacil1;
+    public TMP_Text textoNombreDNI;
+    public TMP_Text fechaVencimientoDNI;
+
+    private int pacientesRestantes;
+
     public List<Pacientes> patientList;
     private Queue<Pacientes> pacienteEspera = new Queue<Pacientes>();
     private Pacientes currentVisitor;

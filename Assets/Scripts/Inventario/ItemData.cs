@@ -15,6 +15,7 @@ public class ItemData : ScriptableObject
 
     public float escalaEnMano = 1f;
     public Vector3 rotacionEnMano = Vector3.zero;
+    public Vector3 posicionEnMano = Vector3.zero;
 
     public Enfermedad queCura;
 

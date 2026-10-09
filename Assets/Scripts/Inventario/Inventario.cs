@@ -56,7 +56,7 @@ public class Inventario : MonoBehaviour
         if (items[index].modeloEnMano != null)
         {
             modelObjetoEquipado = Instantiate(items[index].modeloEnMano, objetoEnMano);
-            modelObjetoEquipado.transform.localPosition = Vector3.zero;
+            modelObjetoEquipado.transform.localPosition = items[index].posicionEnMano;
             modelObjetoEquipado.transform.localRotation = Quaternion.Euler(items[index].rotacionEnMano);
             modelObjetoEquipado.transform.localScale *= items[index].escalaEnMano;
         }

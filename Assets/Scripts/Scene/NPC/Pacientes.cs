@@ -2,8 +2,9 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
-public class Pacientes : MonoBehaviour, IInteractable
+public class Pacientes : MonoBehaviour
 {
     public static Pacientes Actual;
 
@@ -12,7 +13,6 @@ public class Pacientes : MonoBehaviour, IInteractable
     public string imagenCamara;
     public Texture dniImagen;
     public string dniFechaVencimiento;
-
     // Tarjeta DNI (objetos de la escena)
     public GameObject tarjetaDNI;
     public TMP_Text textoNombre;
@@ -27,6 +27,14 @@ public class Pacientes : MonoBehaviour, IInteractable
     public Transform cuartoFacil1;
     public Transform counter;
 
+    private EsperaNPC npcManager;
+
+    public ItemData[] itemData;
+    public GameObject canvasBurbuja;           
+    public Image iconoBurbuja;
+    public bool enCuarto = false;
+    public int[] medicamentos = new int[6];
+
     public Vector3 rotacionEnCounter = new Vector3(0f, 90f, 0f);
     public float velocidadCaminar = 3.5f;
     public Animator anim;
@@ -37,42 +45,36 @@ public class Pacientes : MonoBehaviour, IInteractable
     private bool procesando = false;
     private NavMeshAgent agent;
 
+    public Enfermedad queEnfermedadtiene;
+
+    void Start()
+    {
+        itemData = FindObjectsOfType<ItemData>();
+    }
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
     }
 
-    // Se ejecuta en el momento exacto en que se activa el paciente
-    void OnEnable()
+    public void Inicializar(EsperaNPC npcManager, Transform counter, Transform puertaSalida, Transform cuartoFacil1, GameObject tarjetaDNI, TMP_Text textoNombre, TMP_Text fechaVencimiento)
     {
-        Actual = this;
-        procesando = false;
-        llegoAlCounter = false;
-
-        tarjetaDNI.SetActive(false);
-
-        if (agent != null && counter != null)
-        {
-            agent.speed = velocidadCaminar;
-            StartCoroutine(IrHaciaCounter());
-        }
+        this.npcManager = npcManager;
+        this.counter = counter;
+        this.puertaSalida = puertaSalida;
+        this.cuartoFacil1 = cuartoFacil1;
+        this.tarjetaDNI = tarjetaDNI;   
+        this.textoNombre = textoNombre;
+        this.fechaVencimiento = fechaVencimiento;
     }
-
-    void OnDisable()
-    {
-        if (Actual == this)
-            Actual = null;
-    }
+    
 
 
     public void Interact()
     {
-        FindObjectOfType<EsperaNPC>().MostrarDNI(this);
+        npcManager.MostrarDNI(this);
     }
 
-    public void OnFocus() { }
-    public void OnUnfocus() { }
-        
     // EsperaNPC la llama ANTES de activar al paciente
     public void GenerarDatos()
     {
@@ -81,6 +83,9 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         int posFecha = Random.Range(0, fechasVencimientoPosibles.Length);
         dniFechaVencimiento = fechasVencimientoPosibles[posFecha];
+
+        queEnfermedadtiene = (Enfermedad)Random.Range(1, System.Enum.GetValues(typeof(Enfermedad)).Length);
+        
 
         // Se escriben en la tarjeta ya mismo
         if (textoNombre != null) textoNombre.text = nombre;
@@ -123,7 +128,7 @@ public class Pacientes : MonoBehaviour, IInteractable
             anim.SetTrigger("Golpe");
 
         // Camina a la puerta y desaparece
-        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, () => gameObject.SetActive(false)));
+        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, () => Destroy(gameObject)));
     }
 
     public void Aceptar()

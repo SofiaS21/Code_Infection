@@ -16,5 +16,7 @@ MonoBehaviour:
   descripcion: Cura sangrados
   icono: {fileID: 21300000, guid: 2424edf03cacbef4a8664e64d43f7e7d, type: 3}
   modeloEnMano: {fileID: 100000, guid: 3475e46fc54d05a419fc9981c8368bfa, type: 3}
-  escalaEnMano: 0.09
+  escalaEnMano: 0.15
+  rotacionEnMano: {x: 90, y: -90, z: 0}
+  posicionEnMano: {x: -0.1, y: 0.3, z: 0}
   queCura: 1
