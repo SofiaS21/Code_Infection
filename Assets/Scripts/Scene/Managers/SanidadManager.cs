@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.PostProcessing;
 using TMPro;
 
 public class SanidadManager : MonoBehaviour
@@ -15,10 +16,29 @@ public class SanidadManager : MonoBehaviour
     public Sprite[] sprites;
     public GameObject panelGameOver;
 
+    [Header("PostProcessing")]
+    public float sanidadInicioEfectos = 50f;
+    public float vignetteMax = ;
+    public float ambientOcclusion;
+    public float grainMax;
+    public float chromaticAberration;
+    public float lenseDistortion;
+
     float sanidad = 90f;
     float drenaje;
     float tiempoPorMinuto;
     bool muerto;
+
+    //Efectos post-processing 
+    Vignette vignette;
+    AmbientOcclusion occlusion;
+    Grain grain;
+    ChromaticAberration chromatic;
+    LensDistortion lens;
+    float vignetteBase;
+    float ambientOcclusionBase;
+    float grainBase;
+    float intensidadEfectos;
 
     void Awake()
     {
