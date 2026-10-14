@@ -18,7 +18,7 @@ public class SanidadManager : MonoBehaviour
 
     [Header("PostProcessing")]
     public float sanidadInicioEfectos = 50f;
-    public float vignetteMax = ;
+    public float vignetteMax = 0.55f;
     public float ambientOcclusion;
     public float grainMax;
     public float chromaticAberration;

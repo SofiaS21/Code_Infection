@@ -30,8 +30,6 @@ public class Pacientes : MonoBehaviour , IInteractable
     private EsperaNPC npcManager;
 
     public ItemData[] itemData;
-    public GameObject canvasBurbuja;           
-    public Image iconoBurbuja;
     public bool enCuarto = false;
     public int[] medicamentos = new int[6];
 

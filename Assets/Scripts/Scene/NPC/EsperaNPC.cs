@@ -35,7 +35,10 @@ public class EsperaNPC : MonoBehaviour
 
     [Header("Variables")]
     public TMP_Text dialogueText;
+    public TMP_Text nombrePaciente;
+    public TMP_Text noMasPacientes;
     public GameObject panelDialogue;
+    public GameObject panelNoMasPacientes;
     public GameObject inventario;
     public GameObject tarjetaDNI;
     public Animator anim;
@@ -107,7 +110,8 @@ public class EsperaNPC : MonoBehaviour
         if (pacienteEspera.Count == 0)
         {
             currentVisitor = null;
-            panelDialogue.SetActive(true);
+            panelDialogue.SetActive(false);
+            panelNoMasPacientes.SetActive(true);
             inventario.SetActive(false);
             dialogueText.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
 
@@ -150,6 +154,7 @@ public class EsperaNPC : MonoBehaviour
         if (pacienteHablando) return;
 
         panelDialogue.SetActive(true);
+        nombrePaciente.text = currentVisitor.nombre;
 
         if (!dniMostrado)
         {
