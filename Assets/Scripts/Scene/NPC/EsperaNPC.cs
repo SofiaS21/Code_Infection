@@ -10,11 +10,22 @@ public class EsperaNPC : MonoBehaviour
     [Header("Spawn")]
     public Pacientes[] prefabsPacientes;
     public Transform puntoSpawn;
+
+    [System.Serializable]
     public class RangoDia
     {
         public int minPacientes = 2;
         public int maxPacientes = 6;
+        public bool anomaliaGarantizada = false;
+        [Range(0f, 1f)] public float probabilidadAnomalia = 0.2f;
     }
+
+    [Header("Anomalías")]
+    public AnomaliaData[] anomaliasPosibles;
+
+    private int totalDelDia;
+    private int indiceAnomalo = -1;
+    private RangoDia rangoActual;
 
     [Header("Dificultad por día")]
     public RangoDia[] rangosPorDia;     // posición 0 = día 1, posición 1 = día 2...
@@ -29,8 +40,6 @@ public class EsperaNPC : MonoBehaviour
 
     private int pacientesRestantes;
 
-    public List<Pacientes> patientList;
-    private Queue<Pacientes> pacienteEspera = new Queue<Pacientes>();
     private Pacientes currentVisitor;
 
     [Header("Variables")]
@@ -59,23 +68,21 @@ public class EsperaNPC : MonoBehaviour
 
     void Start()
     {
-        foreach (var patient in patientList)
-            pacienteEspera.Enqueue(patient);
-
         anim = GetComponent<Animator>();
-
         panelDialogue.SetActive(false);
-        ProximoPaciente();
+        IniciarDia();
     }
 
     public void IniciarDia()
     {
         int i = Mathf.Clamp(diaActual - 1, 0, rangosPorDia.Length - 1);
-        RangoDia rango = rangosPorDia[i];
+        rangoActual = rangosPorDia[i];
 
-        pacientesRestantes = Random.Range(rango.minPacientes, rango.maxPacientes + 1);
+        totalDelDia = Random.Range(rangoActual.minPacientes, rangoActual.maxPacientes + 1);
+        pacientesRestantes = totalDelDia;
+        indiceAnomalo = rangoActual.anomaliaGarantizada ? Random.Range(0, totalDelDia) : -1;
+
         esElPrimero = true;
-
         ProximoPaciente();
     }
 
@@ -103,24 +110,39 @@ public class EsperaNPC : MonoBehaviour
         ProximoPaciente();
     }
 
+    AnomaliaData ElegirAnomalia()
+    {
+        var validas = new List<AnomaliaData>();
+        foreach (var a in anomaliasPosibles)
+            if (a.diaMinimo <= diaActual) validas.Add(a);
+
+        if (validas.Count == 0) return null;
+        return validas[Random.Range(0, validas.Count)];
+    }
+
     public void ProximoPaciente()
     {
         StopAllCoroutines();
 
-        if (pacienteEspera.Count == 0)
+        if (pacientesRestantes <= 0)
         {
             currentVisitor = null;
             panelDialogue.SetActive(false);
             panelNoMasPacientes.SetActive(true);
             inventario.SetActive(false);
             dialogueText.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
-
-            StartCoroutine(OcultarDespuesDe(tiempoMensajeVisible));
         }
         else
         {
             StartCoroutine(SiguientePaciente());
         }
+    }
+
+    IEnumerator OcultarNoMasPacientes(float segundos)
+    {
+        yield return new WaitForSeconds(segundos);
+        panelNoMasPacientes.SetActive(false);
+        inventario.SetActive(true);
     }
 
     IEnumerator SiguientePaciente()
@@ -134,6 +156,8 @@ public class EsperaNPC : MonoBehaviour
 
         esElPrimero = false;
         dniMostrado = false;
+
+        int numeroPaciente = totalDelDia - pacientesRestantes;
         pacientesRestantes--;
 
         Pacientes prefab = prefabsPacientes[Random.Range(0, prefabsPacientes.Length)];
@@ -141,6 +165,10 @@ public class EsperaNPC : MonoBehaviour
 
         var agent = currentVisitor.GetComponent<NavMeshAgent>();
         if (agent != null) agent.Warp(puntoSpawn.position);
+
+        bool esAnomalo = (numeroPaciente == indiceAnomalo) || Random.value < rangoActual.probabilidadAnomalia;
+        if (esAnomalo)
+            currentVisitor.anomalia = ElegirAnomalia();
 
         currentVisitor.Inicializar(this, counter, puertaSalida, cuartoFacil1, tarjetaDNI, textoNombreDNI, fechaVencimientoDNI);
         currentVisitor.GenerarDatos();
@@ -161,13 +189,13 @@ public class EsperaNPC : MonoBehaviour
             dniMostrado = true;
             tarjetaDNI.SetActive(true);
             inventario.SetActive(false);
-            Decir("Hola, mi nombre es " + currentVisitor.nombre);
+            Decir("Hola, mi nombre es " + currentVisitor.nombreEnDialogo);
         }
 
         else
         {
             inventario.SetActive(false);
-            Decir("Ehmm.. ya te dije que mi nombre es " + currentVisitor.nombre);
+            Decir("Ehmm.. ya te dije que mi nombre es " + currentVisitor.nombreEnDialogo);
         }
 
         if (!currentVisitor.llegoAlCounter)
@@ -199,7 +227,7 @@ public class EsperaNPC : MonoBehaviour
         pacienteHablando = true;
 
         dialogueText.text = textoCompleto;
-        dialogueText.maxVisibleCharacters = 0; 
+        dialogueText.maxVisibleCharacters = 0;
 
         for (int i = 1; i <= textoCompleto.Length; i++)
         {
@@ -208,12 +236,5 @@ public class EsperaNPC : MonoBehaviour
         }
 
         pacienteHablando = false;
-    }
-
-    IEnumerator OcultarDespuesDe(float segundos)
-    {
-        yield return new WaitForSeconds(segundos);
-        panelDialogue.SetActive(false);
-        inventario.SetActive(true);
     }
 }

@@ -4,15 +4,22 @@ using TMPro;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-public class Pacientes : MonoBehaviour , IInteractable
+public class Pacientes : MonoBehaviour, IInteractable
 {
     public static Pacientes Actual;
 
     // Datos del paciente
     public string nombre;
+    public string nombreEnDialogo;
+    public AnomaliaData anomalia;
+    public Transform anclaAnomalia;
+    public bool EsAnomalia { get { return anomalia != null; } }
+
     public string imagenCamara;
     public Texture dniImagen;
     public string dniFechaVencimiento;
+
+
     // Tarjeta DNI (objetos de la escena)
     public GameObject tarjetaDNI;
     public TMP_Text textoNombre;
@@ -82,17 +89,34 @@ public class Pacientes : MonoBehaviour , IInteractable
         npcManager.MostrarDNI(this);
     }
 
+    public void AplicarAnomalia()
+    {
+        if (anomalia == null) return;
+
+        switch (anomalia.tipo)
+        {
+            case TipoAnomalia.NombreIncorrecto:
+
+                do { nombreEnDialogo = textoNombrePosibles[Random.Range(0, textoNombrePosibles.Length)]; }
+                while (nombreEnDialogo == nombre);
+                break;
+
+            case TipoAnomalia.Visual:
+
+                if (anomalia.prefabVisual != null)
+                    Instantiate(anomalia.prefabVisual, anclaAnomalia != null ? anclaAnomalia : transform);
+                break;
+        } 
+    }
     // EsperaNPC la llama ANTES de activar al paciente
     public void GenerarDatos()
     {
-        int posNombre = Random.Range(0, textoNombrePosibles.Length);
-        nombre = textoNombrePosibles[posNombre];
-
-        int posFecha = Random.Range(0, fechasVencimientoPosibles.Length);
-        dniFechaVencimiento = fechasVencimientoPosibles[posFecha];
-
+        nombre = textoNombrePosibles[Random.Range(0, textoNombrePosibles.Length)];
+        nombreEnDialogo = nombre;
+        dniFechaVencimiento = fechasVencimientoPosibles[Random.Range(0, fechasVencimientoPosibles.Length)];
         queEnfermedadtiene = (Enfermedad)Random.Range(1, System.Enum.GetValues(typeof(Enfermedad)).Length);
-        
+
+        AplicarAnomalia();
 
         // Se escriben en la tarjeta ya mismo
         if (textoNombre != null) textoNombre.text = nombre;

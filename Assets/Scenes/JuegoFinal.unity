@@ -424,7 +424,7 @@ GameObject:
   - component: {fileID: 58136825}
   - component: {fileID: 58136824}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: No mas pacientes - Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -499,7 +499,7 @@ Canvas:
   m_GameObject: {fileID: 58136822}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -2003,7 +2003,7 @@ GameObject:
   m_Component:
   - component: {fileID: 386184979}
   m_Layer: 0
-  m_Name: Paneles
+  m_Name: Ganaste - Perdiste
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2017,14 +2017,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 386184978}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 305.00195, y: 170.59952, z: 0.16709666}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 15.151947, y: -2.9794922, z: 13.170609}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 235177267}
   - {fileID: 1232684008}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 882904295}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &386786844
 GameObject:
@@ -2127,13 +2127,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 415399130}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.741608, y: 8.891681, z: -15.89382}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -287.1084, y: -164.68733, z: -2.8903074}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 480980210}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 882904295}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &416803872
 PrefabInstance:
@@ -3131,15 +3131,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabsPacientes: []
   puntoSpawn: {fileID: 911228739}
+  anomaliasPosibles: []
+  rangosPorDia: []
   diaActual: 1
   counter: {fileID: 1037274077}
   puertaSalida: {fileID: 911228739}
   cuartoFacil1: {fileID: 1127214124}
   textoNombreDNI: {fileID: 97967568}
   fechaVencimientoDNI: {fileID: 333570484}
-  patientList:
-  - {fileID: 1596856241}
-  - {fileID: 0}
   dialogueText: {fileID: 1866672711}
   nombrePaciente: {fileID: 1397101462}
   noMasPacientes: {fileID: 1737581605}
@@ -3458,6 +3457,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nombre: 
+  nombreEnDialogo: 
+  anomalia: {fileID: 0}
+  anclaAnomalia: {fileID: 0}
   imagenCamara: 
   dniImagen: {fileID: 2800000, guid: 5701edc8c3e7ba8479c0e35a96210499, type: 3}
   dniFechaVencimiento: 
@@ -3821,7 +3823,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &704915288
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5193,6 +5195,40 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 2142078080}
   m_SourcePrefab: {fileID: 100100000, guid: b1bf83d32e3fe924dbc796abdf91de06, type: 3}
+--- !u!1 &882904294
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 882904295}
+  m_Layer: 0
+  m_Name: "UI\xB4s"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &882904295
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882904294}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 289.85, y: 173.57901, z: -13.003512}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 415399131}
+  - {fileID: 901839602}
+  - {fileID: 386184979}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &886300728 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2395516329372418766, guid: 1de698e1c6ae9bb499736779312e8c0b, type: 3}
@@ -5213,7 +5249,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &901839602
 Transform:
   m_ObjectHideFlags: 0
@@ -5223,13 +5259,13 @@ Transform:
   m_GameObject: {fileID: 901839601}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.0838628, y: 1.6787698, z: -3.267889}
+  m_LocalPosition: {x: -288.76614, y: -171.90024, z: 9.735623}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 704915288}
   - {fileID: 2076426516}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 882904295}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &903748601
 GameObject:
@@ -7042,7 +7078,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 42ac26e052a040547ac8c965dcff65d9, type: 3}
   - {fileID: 21300000, guid: 1939027dde6b2b045a9f3b2c090c1b8f, type: 3}
   - {fileID: 21300000, guid: 76e27577fd609114d879bf0308ae0360, type: 3}
-  panelGameOver: {fileID: 0}
+  panelGameOver: {fileID: 235177266}
   sanidadInicioEfectos: 50
   vignetteMax: 0.55
   ambientOcclusion: 0
@@ -8363,6 +8399,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nombre: 
+  nombreEnDialogo: 
+  anomalia: {fileID: 0}
+  anclaAnomalia: {fileID: 0}
   imagenCamara: 
   dniImagen: {fileID: 2800000, guid: 88c63ee7792f3594581ef7d1a242f434, type: 3}
   dniFechaVencimiento: 
@@ -8884,16 +8923,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1737581602}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.29267845, y: 0.50975704, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1967922554}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -2.4, y: 17.3}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1737581604
@@ -8926,15 +8965,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 87149c529232ef045a6df74b0ea2406b, type: 2}
+  m_sharedMaterial: {fileID: 21550377365699398, guid: 87149c529232ef045a6df74b0ea2406b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4281611318
+  m_fontColor: {r: 0.21176471, g: 0.20392157, b: 0.20392157, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -8958,7 +8997,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -8987,7 +9026,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -27.23346, y: 0, z: -55.823654, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -10099,7 +10138,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 7f2bbc2bd9520ca4e9c41a7ce2902c6b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -10126,7 +10165,7 @@ RectTransform:
   m_GameObject: {fileID: 1967922551}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3.416719, y: 1.9617188, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1737581603}
@@ -11157,12 +11196,10 @@ SceneRoots:
   - {fileID: 2017805144}
   - {fileID: 147541360}
   - {fileID: 495599493}
-  - {fileID: 901839602}
   - {fileID: 494694862}
   - {fileID: 3890201}
   - {fileID: 75514348}
   - {fileID: 1075575750}
   - {fileID: 1545978486}
   - {fileID: 859471957}
-  - {fileID: 386184979}
-  - {fileID: 415399131}
+  - {fileID: 882904295}
