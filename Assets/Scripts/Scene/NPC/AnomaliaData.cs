@@ -5,9 +5,9 @@ using UnityEngine;
 public enum TipoAnomalia
 {
     NombreIncorrecto,
-    DniVencido,
+    DniFotoIncorrecto,
     Visual,
-    DialogoRaro
+    DialogoRaro,
 }
 
 [CreateAssetMenu(menuName = "Juego/Anomalia")]
@@ -23,17 +23,6 @@ public class AnomaliaData : ScriptableObject
 
     [Header("Secreto")]
     [TextArea] public string frase;
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
+
+

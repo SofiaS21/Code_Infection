@@ -3131,8 +3131,39 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabsPacientes: []
   puntoSpawn: {fileID: 911228739}
-  anomaliasPosibles: []
-  rangosPorDia: []
+  anomaliasPosibles:
+  - {fileID: 11400000, guid: 529d2fea67c702a4da7febd7f3bdec73, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  rangosPorDia:
+  - minPacientes: 2
+    maxPacientes: 2
+    anomaliasGarantizadas: 0
+    probabilidadAnomalia: 0
+  - minPacientes: 2
+    maxPacientes: 4
+    anomaliasGarantizadas: 1
+    probabilidadAnomalia: 0.3
+  - minPacientes: 3
+    maxPacientes: 5
+    anomaliasGarantizadas: 2
+    probabilidadAnomalia: 0.4
+  - minPacientes: 4
+    maxPacientes: 5
+    anomaliasGarantizadas: 2
+    probabilidadAnomalia: 0.3
+  - minPacientes: 5
+    maxPacientes: 5
+    anomaliasGarantizadas: 2
+    probabilidadAnomalia: 0.3
+  - minPacientes: 5
+    maxPacientes: 5
+    anomaliasGarantizadas: 2
+    probabilidadAnomalia: 0.5
+  - minPacientes: 5
+    maxPacientes: 5
+    anomaliasGarantizadas: 0
+    probabilidadAnomalia: 0.5
   diaActual: 1
   counter: {fileID: 1037274077}
   puertaSalida: {fileID: 911228739}
@@ -3385,6 +3416,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Npcs
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: aa8f5abb9b3dcc040b1b0d98d9997919, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: c3a612696e7184046b2faadc85e0d38d, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3486,7 +3521,7 @@ MonoBehaviour:
   medicamentos: 
   rotacionEnCounter: {x: 0, y: 90, z: 0}
   velocidadCaminar: 3.5
-  anim: {fileID: 0}
+  anim: {fileID: 2118323592}
   llegoAlCounter: 0
   queEnfermedadtiene: 0
 --- !u!4 &596735204 stripped
@@ -10870,6 +10905,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 12.252796, y: 11.239458, z: 40.748978}
   m_Center: {x: 4.132519, y: 4.312178, z: -19.212616}
+--- !u!95 &2118323592 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: aa8f5abb9b3dcc040b1b0d98d9997919, type: 3}
+  m_PrefabInstance: {fileID: 596594188}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2118733826
 PrefabInstance:
   m_ObjectHideFlags: 0

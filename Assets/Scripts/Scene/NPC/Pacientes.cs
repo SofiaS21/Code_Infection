@@ -55,6 +55,9 @@ public class Pacientes : MonoBehaviour, IInteractable
     public void OnFocus() { }
     public void OnUnfocus() { }
 
+    public float tiempoEsperaCuracion = 40f;
+    public bool estaCurado = false;
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -83,7 +86,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         this.textoNombre = textoNombre;
         this.fechaVencimiento = fechaVencimiento;
     }
-    
+
     public void Interact()
     {
         npcManager.MostrarDNI(this);
@@ -102,13 +105,10 @@ public class Pacientes : MonoBehaviour, IInteractable
                 break;
 
             case TipoAnomalia.Visual:
-
-                if (anomalia.prefabVisual != null)
-                    Instantiate(anomalia.prefabVisual, anclaAnomalia != null ? anclaAnomalia : transform);
                 break;
         } 
     }
-    // EsperaNPC la llama ANTES de activar al paciente
+
     public void GenerarDatos()
     {
         nombre = textoNombrePosibles[Random.Range(0, textoNombrePosibles.Length)];
@@ -121,6 +121,44 @@ public class Pacientes : MonoBehaviour, IInteractable
         // Se escriben en la tarjeta ya mismo
         if (textoNombre != null) textoNombre.text = nombre;
         if (fechaVencimiento != null) fechaVencimiento.text = dniFechaVencimiento;
+    }
+
+    string Corromper(string texto)
+    {
+        var posiciones = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < texto.Length; i++)
+        {
+            if (ObtenerReemplazo(texto[i]) != null)
+                posiciones.Add(i);
+        }
+
+        // Si el nombre no tiene ninguna letra reemplazable, no hace nada
+        if (posiciones.Count == 0) return texto;
+
+        int elegida = posiciones[Random.Range(0, posiciones.Count)];
+        string reemplazo = ObtenerReemplazo(texto[elegida]);
+
+        return texto.Substring(0, elegida) + reemplazo + texto.Substring(elegida + 1);
+    }
+
+    string ObtenerReemplazo(char c)
+    {
+        switch (char.ToLower(c))
+        {
+            case 'a': return "@";
+            case 'e': return "3";
+            case 'i': return "!";
+            case 'o': return "0";
+            case 's': return "5";
+            case 't': return "7";
+            case 'g': return "6";
+            case 'b': return "8";
+            case 'l': return "1";
+            case 'z': return "2";
+            case 'k': return "|<";
+            case 'h': return "#";
+            default: return null;   
+        }
     }
 
     IEnumerator IrHaciaCounter()
@@ -207,7 +245,60 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (anim != null)
             anim.SetBool("Caminando", false);
 
+        if ( destino == cuartoFacil1)
+        {
+            if (agent != null)
+                agent.enabled = false;
+
+            transform.position = destino.position;
+            transform.rotation = destino.rotation;
+
+            if (anim != null)
+            {
+                anim.SetTrigger("Acostarse");
+            }
+        }
+
         if (alLlegar != null)
             alLlegar.Invoke();
+    }
+
+    IEnumerator EsperarYSalir()
+    {
+        yield return new WaitForSeconds(tiempoEsperarCuracion);
+
+        if (agent != null)
+        {
+            agent.enabled = true;
+            agent.isStopped = false;
+        }
+
+        if (anim != null)
+        {
+            anim.ResetTrigger("Acostarse");
+            anim.SetBool("Caminando", true);
+        }
+
+        if (agent != null && puertaSalida != null)
+        {
+            agent.SetDestination(puertaSalida.position);
+
+            yield return null;
+            while (agent.pathPending)
+                yield return null;
+
+            while (agent.remainingDistance > 0.3f)
+                yield return null;
+        }
+
+        Destroy(gameObject);
+    }
+
+    public void CurarPacientes()
+    {
+        if (estaCurado) return;
+        estaCurado = true;
+
+        StartCoroutine(EsperarYSalir());
     }
 }

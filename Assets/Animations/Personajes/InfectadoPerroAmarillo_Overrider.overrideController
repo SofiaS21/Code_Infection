@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: InfectadoPerroAmarillo_Overrider
+  m_Controller: {fileID: 9100000, guid: a5aa68abc98bd6b40839a85355fa8a01, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: -203655887218126122, guid: 8a8a74742fccb364d8e14628e280f2db, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: 78d2f08243395674fa547ee318b570a0, type: 3}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: ce007c05b8d8e4d4cb909e9fa140ca4a, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: a43997680f6589843a007d887438b6d3, type: 3}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: 7647ecd87e97e23419053ef40e15dabb, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: 1bbc29402bccbe948ad598228817ccdd, type: 3}
+  - m_OriginalClip: {fileID: -203655887218126122, guid: a6d4d636d09279442a87a1dcd3d337a3, type: 3}
+    m_OverrideClip: {fileID: -203655887218126122, guid: 0e2cec864bd26a14fa7a523ad50514dd, type: 3}
