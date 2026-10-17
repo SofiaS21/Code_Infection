@@ -23,6 +23,9 @@ public class Inventario : MonoBehaviour
     void Start()
     {
         canvasInvLleno.SetActive(false);
+
+        foreach (var slot in slotsUI)
+            slot.LimpiarSlot(); 
     }
 
     void Update()
@@ -64,7 +67,7 @@ public class Inventario : MonoBehaviour
 
     public void ConsumirEquipado()
     {
-        if (indiceEquipado >= 0) return;
+        if (indiceEquipado < 0) return;
         if (modelObjetoEquipado != null) Destroy(modelObjetoEquipado);
         QuitarItem(indiceEquipado);
         indiceEquipado = -1;

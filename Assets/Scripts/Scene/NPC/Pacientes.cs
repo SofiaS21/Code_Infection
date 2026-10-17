@@ -17,6 +17,8 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     public string imagenCamara;
     public Texture dniImagen;
+    public Texture[] dniImagenesAnomalas;
+    private RawImage dniFotoRawImage;
     public string dniFechaVencimiento;
 
 
@@ -55,7 +57,7 @@ public class Pacientes : MonoBehaviour, IInteractable
     public void OnFocus() { }
     public void OnUnfocus() { }
 
-    public float tiempoEsperaCuracion = 40f;
+    public float tiempoEsperarCuracion = 40f;
     public bool estaCurado = false;
 
     void Awake()
@@ -70,13 +72,12 @@ public class Pacientes : MonoBehaviour, IInteractable
         Actual = this;
         procesando = false;
         llegoAlCounter = false;
-        tarjetaDNI.SetActive(false);
 
         agent.speed = velocidadCaminar;
         StartCoroutine(IrHaciaCounter());
     }
 
-    public void Inicializar(EsperaNPC npcManager, Transform counter, Transform puertaSalida, Transform cuartoFacil1, GameObject tarjetaDNI, TMP_Text textoNombre, TMP_Text fechaVencimiento)
+    public void Inicializar(EsperaNPC npcManager, Transform counter, Transform puertaSalida, Transform cuartoFacil1, GameObject tarjetaDNI, TMP_Text textoNombre, TMP_Text fechaVencimiento, RawImage dniFotoRawImage)
     {
         this.npcManager = npcManager;
         this.counter = counter;
@@ -85,10 +86,12 @@ public class Pacientes : MonoBehaviour, IInteractable
         this.tarjetaDNI = tarjetaDNI;   
         this.textoNombre = textoNombre;
         this.fechaVencimiento = fechaVencimiento;
+        this.dniFotoRawImage = dniFotoRawImage;
     }
 
     public void Interact()
     {
+        Debug.Log("Interact llamado en " + name);
         npcManager.MostrarDNI(this);
     }
 
@@ -102,6 +105,11 @@ public class Pacientes : MonoBehaviour, IInteractable
 
                 do { nombreEnDialogo = textoNombrePosibles[Random.Range(0, textoNombrePosibles.Length)]; }
                 while (nombreEnDialogo == nombre);
+                break;
+
+            case TipoAnomalia.FotoDiferente:
+                if (dniImagenesAnomalas != null && dniImagenesAnomalas.Length > 0)
+                    dniImagen = dniImagenesAnomalas[Random.Range(0, dniImagenesAnomalas.Length)];
                 break;
 
             case TipoAnomalia.Visual:
@@ -121,6 +129,9 @@ public class Pacientes : MonoBehaviour, IInteractable
         // Se escriben en la tarjeta ya mismo
         if (textoNombre != null) textoNombre.text = nombre;
         if (fechaVencimiento != null) fechaVencimiento.text = dniFechaVencimiento;
+
+        if (dniFotoRawImage != null && dniImagen != null)
+            dniFotoRawImage.texture = dniImagen;
     }
 
     string Corromper(string texto)

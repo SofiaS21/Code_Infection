@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+
 
 public class EsperaNPC : MonoBehaviour
 {
@@ -24,7 +26,6 @@ public class EsperaNPC : MonoBehaviour
     public AnomaliaData[] anomaliasPosibles;
 
     private int totalDelDia;
-    private int indiceAnomalo = -1;
     private RangoDia rangoActual;
     private List<int> indicesAnomalos = new List<int>();
 
@@ -38,6 +39,7 @@ public class EsperaNPC : MonoBehaviour
     public Transform cuartoFacil1;
     public TMP_Text textoNombreDNI;
     public TMP_Text fechaVencimientoDNI;
+    public RawImage dniFotoRawImage;
 
     private int pacientesRestantes;
 
@@ -48,6 +50,7 @@ public class EsperaNPC : MonoBehaviour
     public TMP_Text nombrePaciente;
     public TMP_Text noMasPacientes;
     public GameObject panelDialogue;
+    public GameObject panelDni;
     public GameObject panelNoMasPacientes;
     public GameObject inventario;
     public GameObject tarjetaDNI;
@@ -73,6 +76,7 @@ public class EsperaNPC : MonoBehaviour
         panelDialogue.SetActive(false);
         panelNoMasPacientes.SetActive(false);
         IniciarDia();
+        tarjetaDNI.SetActive(false);
     }
 
     public void IniciarDia()
@@ -109,6 +113,9 @@ public class EsperaNPC : MonoBehaviour
         tarjetaDNI.SetActive(false);
         currentVisitor.Rechazar();
         ProximoPaciente();
+
+        if (DniDisplay.Instancia != null)
+            DniDisplay.Instancia.Ocultar();
     }
 
     public void AceptarAcceso()
@@ -118,6 +125,10 @@ public class EsperaNPC : MonoBehaviour
         tarjetaDNI.SetActive(false);
         currentVisitor.Aceptar();
         ProximoPaciente();
+
+        if (DniDisplay.Instancia != null)
+            DniDisplay.Instancia.Ocultar();
+
     }
 
     AnomaliaData ElegirAnomalia()
@@ -162,7 +173,6 @@ public class EsperaNPC : MonoBehaviour
     {
         currentVisitor = null;
         inventario.SetActive(false);
-        panelDialogue.SetActive(true);
 
         if (!esElPrimero)
             yield return new WaitForSeconds(tiempoEntrePacientes);
@@ -189,21 +199,26 @@ public class EsperaNPC : MonoBehaviour
 
         var agent = currentVisitor.GetComponent<NavMeshAgent>();
         if (agent != null) agent.Warp(puntoSpawn.position);
+
+        currentVisitor.Inicializar(this, counter, puertaSalida, cuartoFacil1, tarjetaDNI, textoNombreDNI, fechaVencimientoDNI, dniFotoRawImage);
+        currentVisitor.GenerarDatos();
+        currentVisitor.Iniciar();
     }
 
     public void MostrarDNI(Pacientes quien)
     {
+ 
         if (currentVisitor == null || quien != currentVisitor) return;
         if (!currentVisitor.PuedeInteractuar) return;
         if (pacienteHablando) return;
 
         panelDialogue.SetActive(true);
-        nombrePaciente.text = currentVisitor.nombreEnDialogo;
+        tarjetaDNI.SetActive(true);
+    nombrePaciente.text = currentVisitor.nombreEnDialogo;
 
         if (!dniMostrado)
         {
             dniMostrado = true;
-            tarjetaDNI.SetActive(true);
             inventario.SetActive(false);
             Decir("Hola, mi nombre es " + currentVisitor.nombreEnDialogo);
         }
@@ -222,6 +237,19 @@ public class EsperaNPC : MonoBehaviour
 
         // Oculta diálogo después de 5 segundos
         corrutinaOcultarDialogo = StartCoroutine(OcultarDialogoDespuesDe(5f));
+
+        DniDisplay.Instancia.MostrarActual();
+    }
+
+    public void AbrirDNI()
+    {
+        if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
+
+        tarjetaDNI.SetActive(true);
+        panelDni.SetActive(true);
+
+        if (DniDisplay.Instancia != null)
+            DniDisplay.Instancia.MostrarActual();
     }
 
     void Decir(string texto)

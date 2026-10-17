@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-
 public class DniDisplay : MonoBehaviour
 {
     public static DniDisplay Instancia;
@@ -16,13 +15,22 @@ public class DniDisplay : MonoBehaviour
         Instancia = this;
     }
 
+    //muestra el DNI del paciente que está en el counter
+    public void MostrarActual()
+    {
+        Pacientes p = Pacientes.Actual;
+        if (p == null) return;
+
+        Mostrar(p.dniImagen, p.nombre, p.dniFechaVencimiento);
+    }
+
     public void Mostrar(Texture textura, string nombre, string fechaVencimiento)
     {
         if (imagenDniUI == null) return;
 
         if (textura == null)
         {
-            imagenDniUI.enabled = false;
+            Ocultar();
             return;
         }
 

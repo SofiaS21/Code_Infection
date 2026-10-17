@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public enum TipoAnomalia
 {
     NombreIncorrecto,
-    DniFotoIncorrecto,
+    FotoDiferente,
     Visual,
     DialogoRaro,
 }
@@ -13,7 +14,7 @@ public enum TipoAnomalia
 [CreateAssetMenu(menuName = "Juego/Anomalia")]
 public class AnomaliaData : ScriptableObject
 {
-
+    public Pacientes prefabAnomalo;
     public string nombreInterno;
     public TipoAnomalia tipo;
     public int diaMinimo = 2;
