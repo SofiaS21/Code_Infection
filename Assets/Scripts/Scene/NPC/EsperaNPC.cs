@@ -59,6 +59,7 @@ public class EsperaNPC : MonoBehaviour
     [Header("Tiempos")]
     public float tiempoMensajeVisible = 5f;
     public float tiempoEntrePacientes = 10f;
+    public float tiempoAntesDelPanel = 5f;
     public float velocidadCaminar = 3.5f;
 
     public float velocidadTexto = 0.05f;
@@ -148,19 +149,33 @@ public class EsperaNPC : MonoBehaviour
 
         if (pacientesRestantes <= 0)
         {
+
             currentVisitor = null;
             panelDialogue.SetActive(false);
-            panelNoMasPacientes.SetActive(true);
-            inventario.SetActive(false);
-            noMasPacientes.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
 
-            StartCoroutine(OcultarNoMasPacientes(tiempoMensajeVisible));    
+            StartCoroutine(MostrarNoMasPacientes());    
         }
         else
         {
             StartCoroutine(SiguientePaciente());
         }
     }
+
+    IEnumerator MostrarNoMasPacientes()
+    {
+        yield return new WaitForSeconds(tiempoAntesDelPanel);
+
+        panelNoMasPacientes.SetActive(true);
+        inventario.SetActive(false);
+        noMasPacientes.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
+
+        yield return new WaitForSeconds(tiempoMensajeVisible);
+
+        panelNoMasPacientes.SetActive(false);
+        inventario.SetActive(true);
+    }
+
+
 
     IEnumerator OcultarNoMasPacientes(float segundos)
     {
@@ -172,7 +187,9 @@ public class EsperaNPC : MonoBehaviour
     IEnumerator SiguientePaciente()
     {
         currentVisitor = null;
-        inventario.SetActive(false);
+        inventario.SetActive(true);
+        panelDialogue.SetActive(false);
+
 
         if (!esElPrimero)
             yield return new WaitForSeconds(tiempoEntrePacientes);
