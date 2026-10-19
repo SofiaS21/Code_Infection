@@ -33,6 +33,21 @@ public class EsperaNPC : MonoBehaviour
     public RangoDia[] rangosPorDia;     // posición 0 = día 1, posición 1 = día 2...
     public int diaActual = 1;
 
+    [Header("Fin del dia")]
+    public GameObject panelReloj;
+    public GameObject panelFinalDia;
+    public TMP_Text textoReloj;
+    public TMP_Text textoFinalDia;
+    public TMP_Text textoIngresos, textoRenta, textoComida, textoCompras, textoMuertes, textoTotal;
+    public float tiempoRelojVisible = 3f;
+
+    private int pacientesEnEscena = 0;
+    private bool diaTerminado = false;
+
+    [Header("Transiciones")]
+    public float duracionFade = 0.8f;
+    public float tiempoBloqueoClic = 3f;
+
     [Header("Referencias de escena que se le pasan al paciente")]
     public Transform counter;
     public Transform puertaSalida;
@@ -74,14 +89,24 @@ public class EsperaNPC : MonoBehaviour
     void Start()
     {
         anim = GetComponent<Animator>();
+
         panelDialogue.SetActive(false);
         panelNoMasPacientes.SetActive(false);
+
         IniciarDia();
         tarjetaDNI.SetActive(false);
+
+        panelReloj.SetActive(false);
+        panelFinalDia.SetActive(false);
     }
 
     public void IniciarDia()
     {
+        diaTerminado = false;
+        pacientesEnEscena = 0;
+        panelReloj.SetActive(false);
+        panelFinalDia.SetActive(false);
+
         int i = Mathf.Clamp(diaActual - 1, 0, rangosPorDia.Length - 1);
         rangoActual = rangosPorDia[i];
 
@@ -153,7 +178,9 @@ public class EsperaNPC : MonoBehaviour
             currentVisitor = null;
             panelDialogue.SetActive(false);
 
-            StartCoroutine(MostrarNoMasPacientes());    
+            ComprobarFinDelDia();
+            if (!diaTerminado)
+                StartCoroutine(MostrarNoMasPacientes());
         }
         else
         {
@@ -161,6 +188,47 @@ public class EsperaNPC : MonoBehaviour
         }
     }
 
+    void ComprobarFinDelDia()
+    {
+        if (diaTerminado) return;
+        if (pacientesRestantes > 0 || pacientesEnEscena > 0) return;
+
+        diaTerminado true;
+        StopAllCoroutines();
+        StartCoroutine(PanelesFinDelDia());
+    }
+
+    IEnumerator PanelesFinDelDia()
+    {
+        currentVisitor = null;
+        panelDialogue.SetActive(false);
+        panelNoMasPacientes.SetActive(false);
+        tarjetaDNI.SetActive(false);
+        inventario.SetActive(false);
+
+        yield return UITransiciones.FadeIn(panelReloj, duracionFade);
+        yield return UITransiciones.EsperarSegundosOClic(tiempoRelojVisible);
+        yield return UITransiciones.FadeOut(panelReloj, duracionFade);
+
+        yield return UITransiciones.FadeIn(panelFinalDia, duracionFade);
+        yield return UITransiciones.EsperarClic(tiempoBloqueoClic);
+        yield return UITransiciones.FadeOut(panelFinalDia, duracionFade);
+
+        AplicarEfectosCambioDeDia();
+        SiguienteDia();
+    }
+
+    public void BotonSiguienteDia()
+    {
+        panelFinalDia.SetActive(false);
+        SiguienteDia();
+    }
+
+    public void PacienteSalio()
+    {
+        pacientesEnEscena = Mathf.Max(0, pacientesEnEscena - 1);
+        ComprobarFinDelDia();
+    }
     IEnumerator MostrarNoMasPacientes()
     {
         yield return new WaitForSeconds(tiempoAntesDelPanel);
@@ -213,6 +281,9 @@ public class EsperaNPC : MonoBehaviour
 
         currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
         currentVisitor.anomalia = anomalia;
+
+        currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
+        pacientesEnEscena++;
 
         var agent = currentVisitor.GetComponent<NavMeshAgent>();
         if (agent != null) agent.Warp(puntoSpawn.position);
