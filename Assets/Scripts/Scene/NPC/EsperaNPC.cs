@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-
 public class EsperaNPC : MonoBehaviour
 {
 
@@ -193,7 +192,7 @@ public class EsperaNPC : MonoBehaviour
         if (diaTerminado) return;
         if (pacientesRestantes > 0 || pacientesEnEscena > 0) return;
 
-        diaTerminado true;
+        diaTerminado = true;
         StopAllCoroutines();
         StartCoroutine(PanelesFinDelDia());
     }
@@ -216,6 +215,11 @@ public class EsperaNPC : MonoBehaviour
 
         AplicarEfectosCambioDeDia();
         SiguienteDia();
+    }
+
+    void AplicarEfectosCambioDeDia()
+    {
+
     }
 
     public void BotonSiguienteDia()
@@ -281,8 +285,6 @@ public class EsperaNPC : MonoBehaviour
 
         currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
         currentVisitor.anomalia = anomalia;
-
-        currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
         pacientesEnEscena++;
 
         var agent = currentVisitor.GetComponent<NavMeshAgent>();

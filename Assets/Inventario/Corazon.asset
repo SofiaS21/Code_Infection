@@ -14,5 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nombre: Corazon
   descripcion: 
-  icono: {fileID: 0}
+  icono: {fileID: 21300000, guid: b0092d49bf30d194ea3e32f44c3011cc, type: 3}
   modeloEnMano: {fileID: 0}
+  escalaEnMano: 1
+  rotacionEnMano: {x: 0, y: 0, z: 0}
+  posicionEnMano: {x: 0, y: 0, z: 0}
+  queCura: 0
