@@ -29,6 +29,12 @@ public class TiendaUI : MonoBehaviour
     [Header("Bloquear al abrir (movimiento, cámara, etc.)")]
     public MonoBehaviour[] scriptsADesactivar;
 
+    [Header("Cierre por distancia")]
+    public Transform jugador;           
+    public Transform computadoraModelo;       
+    public float distanciaCierre = 4f;
+
+
     readonly List<ItemData> carrito = new List<ItemData>();
     public bool EstaAbierta { get; private set; }
 
@@ -56,18 +62,36 @@ public class TiendaUI : MonoBehaviour
 
     void Update()
     {
-        if (EstaAbierta && Input.GetKeyDown(KeyCode.Escape)) Cerrar();
+        if (!EstaAbierta) return;
+
+        if (Input.GetKeyDown(KeyCode.Escape)) { Cerrar(); return; }
+
+        if (jugador != null && computadoraModelo != null &&
+            Vector3.Distance(jugador.position, computadoraModelo.position) > distanciaCierre)
+        {
+            Cerrar();
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (!EstaAbierta) return;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void Abrir()
     {
+        Debug.Log("Tienda abierta");
         EstaAbierta = true;
-        MostrarCarrito(false);
-        inventarioUi.SetActive(false);
-        sanidadUi.SetActive(false);
-        foreach (var s in scriptsADesactivar) s.enabled = false;
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        foreach (var s in scriptsADesactivar)
+            if (s != null) s.enabled = false;
+
+        MostrarCarrito(false);
     }
 
     public void Cerrar()
@@ -75,9 +99,10 @@ public class TiendaUI : MonoBehaviour
         EstaAbierta = false;
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
-        inventarioUi.SetActive(true);
-        sanidadUi.SetActive(true);
-        foreach (var s in scriptsADesactivar) s.enabled = true;
+
+        foreach (var s in scriptsADesactivar)
+            if (s != null) s.enabled = true;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }

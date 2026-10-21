@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 473939}
   m_Layer: 5
   m_Name: ComprasSalir.bttn
-  m_TagString: Untagged
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -150,15 +150,15 @@ RectTransform:
   m_GameObject: {fileID: 473937}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.76870495, y: 3.9004416, z: 3.9004416}
+  m_LocalScale: {x: 0.2227291, y: 1.130137, z: 1.130137}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 772122885}
-  m_Father: {fileID: 729260581}
+  m_Father: {fileID: 1694248261}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -876, y: 396}
+  m_AnchoredPosition: {x: -260.5553, y: 112.30524}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &473939
@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 57166263}
   m_Layer: 5
   m_Name: ComprarPastillas
-  m_TagString: Untagged
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1258,6 +1258,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 120499928}
   m_CullTransparentMesh: 1
+--- !u!1 &127475605 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
+  m_PrefabInstance: {fileID: 493222589}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &137269629
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2252,11 +2257,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0263f6727732f334bb3aa495e3210de6, type: 2}
   botonesComprar:
   - {fileID: 57166263}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   textosCarrito:
   - {fileID: 120499930}
   - {fileID: 557976566}
@@ -2266,11 +2266,16 @@ MonoBehaviour:
   - {fileID: 336400389}
   - {fileID: 1596452859}
   maxCarrito: 3
-  botonVerCarrito: {fileID: 473939}
+  botonVerCarrito: {fileID: 1184714633}
   botonVolverDeTienda: {fileID: 473939}
   botonVolverDeCarrito: {fileID: 605991102}
   botonConfirmar: {fileID: 1627393702}
-  scriptsADesactivar: []
+  scriptsADesactivar:
+  - {fileID: 1699343875}
+  - {fileID: 830403082}
+  jugador: {fileID: 1699343872}
+  computadoraModelo: {fileID: 1763718425}
+  distanciaCierre: 4
 --- !u!1 &329431407
 GameObject:
   m_ObjectHideFlags: 0
@@ -3835,12 +3840,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
       propertyPath: m_Name
-      value: compu
+      value: Computadora tienda
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
+      propertyPath: m_TagString
+      value: Interactuable
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1763718426}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1763718427}
   m_SourcePrefab: {fileID: 100100000, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
 --- !u!1001 &494694862
 PrefabInstance:
@@ -5565,7 +5580,6 @@ RectTransform:
   - {fileID: 139230750}
   - {fileID: 1184714632}
   - {fileID: 1694248261}
-  - {fileID: 473938}
   m_Father: {fileID: 548146286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5587,7 +5601,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -9496,8 +9510,8 @@ GameObject:
   - component: {fileID: 1184714634}
   - component: {fileID: 1184714633}
   m_Layer: 5
-  m_Name: VerCarrito
-  m_TagString: Untagged
+  m_Name: VerCarrito.bttn
+  m_TagString: Button
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11927,6 +11941,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 57166262}
+  - {fileID: 473938}
   m_Father: {fileID: 729260581}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -12014,6 +12029,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8301348219256438973, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
   m_PrefabInstance: {fileID: 2124287587}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1699343875 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8301348219249617277, guid: d23a71d629ca2cb428e58efdcf5d4c1b, type: 3}
+  m_PrefabInstance: {fileID: 2124287587}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05ec5cf00ca181d45a42ba1870e148c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1702169245
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12321,6 +12347,42 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 359d59ca4c3b93d4d9de55cfa722d498, type: 3}
   m_PrefabInstance: {fileID: 493222589}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1763718426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 127475605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbc3135d698827044ad04d827850c66c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tienda: {fileID: 317485794}
+  distanciaMax: 3
+  tecla: 101
+--- !u!65 &1763718427
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 127475605}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.1455696, y: 2.6394584, z: 3.8468971}
+  m_Center: {x: -0.33165634, y: 1.1782398, z: 0.7650465}
 --- !u!1001 &1800907956
 PrefabInstance:
   m_ObjectHideFlags: 0
