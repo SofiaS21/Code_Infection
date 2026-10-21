@@ -3,27 +3,21 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[System.Serializable]
-public class ItemTienda
-{
-    public string nombre;
-    public Sprite icono;
-    public int precio = 5;
-}
-
 public class TiendaUI : MonoBehaviour
 {
     [Header("Paneles")]
     public GameObject panelTienda;
     public GameObject panelCarrito;
+    public GameObject inventarioUi;
+    public GameObject sanidadUi;
 
-    [Header("Catálogo (6 items, mismo orden que los botones)")]
-    public ItemTienda[] items;
-    public Button[] botonesComprar;     
+    [Header("Catálogo (6 items, mismo orden que los botones BUY)")]
+    public ItemData[] items;
+    public Button[] botonesComprar;
 
     [Header("Carrito (3 slots)")]
     public TMP_Text[] textosCarrito;     
-    public Button[] botonesBasura;       
+    public Button[] botonesBasura;      
     public int maxCarrito = 3;
 
     [Header("Navegación")]
@@ -35,14 +29,14 @@ public class TiendaUI : MonoBehaviour
     [Header("Bloquear al abrir (movimiento, cámara, etc.)")]
     public MonoBehaviour[] scriptsADesactivar;
 
-    readonly List<ItemTienda> carrito = new List<ItemTienda>();
+    readonly List<ItemData> carrito = new List<ItemData>();
     public bool EstaAbierta { get; private set; }
 
     void Start()
     {
         for (int i = 0; i < botonesComprar.Length; i++)
         {
-            int idx = i; 
+            int idx = i;
             botonesComprar[i].onClick.AddListener(() => Agregar(idx));
         }
         for (int i = 0; i < botonesBasura.Length; i++)
@@ -69,6 +63,8 @@ public class TiendaUI : MonoBehaviour
     {
         EstaAbierta = true;
         MostrarCarrito(false);
+        inventarioUi.SetActive(false);
+        sanidadUi.SetActive(false);
         foreach (var s in scriptsADesactivar) s.enabled = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -79,6 +75,8 @@ public class TiendaUI : MonoBehaviour
         EstaAbierta = false;
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
+        inventarioUi.SetActive(true);
+        sanidadUi.SetActive(true);
         foreach (var s in scriptsADesactivar) s.enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -109,10 +107,7 @@ public class TiendaUI : MonoBehaviour
     {
         if (carrito.Count == 0) return;
 
-        for (int i = 0; i < carrito.Count; i++)
-        {
-            Debug.Log($"Slot {i} del inventario = {carrito[i].nombre}");
-        }
+        Inventario.instancia.ReemplazarItems(carrito);
 
         carrito.Clear();
         Refrescar();

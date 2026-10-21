@@ -114,4 +114,17 @@ public class Inventario : MonoBehaviour
         items[index] = null;
         slotsUI[index].LimpiarSlot();
     }
+
+    public void ReemplazarItems(List<ItemData> nuevos)
+    {
+        if (modelObjetoEquipado != null) Destroy(modelObjetoEquipado);
+        indiceEquipado = -1;
+
+        for (int i = 0; i < nuevos.Count && i < items.Length; i++)
+        {
+            items[i] = nuevos[i];
+            slotsUI[i].ActualizarSlot(nuevos[i]);
+        }
+    }
+
 }

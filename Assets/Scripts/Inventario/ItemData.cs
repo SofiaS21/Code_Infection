@@ -9,6 +9,7 @@ public class ItemData : ScriptableObject
 {
     public string nombre;
     [TextArea] public string descripcion;
+    public int precio = 5;
 
     public Sprite icono;
     public GameObject modeloEnMano;
