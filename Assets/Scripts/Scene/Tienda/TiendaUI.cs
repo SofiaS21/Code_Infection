@@ -34,6 +34,9 @@ public class TiendaUI : MonoBehaviour
     public Transform computadoraModelo;       
     public float distanciaCierre = 4f;
 
+    [Header("Cursor")]
+    public Texture2D cursorManito;
+    public Vector2 hotspotManito = new Vector2(10, 0);
 
     readonly List<ItemData> carrito = new List<ItemData>();
     public bool EstaAbierta { get; private set; }
@@ -56,8 +59,28 @@ public class TiendaUI : MonoBehaviour
         botonVolverDeTienda.onClick.AddListener(Cerrar);
         botonConfirmar.onClick.AddListener(Confirmar);
 
+        foreach (var b in botonesComprar) AgregarCursor(b);
+        foreach (var b in botonesBasura) AgregarCursor(b);
+        AgregarCursor(botonVerCarrito);
+        AgregarCursor(botonVolverDeTienda);
+        AgregarCursor(botonVolverDeCarrito);
+        AgregarCursor(botonConfirmar);
+
+
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
+    }
+
+    void AgregarCursor(Button b)
+    {
+        if (b == null) { Debug.LogWarning("AgregarCursor: hay un botón vacío en la lista"); return; }
+        if (!b.CompareTag("Button")) { Debug.LogWarning("Sin tag Button: " + b.name); return; }
+        if (cursorManito == null) { Debug.LogWarning("Falta asignar Cursor Manito en TiendaUI"); return; }
+
+        var c = b.GetComponent<BotonCursor>();
+        if (c == null) c = b.gameObject.AddComponent<BotonCursor>();
+        c.cursorManito = cursorManito;
+        c.hotspot = hotspotManito;
     }
 
     void Update()

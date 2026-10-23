@@ -8,6 +8,7 @@ public class TiendaVirtual : MonoBehaviour
     public float distanciaMax = 3f;
     public KeyCode tecla = KeyCode.E;
 
+
     void Update()
     {
         if (tienda.EstaAbierta) return;

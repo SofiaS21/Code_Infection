@@ -17,8 +17,8 @@ public class BotonCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerEnter(PointerEventData e)
     {
         if (cursorManito == null) return;
-        if (boton != null && !boton.interactable) return; 
-        Cursor.SetCursor(cursorManito, hotspot, CursorMode.Auto);
+        if (boton != null && !boton.interactable) { Debug.Log("Botón no interactable"); return; }
+        Cursor.SetCursor(cursorManito, hotspot, CursorMode.ForceSoftware);
     }
 
     public void OnPointerExit(PointerEventData e)
