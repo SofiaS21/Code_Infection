@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TiendaUI : MonoBehaviour
 {
     [Header("Paneles")]
+    public GameObject canvasTienda;
     public GameObject panelTienda;
     public GameObject panelCarrito;
     public GameObject inventarioUi;
@@ -20,6 +21,7 @@ public class TiendaUI : MonoBehaviour
     public TMP_Text[] textosCarrito;      // el texto de cada fila
     public Button[] botonesBasura;        // el tacho de CADA fila (todos distintos)
     public int maxCarrito = 3;
+
 
     [Header("Navegación")]
     public Button botonVerCarrito;
@@ -38,6 +40,10 @@ public class TiendaUI : MonoBehaviour
     [Header("Cursor")]
     public Texture2D cursorManito;
     public Vector2 hotspotManito = new Vector2(10, 0);
+
+    [Header("Pop-up carrito lleno")]
+    public GameObject popupLleno;
+    public Button botonCerrarPopup;
 
     readonly List<ItemData> carrito = new List<ItemData>();
     public bool EstaAbierta { get; private set; }
@@ -59,6 +65,7 @@ public class TiendaUI : MonoBehaviour
 
             int idx = i;
             botonesBasura[i].onClick.AddListener(() => Quitar(idx));
+
         }
 
         botonVerCarrito.onClick.AddListener(() => MostrarCarrito(true));
@@ -66,13 +73,18 @@ public class TiendaUI : MonoBehaviour
         botonVolverDeTienda.onClick.AddListener(Cerrar);
         botonConfirmar.onClick.AddListener(Confirmar);
 
+        if (botonCerrarPopup != null) botonCerrarPopup.onClick.AddListener(CerrarPopup);
+
         // Efecto (manito + agrandar) en TODOS los botones con tag "Button", incluso los desactivados
         foreach (var b in FindObjectsOfType<Button>(true))
             AgregarCursor(b);
 
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
+
+        if (popupLleno != null) popupLleno.SetActive(false);
     }
+
 
     void AgregarCursor(Button b)
     {
@@ -107,6 +119,7 @@ public class TiendaUI : MonoBehaviour
     public void Abrir()
     {
         EstaAbierta = true;
+        if (canvasTienda != null) canvasTienda.SetActive(true);
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -120,6 +133,9 @@ public class TiendaUI : MonoBehaviour
     public void Cerrar()
     {
         EstaAbierta = false;
+        if (canvasTienda != null) canvasTienda.SetActive(false);
+
+        CerrarPopup();
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
 
@@ -133,14 +149,29 @@ public class TiendaUI : MonoBehaviour
 
     void MostrarCarrito(bool verCarrito)
     {
+        CerrarPopup();
         panelTienda.SetActive(!verCarrito);
         panelCarrito.SetActive(verCarrito);
         Refrescar();
     }
+    void MostrarPopup()
+    {
+        if (popupLleno != null) popupLleno.SetActive(true);
+    }
+
+    void CerrarPopup()
+    {
+        if (popupLleno != null) popupLleno.SetActive(false);
+    }
 
     void Agregar(int idx)
     {
-        if (carrito.Count >= maxCarrito) return;
+        if (carrito.Count >= maxCarrito)
+        {
+            MostrarPopup();
+            return;
+        }
+
         carrito.Add(items[idx]);
         Refrescar();
     }
@@ -154,9 +185,7 @@ public class TiendaUI : MonoBehaviour
 
     void Confirmar()
     {
-        if (carrito.Count == 0) return;
 
-        Inventario.instancia.ReemplazarItems(carrito);
 
         carrito.Clear();
         Refrescar();
@@ -176,8 +205,6 @@ public class TiendaUI : MonoBehaviour
                 textosCarrito[i].text = hay ? carrito[i].nombre : "";
         }
 
-        bool lleno = carrito.Count >= maxCarrito;
-        foreach (var b in botonesComprar) b.interactable = !lleno;
         botonConfirmar.interactable = carrito.Count > 0;
     }
 }

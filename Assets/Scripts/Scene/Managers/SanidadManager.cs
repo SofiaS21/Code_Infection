@@ -16,6 +16,10 @@ public class SanidadManager : MonoBehaviour
     public Sprite[] sprites;
     public GameObject panelGameOver;
 
+    [Header("Drenaje por tiempo (puntos por minuto)")]
+    public int drenajeMin = 10;
+    public int drenajeMax = 13;
+
     [Header("PostProcessing")]
     public float sanidadInicioEfectos = 50f;
     public float vignetteMax = 0.55f;
