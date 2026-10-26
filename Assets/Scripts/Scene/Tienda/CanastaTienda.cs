@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class CanastaTienda : MonoBehaviour
 {
-    public Transform[] puntosItems;  
+    public Transform[] puntosItems;
+    public float escalaItems = 1f;
 
     List<ItemData> items = new List<ItemData>();
 
@@ -19,12 +21,36 @@ public class CanastaTienda : MonoBehaviour
             GameObject modelo = Instantiate(items[i].modeloEnMano, puntosItems[i]);
             modelo.transform.localPosition = Vector3.zero;
             modelo.transform.localRotation = Quaternion.identity;
-            modelo.transform.localScale *= items[i].escalaEnMano;
+            modelo.transform.localScale *= items[i].escalaEnMano * escalaItems;
 
-            foreach (var col in modelo.GetComponentsInChildren<Collider>())
-                col.enabled = false;
+            PrepararFisica(modelo);
         }
     }
+    void PrepararFisica(GameObject modelo)
+    {
+        foreach (var mf in modelo.GetComponentsInChildren<MeshFilter>())
+        {
+            if (mf.GetComponent<Collider>() == null)
+            {
+                var mc = mf.gameObject.AddComponent<MeshCollider>();
+                mc.sharedMesh = mf.sharedMesh;
+            }
+        }
+
+        foreach (var mc in modelo.GetComponentsInChildren<MeshCollider>())
+            mc.convex = true;
+
+        foreach (var t in modelo.GetComponentsInChildren<Transform>())
+            t.gameObject.tag = "Interactuable";
+
+        var rb = modelo.GetComponent<Rigidbody>();
+        if (rb == null) rb = modelo.AddComponent<Rigidbody>();
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+
+    }
+
 
     public void Interact()
     {

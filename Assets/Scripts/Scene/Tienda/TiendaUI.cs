@@ -22,6 +22,10 @@ public class TiendaUI : MonoBehaviour
     public Button[] botonesBasura;        // el tacho de CADA fila (todos distintos)
     public int maxCarrito = 3;
 
+    [Header("Canasta")]
+    public CanastaTienda canastaPrefab;
+    public Transform puntoCanasta;
+    CanastaTienda canastaActual;
 
     [Header("Navegación")]
     public Button botonVerCarrito;
@@ -185,7 +189,12 @@ public class TiendaUI : MonoBehaviour
 
     void Confirmar()
     {
+        if (carrito.Count == 0) return;
 
+        if (canastaActual != null) Destroy(canastaActual.gameObject);
+
+        canastaActual = Instantiate(canastaPrefab, puntoCanasta.position, puntoCanasta.rotation);
+        canastaActual.Configurar(carrito);
 
         carrito.Clear();
         Refrescar();
