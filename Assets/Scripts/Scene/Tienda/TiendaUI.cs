@@ -15,23 +15,24 @@ public class TiendaUI : MonoBehaviour
     public ItemData[] items;
     public Button[] botonesComprar;
 
-    [Header("Carrito (3 slots)")]
-    public TMP_Text[] textosCarrito;     
-    public Button[] botonesBasura;      
+    [Header("Carrito (3 filas, en orden)")]
+    public GameObject[] filasCarrito;     // la fila entera (fondo gris + texto + tacho)
+    public TMP_Text[] textosCarrito;      // el texto de cada fila
+    public Button[] botonesBasura;        // el tacho de CADA fila (todos distintos)
     public int maxCarrito = 3;
 
     [Header("Navegación")]
     public Button botonVerCarrito;
-    public Button botonVolverDeTienda;   
-    public Button botonVolverDeCarrito;  
+    public Button botonVolverDeTienda;
+    public Button botonVolverDeCarrito;
     public Button botonConfirmar;
 
     [Header("Bloquear al abrir (movimiento, cámara, etc.)")]
     public MonoBehaviour[] scriptsADesactivar;
 
     [Header("Cierre por distancia")]
-    public Transform jugador;           
-    public Transform computadoraModelo;       
+    public Transform jugador;
+    public Transform computadoraModelo;
     public float distanciaCierre = 4f;
 
     [Header("Cursor")]
@@ -48,8 +49,14 @@ public class TiendaUI : MonoBehaviour
             int idx = i;
             botonesComprar[i].onClick.AddListener(() => Agregar(idx));
         }
+
         for (int i = 0; i < botonesBasura.Length; i++)
         {
+            // Aviso si el mismo tacho está en más de un slot
+            for (int j = 0; j < i; j++)
+                if (botonesBasura[i] != null && botonesBasura[i] == botonesBasura[j])
+                    Debug.LogError("Botones Basura: el slot " + i + " tiene el mismo botón que el slot " + j + ". Cada fila necesita su propio tacho.");
+
             int idx = i;
             botonesBasura[i].onClick.AddListener(() => Quitar(idx));
         }
@@ -59,13 +66,9 @@ public class TiendaUI : MonoBehaviour
         botonVolverDeTienda.onClick.AddListener(Cerrar);
         botonConfirmar.onClick.AddListener(Confirmar);
 
-        foreach (var b in botonesComprar) AgregarCursor(b);
-        foreach (var b in botonesBasura) AgregarCursor(b);
-        AgregarCursor(botonVerCarrito);
-        AgregarCursor(botonVolverDeTienda);
-        AgregarCursor(botonVolverDeCarrito);
-        AgregarCursor(botonConfirmar);
-
+        // Efecto (manito + agrandar) en TODOS los botones con tag "Button", incluso los desactivados
+        foreach (var b in FindObjectsOfType<Button>(true))
+            AgregarCursor(b);
 
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
@@ -73,9 +76,7 @@ public class TiendaUI : MonoBehaviour
 
     void AgregarCursor(Button b)
     {
-        if (b == null) { Debug.LogWarning("AgregarCursor: hay un botón vacío en la lista"); return; }
-        if (!b.CompareTag("Button")) { Debug.LogWarning("Sin tag Button: " + b.name); return; }
-        if (cursorManito == null) { Debug.LogWarning("Falta asignar Cursor Manito en TiendaUI"); return; }
+        if (b == null || !b.CompareTag("Button")) return;
 
         var c = b.GetComponent<BotonCursor>();
         if (c == null) c = b.gameObject.AddComponent<BotonCursor>();
@@ -105,7 +106,6 @@ public class TiendaUI : MonoBehaviour
 
     public void Abrir()
     {
-        Debug.Log("Tienda abierta");
         EstaAbierta = true;
 
         Cursor.lockState = CursorLockMode.None;
@@ -126,6 +126,7 @@ public class TiendaUI : MonoBehaviour
         foreach (var s in scriptsADesactivar)
             if (s != null) s.enabled = true;
 
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -139,7 +140,7 @@ public class TiendaUI : MonoBehaviour
 
     void Agregar(int idx)
     {
-        if (carrito.Count >= maxCarrito) return; // ya tenés 3
+        if (carrito.Count >= maxCarrito) return;
         carrito.Add(items[idx]);
         Refrescar();
     }
@@ -164,11 +165,15 @@ public class TiendaUI : MonoBehaviour
 
     void Refrescar()
     {
-        for (int i = 0; i < textosCarrito.Length; i++)
+        for (int i = 0; i < filasCarrito.Length; i++)
         {
             bool hay = i < carrito.Count;
-            textosCarrito[i].text = hay ? carrito[i].nombre : "";
-            botonesBasura[i].gameObject.SetActive(hay);
+
+            // La fila entera aparece solo si hay un item en ese lugar
+            if (filasCarrito[i] != null) filasCarrito[i].SetActive(hay);
+
+            if (i < textosCarrito.Length && textosCarrito[i] != null)
+                textosCarrito[i].text = hay ? carrito[i].nombre : "";
         }
 
         bool lleno = carrito.Count >= maxCarrito;
