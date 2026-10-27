@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class TiendaUI : MonoBehaviour
 {
     [Header("Paneles")]

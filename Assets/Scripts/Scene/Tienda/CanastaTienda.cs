@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 
-public class CanastaTienda : MonoBehaviour
+public class CanastaTienda : MonoBehaviour, IInteractable
 {
     public Transform[] puntosItems;
     public float escalaItems = 1f;

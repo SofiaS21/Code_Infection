@@ -15,6 +15,9 @@ public class Pacientes : MonoBehaviour, IInteractable
     public Transform anclaAnomalia;
     public bool EsAnomalia { get { return anomalia != null; } }
 
+    [Header("Paciencia")]
+    public float tiempoPaciencia = 45f;
+
     public string imagenCamara;
     public Texture dniImagen;
     public Texture[] dniImagenesAnomalas;
@@ -196,6 +199,18 @@ public class Pacientes : MonoBehaviour, IInteractable
             anim.SetBool("Caminando", false);
 
         llegoAlCounter = true;
+        StartCoroutine(PacienciaCounter());
+    }
+
+    IEnumerator PacienciaCounter()
+    {
+        yield return new WaitForSeconds(tiempoPaciencia);
+
+        if (procesando) yield break;
+        procesando = true;
+
+        if (npcManager != null) npcManager.PacienteSeFueSinAtender(this);
+        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, () => Destroy(gameObject)));
     }
 
     public void Rechazar()
@@ -310,6 +325,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (estaCurado) return;
         estaCurado = true;
 
+        if (npcManager != null) npcManager.PacienteCurado();
         StartCoroutine(EsperarYSalir());
     }
 }
