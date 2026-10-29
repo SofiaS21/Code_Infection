@@ -56,7 +56,7 @@ public class DineroManager : MonoBehaviour
         return true;
     }
 
-¿    public void NuevoDia()
+    public void NuevoDia()
     {
         GananciasDia = 0;
         ComprasDia = 0;

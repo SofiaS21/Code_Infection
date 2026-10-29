@@ -50,6 +50,14 @@ public class TiendaUI : MonoBehaviour
     public GameObject popupLleno;
     public Button botonCerrarPopup;
 
+    [Header("Plata")]
+    public TMP_Text textoDineroTienda;
+
+    [Header("Sin plata")]
+    public GameObject panelSinPlata;
+    public TMP_Text textoPlataQueFalta;
+    public Button botonCerrarSinPlata; 
+
     readonly List<ItemData> carrito = new List<ItemData>();
     public bool EstaAbierta { get; private set; }
 
@@ -83,6 +91,9 @@ public class TiendaUI : MonoBehaviour
         // Efecto (manito + agrandar) en TODOS los botones con tag "Button", incluso los desactivados
         foreach (var b in FindObjectsOfType<Button>(true))
             AgregarCursor(b);
+
+        if (botonCerrarSinPlata != null) botonCerrarSinPlata.onClick.AddListener(CerrarPopup);
+        if (panelSinPlata != null) panelSinPlata.SetActive(false);
 
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
@@ -159,14 +170,23 @@ public class TiendaUI : MonoBehaviour
         panelCarrito.SetActive(verCarrito);
         Refrescar();
     }
-    void MostrarPopup()
+    void MostrarPopup(string mensaje = null)
     {
         if (popupLleno != null) popupLleno.SetActive(true);
+    }
+
+    void MostrarSinPlata(int falta, string queCompra)
+    {
+        falta = Mathf.Max(0, falta);
+        if (textoPlataQueFalta != null)
+            textoPlataQueFalta.text = "Te falta $" + falta + " para comprar " + queCompra;
+        if (panelSinPlata != null) panelSinPlata.SetActive(true);
     }
 
     void CerrarPopup()
     {
         if (popupLleno != null) popupLleno.SetActive(false);
+        if (panelSinPlata != null) panelSinPlata.SetActive(false);
     }
 
     void Agregar(int idx)
@@ -174,6 +194,13 @@ public class TiendaUI : MonoBehaviour
         if (carrito.Count >= maxCarrito)
         {
             MostrarPopup();
+            return;
+        }
+
+        int total = (carrito.Count + 1) * DineroManager.instancia.precioItem;
+        if (!DineroManager.instancia.PuedePagar(total))
+        {
+            MostrarSinPlata(total - DineroManager.instancia.Dinero, items[idx].nombre);
             return;
         }
 
@@ -191,6 +218,13 @@ public class TiendaUI : MonoBehaviour
     void Confirmar()
     {
         if (carrito.Count == 0) return;
+
+        int total = carrito.Count * DineroManager.instancia.precioItem;
+        if (!DineroManager.instancia.Gastar(total))
+        {
+            MostrarPopup("No te alcanza la plata");
+            return;
+        }
 
         if (canastaActual != null) Destroy(canastaActual.gameObject);
 
@@ -215,6 +249,11 @@ public class TiendaUI : MonoBehaviour
                 textosCarrito[i].text = hay ? carrito[i].nombre : "";
         }
 
-        botonConfirmar.interactable = carrito.Count > 0;
+        int totalCarrito = carrito.Count * DineroManager.instancia.precioItem;
+
+        botonConfirmar.interactable = carrito.Count > 0 &&
+                                      DineroManager.instancia.PuedePagar(totalCarrito);
+
+        if (textoDineroTienda != null) textoDineroTienda.text = "$" + DineroManager.instancia.Dinero;
     }
 }

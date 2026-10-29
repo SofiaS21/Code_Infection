@@ -233,6 +233,26 @@ public class EsperaNPC : MonoBehaviour
         pacientesEnEscena = Mathf.Max(0, pacientesEnEscena - 1);
         ComprobarFinDelDia();
     }
+    public void PacienteCurado()
+    {
+        DineroManager.instancia.PacienteCurado();
+    }
+
+    public void PacienteSeFueSinAtender(Pacientes p)
+    {
+        if (p != currentVisitor) return;
+
+        // Solo los normales castigan; si se va una anomalía no pasa nada
+        if (!p.EsAnomalia)
+            DineroManager.instancia.ErrorPacienteNormal();
+
+        tarjetaDNI.SetActive(false);
+        if (DniDisplay.Instancia != null)
+            DniDisplay.Instancia.Ocultar();
+
+        ProximoPaciente();
+    }   
+
     IEnumerator MostrarNoMasPacientes()
     {
         yield return new WaitForSeconds(tiempoAntesDelPanel);
