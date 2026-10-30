@@ -72,6 +72,11 @@ public class Inventario : MonoBehaviour
         QuitarItem(indiceEquipado);
         indiceEquipado = -1;
     }
+    public void TirarEquipado()
+    {
+        if (indiceEquipado < 0) return;
+        ConsumirEquipado(); 
+    }
 
     void Awake()
     {

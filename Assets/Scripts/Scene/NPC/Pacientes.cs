@@ -281,7 +281,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
             if (anim != null)
             {
-                anim.SetTrigger("Acostarse");
+                anim.SetTrigger("Acostado");
             }
         }
 
@@ -301,7 +301,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         if (anim != null)
         {
-            anim.ResetTrigger("Acostarse");
+            anim.ResetTrigger("Acostado");
             anim.SetBool("Caminando", true);
         }
 
