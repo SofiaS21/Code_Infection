@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nombre: Tijeras
   descripcion: 
+  precio: 5
   icono: {fileID: 21300000, guid: 807b1f7bfd10b2d41ac6ec0fefb65b26, type: 3}
-  modeloEnMano: {fileID: 0}
-  escalaEnMano: 1
+  modeloEnMano: {fileID: 100000, guid: 34c0ca16fbba2414fbdfe2b254cbf371, type: 3}
+  escalaEnMano: 3
   rotacionEnMano: {x: 0, y: 0, z: 0}
   posicionEnMano: {x: 0, y: 0, z: 0}
   queCura: 0

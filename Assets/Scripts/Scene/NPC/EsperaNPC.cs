@@ -37,7 +37,7 @@ public class EsperaNPC : MonoBehaviour
     public GameObject panelFinalDia;
     public TMP_Text textoReloj;
     public TMP_Text textoFinalDia;
-    public TMP_Text textoIngresos, textoRenta, textoComida, textoCompras, textoMuertes, textoTotal;
+    public TMP_Text textoIngresos, textoCompras, textoMuertes, textoTotal;
     public float tiempoRelojVisible = 3f;
 
     private int pacientesEnEscena = 0;
@@ -67,6 +67,7 @@ public class EsperaNPC : MonoBehaviour
     public GameObject panelDni;
     public GameObject panelNoMasPacientes;
     public GameObject inventario;
+    public GameObject sanidadPanel;
     public GameObject tarjetaDNI;
     public Animator anim;
 
@@ -203,7 +204,9 @@ public class EsperaNPC : MonoBehaviour
         panelDialogue.SetActive(false);
         panelNoMasPacientes.SetActive(false);
         tarjetaDNI.SetActive(false);
+        sanidadPanel.SetActive(false);
         inventario.SetActive(false);
+
 
         yield return UITransiciones.FadeIn(panelReloj, duracionFade);
         yield return UITransiciones.EsperarSegundosOClic(tiempoRelojVisible);
@@ -267,8 +270,6 @@ public class EsperaNPC : MonoBehaviour
         inventario.SetActive(true);
     }
 
-
-
     IEnumerator OcultarNoMasPacientes(float segundos)
     {
         yield return new WaitForSeconds(segundos);
@@ -292,11 +293,9 @@ public class EsperaNPC : MonoBehaviour
         int numeroPaciente = totalDelDia - pacientesRestantes;
         pacientesRestantes--;
 
-        // 1. Decidir si es anómalo y cuál anomalía
         bool esAnomalo = indicesAnomalos.Contains(numeroPaciente) || Random.value < rangoActual.probabilidadAnomalia;
         AnomaliaData anomalia = esAnomalo ? ElegirAnomalia() : null;
 
-        // 2. Elegir el prefab: el anómalo si la anomalía es visual, si no uno normal
         Pacientes prefab;
         if (anomalia != null && anomalia.tipo == TipoAnomalia.Visual && anomalia.prefabAnomalo != null)
             prefab = anomalia.prefabAnomalo;
@@ -324,7 +323,7 @@ public class EsperaNPC : MonoBehaviour
 
         panelDialogue.SetActive(true);
         tarjetaDNI.SetActive(true);
-    nombrePaciente.text = currentVisitor.nombreEnDialogo;
+        nombrePaciente.text = currentVisitor.nombreEnDialogo;
 
         if (!dniMostrado)
         {
