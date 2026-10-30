@@ -15,7 +15,7 @@ MonoBehaviour:
   nombre: Corazon
   descripcion: 
   precio: 5
-  icono: {fileID: 21300000, guid: b0092d49bf30d194ea3e32f44c3011cc, type: 3}
+  icono: {fileID: 1471322748, guid: b0092d49bf30d194ea3e32f44c3011cc, type: 3}
   modeloEnMano: {fileID: 100000, guid: ab67e2497c4fe0241b13c9d1407ff4e2, type: 3}
   escalaEnMano: 5.5
   rotacionEnMano: {x: -90, y: 90, z: 0}
