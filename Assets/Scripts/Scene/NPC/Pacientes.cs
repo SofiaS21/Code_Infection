@@ -380,6 +380,13 @@ public class Pacientes : MonoBehaviour, IInteractable
         // Sigue acostado durante tiempoCuracion
         yield return new WaitForSeconds(tiempoCuracion);
 
+        // Punto del piso donde se levanta (hay que leerlo antes de liberar el cuarto)
+        Vector3 origen = transform.position;
+        if (cuartoAsignado != null && cuartoAsignado.puntoLevantarse != null)
+            origen = cuartoAsignado.puntoLevantarse.position;
+        else
+            Debug.LogWarning("Falta asignar Punto Levantarse en " + (cuartoAsignado != null ? cuartoAsignado.name : "el cuarto"));
+
         // Se levanta: la camilla queda libre para otro paciente
         acostado = false;
         enCuarto = false;
@@ -390,8 +397,14 @@ public class Pacientes : MonoBehaviour, IInteractable
             agent.enabled = true;
 
             UnityEngine.AI.NavMeshHit hit;
-            if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out hit, 3f, UnityEngine.AI.NavMesh.AllAreas))
+            if (UnityEngine.AI.NavMesh.SamplePosition(origen, out hit, 2f, UnityEngine.AI.NavMesh.AllAreas))
                 agent.Warp(hit.position);
+
+            if (!agent.isOnNavMesh)
+            {
+                Debug.LogError("El punto de levantarse no está sobre el NavMesh");
+                yield break;   // no se destruye: así se nota que hay que corregir el punto
+            }
 
             agent.isStopped = false;
         }
@@ -407,19 +420,19 @@ public class Pacientes : MonoBehaviour, IInteractable
         {
             agent.SetDestination(puertaSalida.position);
 
-            yield return null;
-            while (agent.pathPending)
+            // Solo se destruye cuando llega de verdad a la puerta
+            while (DistanciaPlana(transform.position, puertaSalida.position) > 0.8f)
                 yield return null;
-
-            float espera = 0f;
-            while (agent.remainingDistance > 0.3f && espera < 60f)
-            {
-                espera += Time.deltaTime;
-                yield return null;
-            }
         }
 
         Salir();
+    }
+
+    float DistanciaPlana(Vector3 a, Vector3 b)
+    {
+        a.y = 0f;
+        b.y = 0f;
+        return Vector3.Distance(a, b);
     }
 
     void LiberarCuarto()

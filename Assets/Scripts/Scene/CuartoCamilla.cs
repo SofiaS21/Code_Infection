@@ -6,6 +6,9 @@ public class CuartoCamilla : MonoBehaviour
     [Header("Dónde se acuesta")]
     public Transform puntoAcostado;
 
+    [Header("Dónde aparece al levantarse (en el piso, al lado de la cama)")]
+    public Transform puntoLevantarse;
+
     [Header("Burbuja de la camilla")]
     public GameObject canvasBurbuja;     
     public RawImage iconoImage;             

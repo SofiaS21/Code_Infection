@@ -45,6 +45,7 @@ public class EsperaNPC : MonoBehaviour
     public TMP_Text textoFinalDia;
     public TMP_Text textoIngresos, textoCompras, textoMuertes, textoTotal;
     public float tiempoRelojVisible = 3f;
+    public float retrasoPanelFinDia = 1.5f;
 
     private int pacientesEnEscena = 0;
     private bool diaTerminado = false;
@@ -246,6 +247,9 @@ public class EsperaNPC : MonoBehaviour
 
     IEnumerator PanelesFinDelDia()
     {
+        yield return new WaitForSeconds(retrasoPanelFinDia);
+        currentVisitor = null;
+
         currentVisitor = null;
         panelDialogue.SetActive(false);
         panelNoMasPacientes.SetActive(false);
