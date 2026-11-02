@@ -32,6 +32,12 @@ public class EsperaNPC : MonoBehaviour
     public RangoDia[] rangosPorDia;     // posición 0 = día 1, posición 1 = día 2...
     public int diaActual = 1;
 
+    [Header("Cuartos (uno por camilla)")]
+    public CuartoCamilla[] cuartos;
+
+    [Header("Medicamentos (los 6 ItemData: Bisturin, Corazon, Jeringa, Pastilla, Tijeras, Vendaje)")]
+    public ItemData[] todosLosItems;
+
     [Header("Fin del dia")]
     public GameObject panelReloj;
     public GameObject panelFinalDia;
@@ -42,6 +48,8 @@ public class EsperaNPC : MonoBehaviour
 
     private int pacientesEnEscena = 0;
     private bool diaTerminado = false;
+    private int curadosHoy = 0;
+    private int muertosHoy = 0;
 
     [Header("Transiciones")]
     public float duracionFade = 0.8f;
@@ -104,8 +112,11 @@ public class EsperaNPC : MonoBehaviour
     {
         diaTerminado = false;
         pacientesEnEscena = 0;
+        curadosHoy = 0;
+        muertosHoy = 0;
         panelReloj.SetActive(false);
         panelFinalDia.SetActive(false);
+        if (sanidadPanel != null) sanidadPanel.SetActive(true);
 
         int i = Mathf.Clamp(diaActual - 1, 0, rangosPorDia.Length - 1);
         rangoActual = rangosPorDia[i];
@@ -148,13 +159,42 @@ public class EsperaNPC : MonoBehaviour
     {
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
 
+        // Busca una camilla libre; si están todas ocupadas no lo deja pasar todavía
+        CuartoCamilla cuarto = ObtenerCuartoLibre();
+        if (cuarto == null)
+        {
+            Debug.Log("No hay cuartos libres");
+            return;
+        }
+
+        cuarto.Ocupar();
+
         tarjetaDNI.SetActive(false);
-        currentVisitor.Aceptar();
+        currentVisitor.Aceptar(cuarto);
         ProximoPaciente();
 
         if (DniDisplay.Instancia != null)
             DniDisplay.Instancia.Ocultar();
 
+    }
+
+    CuartoCamilla ObtenerCuartoLibre()
+    {
+        var libres = new List<CuartoCamilla>();
+        foreach (var c in cuartos)
+            if (c != null && !c.Ocupado) libres.Add(c);
+
+        if (libres.Count == 0) return null;
+        return libres[Random.Range(0, libres.Count)];
+    }
+
+    // Devuelve el ItemData que cura esa enfermedad (para mostrar su ícono en la camilla)
+    public ItemData ItemQueCura(Enfermedad enfermedad)
+    {
+        foreach (var it in todosLosItems)
+            if (it != null && it.queCura == enfermedad) return it;
+
+        return null;
     }
 
     AnomaliaData ElegirAnomalia()
@@ -198,6 +238,12 @@ public class EsperaNPC : MonoBehaviour
         StartCoroutine(PanelesFinDelDia());
     }
 
+    void RellenarPanelFinal()
+    {
+        if (textoFinalDia != null) textoFinalDia.text = "DIA " + diaActual;
+        if (textoMuertes != null) textoMuertes.text = muertosHoy.ToString();
+    }
+
     IEnumerator PanelesFinDelDia()
     {
         currentVisitor = null;
@@ -207,6 +253,7 @@ public class EsperaNPC : MonoBehaviour
         sanidadPanel.SetActive(false);
         inventario.SetActive(false);
 
+        RellenarPanelFinal();
 
         yield return UITransiciones.FadeIn(panelReloj, duracionFade);
         yield return UITransiciones.EsperarSegundosOClic(tiempoRelojVisible);
@@ -236,9 +283,16 @@ public class EsperaNPC : MonoBehaviour
         pacientesEnEscena = Mathf.Max(0, pacientesEnEscena - 1);
         ComprobarFinDelDia();
     }
+
     public void PacienteCurado()
     {
+        curadosHoy++;
         DineroManager.instancia.PacienteCurado();
+    }
+
+    public void PacienteMurio()
+    {
+        muertosHoy++;
     }
 
     public void PacienteSeFueSinAtender(Pacientes p)
@@ -254,7 +308,7 @@ public class EsperaNPC : MonoBehaviour
             DniDisplay.Instancia.Ocultar();
 
         ProximoPaciente();
-    }   
+    }
 
     IEnumerator MostrarNoMasPacientes()
     {
@@ -263,9 +317,10 @@ public class EsperaNPC : MonoBehaviour
         panelNoMasPacientes.SetActive(true);
         inventario.SetActive(false);
         noMasPacientes.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
+    }
 
-        yield return new WaitForSeconds(tiempoMensajeVisible);
-
+    public void CerrarNoMasPacientes()
+    {
         panelNoMasPacientes.SetActive(false);
         inventario.SetActive(true);
     }
@@ -316,7 +371,7 @@ public class EsperaNPC : MonoBehaviour
 
     public void MostrarDNI(Pacientes quien)
     {
- 
+
         if (currentVisitor == null || quien != currentVisitor) return;
         if (!currentVisitor.PuedeInteractuar) return;
         if (pacienteHablando) return;

@@ -101,6 +101,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7e65ddc619a9ca04d8be6dd1e2e4ad6f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3425600192113669448}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7e65ddc619a9ca04d8be6dd1e2e4ad6f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1448477296933768094}
   m_SourcePrefab: {fileID: 100100000, guid: 7e65ddc619a9ca04d8be6dd1e2e4ad6f, type: 3}
 --- !u!95 &767148345197843742 stripped
 Animator:
@@ -128,6 +131,9 @@ MonoBehaviour:
   nombreEnDialogo: 
   anomalia: {fileID: 0}
   anclaAnomalia: {fileID: 0}
+  tiempoPaciencia: 45
+  offsetAcostado: {x: 0.57, y: -2.65, z: 0}
+  rotacionExtraAcostado: {x: -5.72, y: 0, z: 0}
   imagenCamara: 
   dniImagen: {fileID: 2800000, guid: 88c63ee7792f3594581ef7d1a242f434, type: 3}
   dniImagenesAnomalas:
@@ -210,3 +216,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.373524, y: 19.458645, z: 2.6883624}
   m_Center: {x: -0.03637141, y: 9.600868, z: 0.10647908}
+--- !u!54 &1448477296933768094
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6273102113891833310}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

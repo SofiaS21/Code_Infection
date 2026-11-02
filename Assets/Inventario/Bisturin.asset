@@ -20,4 +20,4 @@ MonoBehaviour:
   escalaEnMano: 4
   rotacionEnMano: {x: 0, y: 180, z: 0}
   posicionEnMano: {x: 0, y: 0, z: 0}
-  queCura: 0
+  queCura: 4

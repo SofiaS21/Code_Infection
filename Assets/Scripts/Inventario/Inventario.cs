@@ -8,14 +8,20 @@ public class Inventario : MonoBehaviour
     public ItemData[] items; 
     public SlotUI[] slotsUI;
     public Transform objetoEnMano;     
-
+     
     public GameObject canvasInvLleno;
-    private GameObject modelObjetoEquipado; 
+    private GameObject modelObjetoEquipado;
 
     private int indiceEquipado = -1;
+
     public ItemData ItemEquipado
     {
-        get { return indiceEquipado >= 0 ? items[indiceEquipado] : null; }
+        get
+        {
+            if (indiceEquipado >= 0 && indiceEquipado < items.Length)
+                return items[indiceEquipado];
+            return null;
+        }
     }
 
     public static Inventario instancia;
@@ -64,6 +70,7 @@ public class Inventario : MonoBehaviour
             modelObjetoEquipado.transform.localScale *= items[index].escalaEnMano;
         }
     }
+
 
     public void ConsumirEquipado()
     {

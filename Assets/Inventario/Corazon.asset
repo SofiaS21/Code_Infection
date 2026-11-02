@@ -20,4 +20,4 @@ MonoBehaviour:
   escalaEnMano: 5.5
   rotacionEnMano: {x: -90, y: 90, z: 0}
   posicionEnMano: {x: 0, y: 0.05, z: 0}
-  queCura: 0
+  queCura: 3

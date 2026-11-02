@@ -18,6 +18,19 @@ public class Pacientes : MonoBehaviour, IInteractable
     [Header("Paciencia")]
     public float tiempoPaciencia = 45f;
 
+    [Header("Curación")]
+    public float tiempoCuracion = 10f;            // segundos que espera después de curarse antes de irse
+    public float tiempoDesaparecerMuerto = 3f;    // segundos que queda en la camilla si muere
+
+    [Header("Ajuste al acostarse (distinto por prefab)")]
+    public Vector3 offsetAcostado = Vector3.zero;
+    public Vector3 rotacionExtraAcostado = Vector3.zero;
+
+    private Transform puntoAcostado;
+    private bool acostado = false;
+    private CuartoCamilla cuartoAsignado;
+    private bool muerto = false;
+
     public string imagenCamara;
     public Texture dniImagen;
     public Texture[] dniImagenesAnomalas;
@@ -36,7 +49,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     // Lugares a los que camina
     public Transform puertaSalida;
-    public Transform cuartoFacil1;
+    public Transform cuartoFacil1;   // ya no se usa para acostarse (ahora va al cuarto asignado), se deja para no romper referencias
     public Transform counter;
 
     private EsperaNPC npcManager;
@@ -60,7 +73,6 @@ public class Pacientes : MonoBehaviour, IInteractable
     public void OnFocus() { }
     public void OnUnfocus() { }
 
-    public float tiempoEsperarCuracion = 40f;
     public bool estaCurado = false;
 
     void Awake()
@@ -86,7 +98,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         this.counter = counter;
         this.puertaSalida = puertaSalida;
         this.cuartoFacil1 = cuartoFacil1;
-        this.tarjetaDNI = tarjetaDNI;   
+        this.tarjetaDNI = tarjetaDNI;
         this.textoNombre = textoNombre;
         this.fechaVencimiento = fechaVencimiento;
         this.dniFotoRawImage = dniFotoRawImage;
@@ -94,8 +106,30 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        // Si está acostado esperando su medicina, se intenta curar con el ítem en mano
+        if (enCuarto && !estaCurado && !muerto)
+        {
+            UsarItemEquipado();
+            return;
+        }
+
         Debug.Log("Interact llamado en " + name);
         npcManager.MostrarDNI(this);
+    }
+
+    void UsarItemEquipado()
+    {
+        if (Inventario.instancia == null) return;
+
+        ItemData item = Inventario.instancia.ItemEquipado;
+        if (item == null) return;   // no tiene nada en la mano
+
+        Inventario.instancia.ConsumirEquipado();
+
+        if (item.queCura == queEnfermedadtiene)
+            CurarPacientes();
+        else
+            Morir();
     }
 
     public void AplicarAnomalia()
@@ -117,7 +151,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
             case TipoAnomalia.Visual:
                 break;
-        } 
+        }
     }
 
     public void GenerarDatos()
@@ -171,7 +205,7 @@ public class Pacientes : MonoBehaviour, IInteractable
             case 'z': return "2";
             case 'k': return "|<";
             case 'h': return "#";
-            default: return null;   
+            default: return null;
         }
     }
 
@@ -210,7 +244,11 @@ public class Pacientes : MonoBehaviour, IInteractable
         procesando = true;
 
         if (npcManager != null) npcManager.PacienteSeFueSinAtender(this);
-        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, () => Destroy(gameObject)));
+
+        if (anim != null)
+            anim.SetTrigger("Golpe");
+
+        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, Salir));
     }
 
     public void Rechazar()
@@ -223,30 +261,41 @@ public class Pacientes : MonoBehaviour, IInteractable
             anim.SetTrigger("Golpe");
 
         // Camina a la puerta y desaparece
-        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, () => Destroy(gameObject)));
+        StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, Salir));
     }
 
-    public void Aceptar()
+    // EsperaNPC le pasa el cuarto que le tocó
+    public void Aceptar(CuartoCamilla cuarto)
     {
         if (procesando) return;
         procesando = true;
         StopAllCoroutines();
 
+        cuartoAsignado = cuarto;
+
         if (anim != null)
             anim.SetTrigger("Bailar");
 
         // Camina al cuarto y se queda ahí
-        StartCoroutine(EsperarAnimacionYCaminar(cuartoFacil1, null));
+        StartCoroutine(EsperarAnimacionYCaminar(cuarto.puntoAcostado, null));
     }
 
     IEnumerator EsperarAnimacionYCaminar(Transform destino, System.Action alLlegar)
     {
-        // Un frame para que el Animator procese el trigger
         yield return null;
 
         if (anim != null)
         {
-            while (anim.GetCurrentAnimatorStateInfo(0).IsTag("Reaccion"))
+            float t = 0f;
+            while (t < 1f &&
+                   !anim.GetCurrentAnimatorStateInfo(0).IsTag("Reaccion") &&
+                   !(anim.IsInTransition(0) && anim.GetNextAnimatorStateInfo(0).IsTag("Reaccion")))
+            {
+                t += Time.deltaTime;
+                yield return null;
+            }
+
+            while (anim.GetCurrentAnimatorStateInfo(0).IsTag("Reaccion") || anim.IsInTransition(0))
                 yield return null;
         }
 
@@ -262,8 +311,13 @@ public class Pacientes : MonoBehaviour, IInteractable
             while (agent.pathPending)
                 yield return null;
 
-            while (agent.remainingDistance > 0.3f)
+            // El límite de tiempo evita que se quede trabado para siempre si el punto no está bien sobre el NavMesh
+            float espera = 0f;
+            while (agent.remainingDistance > 0.3f && espera < 30f)
+            {
+                espera += Time.deltaTime;
                 yield return null;
+            }
 
             agent.isStopped = true;
         }
@@ -271,31 +325,74 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (anim != null)
             anim.SetBool("Caminando", false);
 
-        if ( destino == cuartoFacil1)
+        // Llegó a su cuarto: se acuesta y aparece el ícono del medicamento
+        if (cuartoAsignado != null && destino == cuartoAsignado.puntoAcostado)
         {
             if (agent != null)
                 agent.enabled = false;
 
-            transform.position = destino.position;
-            transform.rotation = destino.rotation;
+            puntoAcostado = destino;
+            acostado = true;
+            enCuarto = true;
 
             if (anim != null)
-            {
-                anim.SetTrigger("Acostado");
-            }
+                anim.CrossFade("Acostado", 0.2f);
+
+            if (npcManager != null)
+                cuartoAsignado.MostrarBurbuja(npcManager.ItemQueCura(queEnfermedadtiene));
         }
 
         if (alLlegar != null)
             alLlegar.Invoke();
     }
 
+    public void CurarPacientes()
+    {
+        if (estaCurado || muerto) return;
+        estaCurado = true;
+
+        if (cuartoAsignado != null) cuartoAsignado.OcultarBurbuja();
+        if (npcManager != null) npcManager.PacienteCurado();
+
+        StartCoroutine(EsperarYSalir());
+    }
+
+    // Medicamento incorrecto
+    public void Morir()
+    {
+        if (estaCurado || muerto) return;
+        muerto = true;
+
+        if (cuartoAsignado != null) cuartoAsignado.OcultarBurbuja();
+        if (npcManager != null) npcManager.PacienteMurio();
+
+        StartCoroutine(DesaparecerTrasMorir());
+    }
+
+    IEnumerator DesaparecerTrasMorir()
+    {
+        yield return new WaitForSeconds(tiempoDesaparecerMuerto);
+        Salir();
+    }
+
     IEnumerator EsperarYSalir()
     {
-        yield return new WaitForSeconds(tiempoEsperarCuracion);
+        // Sigue acostado durante tiempoCuracion
+        yield return new WaitForSeconds(tiempoCuracion);
+
+        // Se levanta: la camilla queda libre para otro paciente
+        acostado = false;
+        enCuarto = false;
+        LiberarCuarto();
 
         if (agent != null)
         {
             agent.enabled = true;
+
+            UnityEngine.AI.NavMeshHit hit;
+            if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out hit, 3f, UnityEngine.AI.NavMesh.AllAreas))
+                agent.Warp(hit.position);
+
             agent.isStopped = false;
         }
 
@@ -303,6 +400,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         {
             anim.ResetTrigger("Acostado");
             anim.SetBool("Caminando", true);
+            anim.CrossFade("Caminata", 0.2f);
         }
 
         if (agent != null && puertaSalida != null)
@@ -313,19 +411,39 @@ public class Pacientes : MonoBehaviour, IInteractable
             while (agent.pathPending)
                 yield return null;
 
-            while (agent.remainingDistance > 0.3f)
+            float espera = 0f;
+            while (agent.remainingDistance > 0.3f && espera < 60f)
+            {
+                espera += Time.deltaTime;
                 yield return null;
+            }
         }
 
+        Salir();
+    }
+
+    void LiberarCuarto()
+    {
+        if (cuartoAsignado != null)
+        {
+            cuartoAsignado.Liberar();
+            cuartoAsignado = null;
+        }
+    }
+
+    // Todas las salidas pasan por acá: libera el cuarto, avisa al manager y se destruye
+    void Salir()
+    {
+        LiberarCuarto();
+        if (npcManager != null) npcManager.PacienteSalio();
         Destroy(gameObject);
     }
 
-    public void CurarPacientes()
+    void LateUpdate()
     {
-        if (estaCurado) return;
-        estaCurado = true;
+        if (!acostado || puntoAcostado == null) return;
 
-        if (npcManager != null) npcManager.PacienteCurado();
-        StartCoroutine(EsperarYSalir());
+        transform.position = puntoAcostado.position + puntoAcostado.TransformDirection(offsetAcostado);
+        transform.rotation = puntoAcostado.rotation * Quaternion.Euler(rotacionExtraAcostado);
     }
 }

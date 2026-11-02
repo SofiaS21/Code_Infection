@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Enfermedad { DolorCabeza, Hemorragia, Infeccion }
+public enum Enfermedad { DolorCabeza, Hemorragia, Infeccion, ProblemasCardiacos, ProblemasDePiel, CortarInfeccion}
 [CreateAssetMenu(fileName = "Nuevo Item", menuName = "Inventario/Item")]
 
 public class ItemData : ScriptableObject
