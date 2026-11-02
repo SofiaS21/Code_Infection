@@ -12,6 +12,7 @@ public class DineroManager : MonoBehaviour
     public int precioItem = 15;
     public int premioCurar = 20;
     public int castigoError = 10;
+    public int TotalDia { get { return GananciasDia - ComprasDia; } }
 
     [Header("UI")]
     public TMP_Text textoDinero; 

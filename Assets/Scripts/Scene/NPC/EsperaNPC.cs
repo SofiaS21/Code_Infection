@@ -141,6 +141,7 @@ public class EsperaNPC : MonoBehaviour
     public void SiguienteDia()
     {
         diaActual++;
+        DineroManager.instancia.NuevoDia();
         IniciarDia();
     }
 
@@ -241,8 +242,19 @@ public class EsperaNPC : MonoBehaviour
 
     void RellenarPanelFinal()
     {
+        var d = DineroManager.instancia;
+
         if (textoFinalDia != null) textoFinalDia.text = "DIA " + diaActual;
+        if (textoIngresos != null) textoIngresos.text = FormatoDinero(d.GananciasDia);
+        if (textoCompras != null) textoCompras.text = FormatoDinero(-d.ComprasDia);
         if (textoMuertes != null) textoMuertes.text = muertosHoy.ToString();
+        if (textoTotal != null) textoTotal.text = FormatoDinero(d.TotalDia);
+    }
+
+    string FormatoDinero(int v)
+    {
+        string signo = v > 0 ? "+" : (v < 0 ? "-" : "");
+        return signo + "$" + Mathf.Abs(v);
     }
 
     IEnumerator PanelesFinDelDia()
@@ -267,7 +279,8 @@ public class EsperaNPC : MonoBehaviour
         yield return UITransiciones.EsperarClic(tiempoBloqueoClic);
         yield return UITransiciones.FadeOut(panelFinalDia, duracionFade);
 
-        AplicarEfectosCambioDeDia();
+        AplicarEfectosCambioDeDia();    diaActual++;
+
         SiguienteDia();
     }
 
@@ -415,10 +428,8 @@ public class EsperaNPC : MonoBehaviour
 
         tarjetaDNI.SetActive(true);
         panelDni.SetActive(true);
-
-        if (DniDisplay.Instancia != null)
-            DniDisplay.Instancia.MostrarActual();
-    }
+        RellenarPanelFinal();  
+     }
 
     void Decir(string texto)
     {

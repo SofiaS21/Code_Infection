@@ -839,6 +839,8 @@ MonoBehaviour:
   anomalia: {fileID: 0}
   anclaAnomalia: {fileID: 0}
   tiempoPaciencia: 45
+  tiempoCuracion: 10
+  tiempoDesaparecerMuerto: 3
   offsetAcostado: {x: 0, y: 0, z: 0}
   rotacionExtraAcostado: {x: -76.65, y: 0, z: 0}
   imagenCamara: 
@@ -852,10 +854,10 @@ MonoBehaviour:
   textoNombre: {fileID: 0}
   fechaVencimiento: {fileID: 0}
   textoNombrePosibles:
-  - QuiQui
-  - Pumis
-  - Kirk
-  - Titi
+  - Baredes
+  - Jerson
+  - Dobi
+  - Ted
   - Jeffrey
   fechasVencimientoPosibles:
   - 03/23/28
@@ -874,7 +876,6 @@ MonoBehaviour:
   anim: {fileID: 294250726126880412}
   llegoAlCounter: 0
   queEnfermedadtiene: 0
-  tiempoEsperarCuracion: 40
   estaCurado: 0
 --- !u!114 &4247610941843202275
 MonoBehaviour:

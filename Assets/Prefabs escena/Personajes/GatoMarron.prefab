@@ -132,6 +132,8 @@ MonoBehaviour:
   anomalia: {fileID: 0}
   anclaAnomalia: {fileID: 0}
   tiempoPaciencia: 45
+  tiempoCuracion: 10
+  tiempoDesaparecerMuerto: 3
   offsetAcostado: {x: 0.57, y: -2.65, z: 0}
   rotacionExtraAcostado: {x: -5.72, y: 0, z: 0}
   imagenCamara: 
@@ -145,15 +147,12 @@ MonoBehaviour:
   textoNombre: {fileID: 0}
   fechaVencimiento: {fileID: 0}
   textoNombrePosibles:
-  - QuiQui
-  - Pumis
-  - Kirk
-  - Titi
-  - Jeffrey
-  - Alfonso Amat
-  - Patrick Jane
-  - Gregory House
   - Ted
+  - Gregory
+  - Maxi
+  - Esteso
+  - Jeffrey
+  - Amat
   fechasVencimientoPosibles:
   - 03/23/28
   - 05/19/27
@@ -171,7 +170,6 @@ MonoBehaviour:
   anim: {fileID: 767148345197843742}
   llegoAlCounter: 0
   queEnfermedadtiene: 0
-  tiempoEsperarCuracion: 40
   estaCurado: 0
 --- !u!195 &5336971578619713657
 NavMeshAgent:
