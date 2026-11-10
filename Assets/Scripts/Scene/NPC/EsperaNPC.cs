@@ -64,8 +64,11 @@ public class EsperaNPC : MonoBehaviour
     public TMP_Text fechaVencimientoDNI;
     public RawImage dniFotoRawImage;
 
-    private int pacientesRestantes;
+    [Header("Jugador (para el ataque de anomalías)")]
+    public Transform jugador;
+    public MonoBehaviour controladorJugador;
 
+    private int pacientesRestantes;
     private Pacientes currentVisitor;
 
     [Header("Variables")]
@@ -365,8 +368,19 @@ public class EsperaNPC : MonoBehaviour
         int numeroPaciente = totalDelDia - pacientesRestantes;
         pacientesRestantes--;
 
-        bool esAnomalo = indicesAnomalos.Contains(numeroPaciente) || Random.value < rangoActual.probabilidadAnomalia;
+        bool garantizado = indicesAnomalos.Contains(numeroPaciente);
+        float dado = Random.value;
+        bool esAnomalo = garantizado || dado < rangoActual.probabilidadAnomalia;
         AnomaliaData anomalia = esAnomalo ? ElegirAnomalia() : null;
+
+        Debug.Log("[Paciente " + (numeroPaciente + 1) + "/" + totalDelDia + "] Día " + diaActual
+            + " | garantizado: " + garantizado
+            + " | dado: " + dado.ToString("F2") + " vs prob: " + rangoActual.probabilidadAnomalia
+            + " | ¿anómalo?: " + esAnomalo
+            + " | anomalía: " + (anomalia != null ? anomalia.name + " (" + anomalia.tipo + ")" : "NINGUNA"));
+
+        if (esAnomalo && anomalia == null)
+            Debug.LogWarning("Tocaba anomalía pero ElegirAnomalia() devolvió null. Revisá 'Anomalias Posibles' y el Dia Minimo de cada una.");
 
         Pacientes prefab;
         if (anomalia != null && anomalia.tipo == TipoAnomalia.Visual && anomalia.prefabAnomalo != null)

@@ -19,8 +19,16 @@ public class Pacientes : MonoBehaviour, IInteractable
     public float tiempoPaciencia = 45f;
 
     [Header("Curación")]
-    public float tiempoCuracion = 10f;            // segundos que espera después de curarse antes de irse
+    public float tiempoCuracion = 10f;            // segundos que espera después de curarse antes de irse (o de atacar, si es anomalía)
     public float tiempoDesaparecerMuerto = 3f;    // segundos que queda en la camilla si muere
+
+    [Header("Ataque (solo anomalías)")]
+    public float velocidadAtaque = 8f;            
+    public float distanciaAtaque = 1.5f;          // a qué distancia del jugador frena para atacar
+    public string triggerAtaqueAnim = "Ataque";       
+    public float momentoDano = 0.8f;            
+    public float duracionAtaque = 2f;             // duración total de cuanto tiempo el jugador se uqeda quieto
+    public float tiempoMaxCorrer = 15f;           // por seguridad: si no llega al jugador en este tiempo, ataca igual
 
     [Header("Ajuste al acostarse (distinto por prefab)")]
     public Vector3 offsetAcostado = Vector3.zero;
@@ -346,6 +354,7 @@ public class Pacientes : MonoBehaviour, IInteractable
             alLlegar.Invoke();
     }
 
+    // Medicamento correcto
     public void CurarPacientes()
     {
         if (estaCurado || muerto) return;
@@ -353,6 +362,10 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         if (cuartoAsignado != null) cuartoAsignado.OcultarBurbuja();
         if (npcManager != null) npcManager.PacienteCurado();
+
+        // Normal curado: +5 de sanidad. Si es anomalía no suma: después de curarse te ataca.
+        if (!EsAnomalia && SanidadManager.Instance != null)
+            SanidadManager.Instance.PacienteCurado();
 
         StartCoroutine(EsperarYSalir());
     }
@@ -364,7 +377,21 @@ public class Pacientes : MonoBehaviour, IInteractable
         muerto = true;
 
         if (cuartoAsignado != null) cuartoAsignado.OcultarBurbuja();
-        if (npcManager != null) npcManager.PacienteMurio();
+
+        if (EsAnomalia)
+        {
+            // Matar a una anomalía te da +5 de sanidad y no cuenta como muerte de paciente
+            if (SanidadManager.Instance != null)
+                SanidadManager.Instance.AnomaliaMuerta();
+        }
+        else
+        {
+            // Paciente normal muerto por error: -10 de sanidad
+            if (SanidadManager.Instance != null)
+                SanidadManager.Instance.PacienteMuertoPorError();
+
+            if (npcManager != null) npcManager.PacienteMurio();
+        }
 
         StartCoroutine(DesaparecerTrasMorir());
     }
@@ -416,6 +443,10 @@ public class Pacientes : MonoBehaviour, IInteractable
             anim.CrossFade("Caminata", 0.2f);
         }
 
+        // Si es una anomalía, antes de irse corre hacia el jugador y lo ataca
+        if (EsAnomalia && agent != null && npcManager != null && npcManager.jugador != null)
+            yield return StartCoroutine(AtacarJugador());
+
         if (agent != null && puertaSalida != null)
         {
             agent.SetDestination(puertaSalida.position);
@@ -426,6 +457,70 @@ public class Pacientes : MonoBehaviour, IInteractable
         }
 
         Salir();
+    }
+
+    IEnumerator AtacarJugador()
+    {
+        Transform jugador = npcManager.jugador;
+
+        // Corre hacia el jugador
+        agent.speed = velocidadAtaque;
+        agent.isStopped = false;
+
+        float tiempo = 0f;
+        while (DistanciaPlana(transform.position, jugador.position) > distanciaAtaque && tiempo < tiempoMaxCorrer)
+        {
+            agent.SetDestination(jugador.position);
+            tiempo += Time.deltaTime;
+            yield return null;
+        }
+
+        // Si se acabó el tiempo y todavía no llegó, desaparece sin atacar
+        if (DistanciaPlana(transform.position, jugador.position) > distanciaAtaque)
+        {
+            Debug.Log("[" + name + "] no llegó al jugador en " + tiempoMaxCorrer + "s, desaparece");
+            Salir();
+            yield break;
+        }
+
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
+
+        if (anim != null)
+            anim.SetBool("Caminando", false);
+
+        if (npcManager.controladorJugador != null)
+            npcManager.controladorJugador.enabled = false;
+
+        // camina hacia el jugaor
+        Vector3 dir = jugador.position - transform.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude > 0.001f)
+            transform.rotation = Quaternion.LookRotation(dir);
+
+        if (anim != null)
+            anim.SetTrigger(triggerAtaqueAnim);
+
+        // El golpe quita sanidad en el momento justo de la animación
+        yield return new WaitForSeconds(momentoDano);
+        if (SanidadManager.Instance != null)
+            SanidadManager.Instance.AtaqueAnomalia();
+
+        yield return new WaitForSeconds(Mathf.Max(0f, duracionAtaque - momentoDano));
+
+        // Libera al jugador
+        if (npcManager.controladorJugador != null)
+            npcManager.controladorJugador.enabled = true;
+
+        // Vuelve a caminar normal para ir a la puerta
+        agent.speed = velocidadCaminar;
+        agent.isStopped = false;
+
+        if (anim != null)
+        {
+            anim.SetBool("Caminando", true);
+            anim.CrossFade("Caminata", 0.2f);
+        }
     }
 
     float DistanciaPlana(Vector3 a, Vector3 b)
@@ -444,9 +539,13 @@ public class Pacientes : MonoBehaviour, IInteractable
         }
     }
 
-    // Todas las salidas pasan por acá: libera el cuarto, avisa al manager y se destruye
+    private bool yaSalio = false;
+
     void Salir()
     {
+        if (yaSalio) return;
+        yaSalio = true;
+
         LiberarCuarto();
         if (npcManager != null) npcManager.PacienteSalio();
         Destroy(gameObject);

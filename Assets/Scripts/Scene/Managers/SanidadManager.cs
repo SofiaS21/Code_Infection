@@ -117,8 +117,9 @@ public class SanidadManager : MonoBehaviour
         SceneManager.LoadScene("Inicio");
     }
 
-    public void RecibirDanoEnemigo() { CambiarSanidad(-Random.Range(5, 9)); }
-    public void PacienteMuertoPorError() { CambiarSanidad(-Random.Range(10, 16)); }
+    public void PacienteMuertoPorError() { CambiarSanidad(-10); }
     public void PacienteCurado() { CambiarSanidad(5); }
+    public void AnomaliaMuerta() { CambiarSanidad(5); }
+    public void AtaqueAnomalia() { CambiarSanidad(-15); }
 
 }

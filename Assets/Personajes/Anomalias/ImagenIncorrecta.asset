@@ -15,6 +15,6 @@ MonoBehaviour:
   prefabAnomalo: {fileID: 0}
   nombreInterno: 
   tipo: 1
-  diaMinimo: 2
+  diaMinimo: 1
   prefabVisual: {fileID: 0}
   frase: 
