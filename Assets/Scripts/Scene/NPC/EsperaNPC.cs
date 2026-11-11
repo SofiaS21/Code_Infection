@@ -47,6 +47,8 @@ public class EsperaNPC : MonoBehaviour
     public float tiempoRelojVisible = 3f;
     public float retrasoPanelFinDia = 1.5f;
 
+    private bool juegoTerminado = false;
+
     private int pacientesEnEscena = 0;
     private bool diaTerminado = false;
     private int curadosHoy = 0;
@@ -55,6 +57,10 @@ public class EsperaNPC : MonoBehaviour
     [Header("Transiciones")]
     public float duracionFade = 0.8f;
     public float tiempoBloqueoClic = 3f;
+
+    [Header("Game Over por rechazos")]
+    public int maxRechazosNormales = 1;
+    private int rechazosNormales = 0;
 
     [Header("Referencias de escena que se le pasan al paciente")]
     public Transform counter;
@@ -150,18 +156,44 @@ public class EsperaNPC : MonoBehaviour
 
     public void DenegarAcceso()
     {
+        if (Time.timeScale == 0f) return;
+        if (juegoTerminado) return;
+
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
+
+        bool eraNormal = !currentVisitor.EsAnomalia;
+
+        if (currentVisitor.EsAnomalia && SanidadManager.Instance != null)
+            SanidadManager.Instance.RechazarAnomalia();
 
         tarjetaDNI.SetActive(false);
         currentVisitor.Rechazar();
-        ProximoPaciente();
 
         if (DniDisplay.Instancia != null)
             DniDisplay.Instancia.Ocultar();
+
+        if (eraNormal)
+        {
+            rechazosNormales++;
+            Debug.Log("Rechazos de normales: " + rechazosNormales + "/" + maxRechazosNormales);
+
+            if (rechazosNormales >= maxRechazosNormales)
+            {
+                panelDialogue.SetActive(false);
+                inventario.SetActive(false);
+                SanidadManager.Instance.PerderPorRechazos();
+                return;   // no sigue con el próximo paciente
+            }
+        }
+
+        ProximoPaciente();
     }
 
     public void AceptarAcceso()
     {
+        if (juegoTerminado) return;
+        if (Time.timeScale == 0f) return;
+
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
 
         // Busca una camilla libre; si están todas ocupadas no lo deja pasar todavía
@@ -173,6 +205,14 @@ public class EsperaNPC : MonoBehaviour
         }
 
         cuarto.Ocupar();
+
+        int numeroCuarto = System.Array.IndexOf(cuartos, cuarto) + 1;
+        Debug.Log("Paciente " + currentVisitor.nombre + " fue al cuarto " + numeroCuarto
+            + " (" + cuarto.name + ")"
+            + (currentVisitor.EsAnomalia ? " | ANOMALÍA: " + currentVisitor.anomalia.tipo : ""));
+
+        if (SanidadManager.Instance != null)
+            SanidadManager.Instance.AceptarPaciente();
 
         tarjetaDNI.SetActive(false);
         currentVisitor.Aceptar(cuarto);

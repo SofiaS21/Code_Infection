@@ -16,6 +16,11 @@ public class SanidadManager : MonoBehaviour
     public Sprite[] sprites;
     public GameObject panelGameOver;
 
+    [Header("Game Over")]
+    public GameObject padreGameOver;       
+    public GameObject crosshair;            
+    public MonoBehaviour controladorJugador;
+
     [Header("Drenaje por tiempo (puntos por minuto)")]
     public int drenajeMin = 10;
     public int drenajeMax = 15;
@@ -28,6 +33,10 @@ public class SanidadManager : MonoBehaviour
     public float grainMax = 0.8f;
     public float chromaticMax = 1f;
     public float lensMax = 30f;
+
+    public Button botonVolverMenu;
+    public void RechazarAnomalia() { CambiarSanidad(10); }
+    public void AceptarPaciente() { CambiarSanidad(5); }
 
     float sanidad = 90f;
     float drenaje;
@@ -58,6 +67,12 @@ public class SanidadManager : MonoBehaviour
         BuscarEfectos();
         ElegirDrenaje();
         ActualizarUI();
+
+        if (botonVolverMenu != null)
+        {
+            botonVolverMenu.onClick.RemoveAllListeners();
+            botonVolverMenu.onClick.AddListener(VolverAlMenu);
+        }
     }
 
     void Update()
@@ -156,11 +171,25 @@ public class SanidadManager : MonoBehaviour
         iconoCerebro.sprite = sprites[i];
     }
 
-    void GameOver()
+    public void PerderPorRechazos()
+    {   
+        GameOver();
+    }
+
+    void GameOver() 
     {
+        if (muerto) return;
         muerto = true;
-        Time.timeScale = 0f;
+
+        // Activa el padre primero, si no el panel no se ve
+        if (padreGameOver != null) padreGameOver.SetActive(true);
         panelGameOver.SetActive(true);
+
+        // Apaga el crosshair y congela al jugador
+        if (crosshair != null) crosshair.SetActive(false);
+        if (controladorJugador != null) controladorJugador.enabled = false;
+
+        Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -177,7 +206,10 @@ public class SanidadManager : MonoBehaviour
 
     public void VolverAlMenu()
     {
+        Debug.Log("BOTON APRETADO. Escena a cargar: Inicio");
         Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         SceneManager.LoadScene("Inicio");
     }
 
