@@ -847,6 +847,8 @@ MonoBehaviour:
   momentoDano: 0.8
   duracionAtaque: 2
   tiempoMaxCorrer: 15
+  puedeAtacar: 1
+  probabilidadCorromper: 0.3
   offsetAcostado: {x: 0, y: 0, z: 0}
   rotacionExtraAcostado: {x: -76.65, y: 0, z: 0}
   imagenCamara: 

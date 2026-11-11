@@ -15,6 +15,9 @@ public class Pacientes : MonoBehaviour, IInteractable
     public Transform anclaAnomalia;
     public bool EsAnomalia { get { return anomalia != null; } }
 
+    // Todas las anomalías atacan (visual, diálogo, nombre, foto)
+    public bool Ataca { get { return anomalia != null; } }
+
     [Header("Paciencia")]
     public float tiempoPaciencia = 45f;
 
@@ -22,13 +25,20 @@ public class Pacientes : MonoBehaviour, IInteractable
     public float tiempoCuracion = 10f;            // segundos que espera después de curarse antes de irse (o de atacar, si es anomalía)
     public float tiempoDesaparecerMuerto = 3f;    // segundos que queda en la camilla si muere
 
-    [Header("Ataque (solo anomalías)")]
-    public float velocidadAtaque = 8f;            
-    public float distanciaAtaque = 1.5f;          // a qué distancia del jugador frena para atacar
-    public string triggerAtaqueAnim = "Ataque";       
-    public float momentoDano = 0.8f;            
-    public float duracionAtaque = 2f;             // duración total de cuanto tiempo el jugador se uqeda quieto
-    public float tiempoMaxCorrer = 15f;           // por seguridad: si no llega al jugador en este tiempo, ataca igual
+    [Header("Ataque (anomalías)")]
+    public float velocidadAtaque = 8f;
+    public float distanciaAtaque = 3f;            // a qué distancia del jugador frena (más alto = más lejos)
+    public float alturaAtaque = 1.2f;             // cuánto sube antes de atacar
+    public float duracionSubida = 0.4f;           // cuánto tarda en subir y en bajar
+    public string triggerAtaqueAnim = "Ataque";
+    public float momentoDano = 0.8f;              // segundos desde que empieza la animación hasta que quita sanidad
+    public float duracionAtaque = 2f;             // cuánto tiempo dura la animación de ataque (el jugador queda quieto)
+    public float tiempoMaxCorrer = 15f;           // por seguridad: si no llega al jugador en este tiempo, desaparece
+
+    [Header("Diálogo raro")]
+    [Range(0f, 1f)] public float probabilidadCorromper = 0.3f;   // chance de que cada letra reemplazable cambie
+    private string saludoAnomalo = "";
+    private string repeticionAnomala = "";
 
     [Header("Ajuste al acostarse (distinto por prefab)")]
     public Vector3 offsetAcostado = Vector3.zero;
@@ -157,9 +167,29 @@ public class Pacientes : MonoBehaviour, IInteractable
                     dniImagen = dniImagenesAnomalas[Random.Range(0, dniImagenesAnomalas.Length)];
                 break;
 
+            case TipoAnomalia.DialogoRaro:
+                // Algunas letras del diálogo cambian por símbolos (a -> @, e -> 3, etc.)
+                saludoAnomalo = CorromperAlgunas("Hola, mi nombre es " + nombreEnDialogo, probabilidadCorromper);
+                repeticionAnomala = CorromperAlgunas("Ehmm.. ya te dije que mi nombre es " + nombreEnDialogo, probabilidadCorromper);
+                break;
+
             case TipoAnomalia.Visual:
+                // El cambio es el modelo infectado: lo elige EsperaNPC al instanciar el prefab
                 break;
         }
+    }
+
+    // EsperaNPC pide estos textos en vez de armarlos él
+    public string ObtenerSaludo()
+    {
+        if (!string.IsNullOrEmpty(saludoAnomalo)) return saludoAnomalo;
+        return "Hola, mi nombre es " + nombreEnDialogo;
+    }
+
+    public string ObtenerRepeticion()
+    {
+        if (!string.IsNullOrEmpty(repeticionAnomala)) return repeticionAnomala;
+        return "Ehmm.. ya te dije que mi nombre es " + nombreEnDialogo;
     }
 
     public void GenerarDatos()
@@ -177,6 +207,31 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         if (dniFotoRawImage != null && dniImagen != null)
             dniFotoRawImage.texture = dniImagen;
+    }
+
+    // Cambia solo ALGUNAS letras del texto (cada letra reemplazable tiene 'probabilidad' de cambiar).
+    // Si por azar no cambió ninguna, cambia una para que la anomalía siempre se note.
+    string CorromperAlgunas(string texto, float probabilidad)
+    {
+        var sb = new System.Text.StringBuilder();
+        bool cambioAlguna = false;
+
+        for (int i = 0; i < texto.Length; i++)
+        {
+            string reemplazo = ObtenerReemplazo(texto[i]);
+            if (reemplazo != null && Random.value < probabilidad)
+            {
+                sb.Append(reemplazo);
+                cambioAlguna = true;
+            }
+            else
+            {
+                sb.Append(texto[i]);
+            }
+        }
+
+        if (!cambioAlguna) return Corromper(texto);
+        return sb.ToString();
     }
 
     string Corromper(string texto)
@@ -363,7 +418,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (cuartoAsignado != null) cuartoAsignado.OcultarBurbuja();
         if (npcManager != null) npcManager.PacienteCurado();
 
-        // Normal curado: +5 de sanidad. Si es anomalía no suma: después de curarse te ataca.
+        // Normal curado: +5 de sanidad. Si es anomalía no suma.
         if (!EsAnomalia && SanidadManager.Instance != null)
             SanidadManager.Instance.PacienteCurado();
 
@@ -443,8 +498,13 @@ public class Pacientes : MonoBehaviour, IInteractable
             anim.CrossFade("Caminata", 0.2f);
         }
 
+        Debug.Log("[" + name + "] terminó de curarse | EsAnomalia: " + EsAnomalia
+            + " | tipo: " + (anomalia != null ? anomalia.tipo.ToString() : "-")
+            + " | Ataca: " + Ataca
+            + " | jugador asignado: " + (npcManager != null && npcManager.jugador != null));
+
         // Si es una anomalía, antes de irse corre hacia el jugador y lo ataca
-        if (EsAnomalia && agent != null && npcManager != null && npcManager.jugador != null)
+        if (Ataca && agent != null && npcManager != null && npcManager.jugador != null)
             yield return StartCoroutine(AtacarJugador());
 
         if (agent != null && puertaSalida != null)
@@ -462,6 +522,7 @@ public class Pacientes : MonoBehaviour, IInteractable
     IEnumerator AtacarJugador()
     {
         Transform jugador = npcManager.jugador;
+        float alturaOriginal = agent.baseOffset;
 
         // Corre hacia el jugador
         agent.speed = velocidadAtaque;
@@ -489,30 +550,40 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (anim != null)
             anim.SetBool("Caminando", false);
 
+        // Congela al jugador
         if (npcManager.controladorJugador != null)
             npcManager.controladorJugador.enabled = false;
 
-        // camina hacia el jugaor
+        // Se da vuelta hacia el jugador
         Vector3 dir = jugador.position - transform.position;
         dir.y = 0f;
         if (dir.sqrMagnitude > 0.001f)
             transform.rotation = Quaternion.LookRotation(dir);
 
+        // Sube antes de atacar
+        yield return StartCoroutine(CambiarAltura(alturaOriginal + alturaAtaque, duracionSubida));
+
         if (anim != null)
             anim.SetTrigger(triggerAtaqueAnim);
 
-        // El golpe quita sanidad en el momento justo de la animación
+        // El golpe quita sanidad y dispara los efectos en el momento justo de la animación
         yield return new WaitForSeconds(momentoDano);
         if (SanidadManager.Instance != null)
             SanidadManager.Instance.AtaqueAnomalia();
 
-        yield return new WaitForSeconds(Mathf.Max(0f, duracionAtaque - momentoDano));
+        float resto = Mathf.Max(0f, duracionAtaque - momentoDano);
+        if (EfectoAtaque.Instance != null)
+            EfectoAtaque.Instance.Reproducir(resto);
+
+        yield return new WaitForSeconds(resto);
 
         // Libera al jugador
         if (npcManager.controladorJugador != null)
             npcManager.controladorJugador.enabled = true;
 
-        // Vuelve a caminar normal para ir a la puerta
+        // Baja de nuevo y vuelve a caminar a la puerta
+        StartCoroutine(CambiarAltura(alturaOriginal, duracionSubida));
+
         agent.speed = velocidadCaminar;
         agent.isStopped = false;
 
@@ -521,6 +592,20 @@ public class Pacientes : MonoBehaviour, IInteractable
             anim.SetBool("Caminando", true);
             anim.CrossFade("Caminata", 0.2f);
         }
+    }
+
+    // Sube o baja el modelo suavemente (sin tocar el NavMeshAgent de lugar)
+    IEnumerator CambiarAltura(float destino, float duracion)
+    {
+        float inicio = agent.baseOffset;
+        float t = 0f;
+        while (t < duracion)
+        {
+            t += Time.deltaTime;
+            agent.baseOffset = Mathf.Lerp(inicio, destino, Mathf.SmoothStep(0f, 1f, t / duracion));
+            yield return null;
+        }
+        agent.baseOffset = destino;
     }
 
     float DistanciaPlana(Vector3 a, Vector3 b)
@@ -541,6 +626,7 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     private bool yaSalio = false;
 
+    // Todas las salidas pasan por acá: libera el cuarto, avisa al manager y se destruye
     void Salir()
     {
         if (yaSalio) return;

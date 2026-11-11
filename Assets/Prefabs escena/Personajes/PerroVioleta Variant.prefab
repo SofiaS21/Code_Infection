@@ -29,15 +29,15 @@ PrefabInstance:
     - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
       propertyPath: dniImagenesAnomalas.Array.data[0]
       value: 
-      objectReference: {fileID: 2800000, guid: 3a480e4e1e2a8724bb9b06232c22fb63, type: 3}
+      objectReference: {fileID: 2800000, guid: 9c8267247c5488340be68c56e6b2dc85, type: 3}
     - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
       propertyPath: dniImagenesAnomalas.Array.data[1]
       value: 
-      objectReference: {fileID: 2800000, guid: aa996a4efa0bcc44a89bba67148fab28, type: 3}
+      objectReference: {fileID: 2800000, guid: 573ca14afa2f67d409655550a6144a26, type: 3}
     - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
       propertyPath: dniImagenesAnomalas.Array.data[2]
       value: 
-      objectReference: {fileID: 2800000, guid: 4db6af051e55c7049983ef8322bd4ecf, type: 3}
+      objectReference: {fileID: 2800000, guid: 6a97af7f2004b1349969c0aa2f531341, type: 3}
     - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
       propertyPath: textoNombrePosibles.Array.data[0]
       value: Winny

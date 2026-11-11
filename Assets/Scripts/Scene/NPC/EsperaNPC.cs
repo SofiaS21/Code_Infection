@@ -274,15 +274,22 @@ public class EsperaNPC : MonoBehaviour
 
         RellenarPanelFinal();
 
+        textoReloj.text = "8:59";
+        textoReloj.alpha = 1f;
+
         yield return UITransiciones.FadeIn(panelReloj, duracionFade);
         yield return UITransiciones.EsperarSegundosOClic(tiempoRelojVisible);
+
+        yield return UITransiciones.CambiarTextoConFade(textoReloj, "9:00", 0.2f);
+        yield return new WaitForSeconds(1.5f);
+
         yield return UITransiciones.FadeOut(panelReloj, duracionFade);
 
         yield return UITransiciones.FadeIn(panelFinalDia, duracionFade);
         yield return UITransiciones.EsperarClic(tiempoBloqueoClic);
         yield return UITransiciones.FadeOut(panelFinalDia, duracionFade);
 
-        AplicarEfectosCambioDeDia();    diaActual++;
+        AplicarEfectosCambioDeDia();
 
         SiguienteDia();
     }
@@ -367,7 +374,7 @@ public class EsperaNPC : MonoBehaviour
 
         int numeroPaciente = totalDelDia - pacientesRestantes;
         pacientesRestantes--;
-
+            
         bool garantizado = indicesAnomalos.Contains(numeroPaciente);
         float dado = Random.value;
         bool esAnomalo = garantizado || dado < rangoActual.probabilidadAnomalia;
@@ -382,10 +389,11 @@ public class EsperaNPC : MonoBehaviour
         if (esAnomalo && anomalia == null)
             Debug.LogWarning("Tocaba anomalía pero ElegirAnomalia() devolvió null. Revisá 'Anomalias Posibles' y el Dia Minimo de cada una.");
 
-        Pacientes prefab;
-        if (anomalia != null && anomalia.tipo == TipoAnomalia.Visual && anomalia.prefabAnomalo != null)
-            prefab = anomalia.prefabAnomalo;
-        else
+        Pacientes prefab = null;
+        if (anomalia != null && anomalia.tipo == TipoAnomalia.Visual)
+            prefab = anomalia.ElegirPrefab();
+
+        if (prefab == null)
             prefab = prefabsPacientes[Random.Range(0, prefabsPacientes.Length)];
 
         currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
@@ -415,13 +423,13 @@ public class EsperaNPC : MonoBehaviour
         {
             dniMostrado = true;
             inventario.SetActive(false);
-            Decir("Hola, mi nombre es " + currentVisitor.nombreEnDialogo);
+            Decir(currentVisitor.ObtenerSaludo());
         }
 
         else
         {
             inventario.SetActive(false);
-            Decir("Ehmm.. ya te dije que mi nombre es " + currentVisitor.nombreEnDialogo);
+            Decir(currentVisitor.ObtenerRepeticion());
         }
 
         if (!currentVisitor.llegoAlCounter)

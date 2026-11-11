@@ -17,50 +17,53 @@ public class SanidadManager : MonoBehaviour
     public GameObject panelGameOver;
 
     [Header("Drenaje por tiempo (puntos por minuto)")]
-    public int drenajeMin = 18;
-    public int drenajeMax = 23;
+    public int drenajeMin = 10;
+    public int drenajeMax = 15;
 
     [Header("PostProcessing")]
-    public float sanidadInicioEfectos = 50f;
+    public PostProcessVolume volume;               // arrastrá acá tu Post-process Volume
+    public float sanidadInicioEfectos = 1f;       // desde acá empiezan a subir
     public float vignetteMax = 0.55f;
-    public float ambientOcclusion;
-    public float grainMax;
-    public float chromaticAberration;
-    public float lenseDistortion;
+    public float ambientOcclusionMax = 2f;
+    public float grainMax = 0.8f;
+    public float chromaticMax = 1f;
+    public float lensMax = 30f;
 
     float sanidad = 90f;
     float drenaje;
     float tiempoPorMinuto;
     bool muerto;
 
-    //Efectos post-processing 
+    // Efectos post-processing
     Vignette vignette;
     AmbientOcclusion occlusion;
     Grain grain;
     ChromaticAberration chromatic;
     LensDistortion lens;
     float vignetteBase;
-    float ambientOcclusionBase;
+    float occlusionBase;
     float grainBase;
-    float intensidadEfectos;
+    float intensidadEfectos;   // 0 a 1 (suavizada)
 
     void Awake()
     {
         Instance = this;
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         Time.timeScale = 1f;
         if (panelGameOver != null) panelGameOver.SetActive(false);
+
+        BuscarEfectos();
         ElegirDrenaje();
         ActualizarUI();
     }
 
-    // Update is called once per frame
     void Update()
     {
+        ActualizarEfectos();   // va antes del return para que siga funcionando al morir
+
         if (muerto) return;
 
         tiempoPorMinuto += Time.deltaTime;
@@ -75,9 +78,70 @@ public class SanidadManager : MonoBehaviour
 
     void ElegirDrenaje()
     {
-        drenaje = Random.Range(3, 5) / 60f; //3 o 4 por minuto
+        drenaje = Random.Range(drenajeMin, drenajeMax + 1) / 60f;   // puntos por minuto
     }
 
+    void BuscarEfectos()
+    {
+        if (volume == null)
+        {
+            Debug.LogWarning("SanidadManager: falta arrastrar el Post-process Volume.");
+            return;
+        }
+
+        volume.profile.TryGetSettings(out vignette);
+        volume.profile.TryGetSettings(out occlusion);
+        volume.profile.TryGetSettings(out grain);
+        volume.profile.TryGetSettings(out chromatic);
+        volume.profile.TryGetSettings(out lens);
+
+        if (vignette == null) Debug.LogWarning("SanidadManager: el profile no tiene Vignette.");
+        if (occlusion == null) Debug.LogWarning("SanidadManager: el profile no tiene Ambient Occlusion.");
+        if (grain == null) Debug.LogWarning("SanidadManager: el profile no tiene Grain.");
+        if (chromatic == null) Debug.LogWarning("SanidadManager: el profile no tiene Chromatic Aberration.");
+        if (lens == null) Debug.LogWarning("SanidadManager: el profile no tiene Lens Distortion.");
+
+        if (vignette != null) vignetteBase = vignette.intensity.value;
+        if (occlusion != null) occlusionBase = occlusion.intensity.value;
+        if (grain != null) grainBase = grain.intensity.value;
+    }
+
+    void ActualizarEfectos()
+    {
+        // 0 cuando sanidad >= sanidadInicioEfectos, 1 cuando sanidad = 0
+        float objetivo = Mathf.InverseLerp(sanidadInicioEfectos, 0f, sanidad);
+
+        // suavizado para que no salte de golpe
+        intensidadEfectos = Mathf.Lerp(intensidadEfectos, objetivo, Time.unscaledDeltaTime * 3f);
+
+        if (vignette != null)
+        {
+            vignette.enabled.Override(true);
+            vignette.intensity.Override(Mathf.Lerp(vignetteBase, vignetteMax, intensidadEfectos));
+        }
+        if (occlusion != null)
+        {
+            occlusion.enabled.Override(true);
+            occlusion.intensity.Override(Mathf.Lerp(occlusionBase, ambientOcclusionMax, intensidadEfectos));
+        }
+        if (grain != null)
+        {
+            grain.enabled.Override(true);
+            grain.intensity.Override(Mathf.Lerp(grainBase, grainMax, intensidadEfectos));
+        }
+        if (chromatic != null)
+        {
+            chromatic.enabled.Override(true);
+            chromatic.intensity.Override(chromaticMax * intensidadEfectos);
+        }
+        if (lens != null)
+        {
+            lens.enabled.Override(true);
+            lens.intensity.Override(lensMax * intensidadEfectos);
+        }
+    }
+
+    // ---------- UI ----------
     void ActualizarUI()
     {
         int valor = Mathf.CeilToInt(sanidad);
@@ -118,8 +182,7 @@ public class SanidadManager : MonoBehaviour
     }
 
     public void PacienteMuertoPorError() { CambiarSanidad(-10); }
-    public void PacienteCurado() { CambiarSanidad(5); }
+    public void PacienteCurado() { CambiarSanidad(10); }
     public void AnomaliaMuerta() { CambiarSanidad(5); }
     public void AtaqueAnomalia() { CambiarSanidad(-15); }
-
 }

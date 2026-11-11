@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public static class UITransiciones
 {
@@ -70,5 +71,26 @@ public static class UITransiciones
         yield return null;
     }
 
+    public static IEnumerator CambiarTextoConFade(TMP_Text txt, string nuevo, float duracion = 0.4f)
+    {
+        float t = 0f;
+        while (t < duracion)
+        {
+            t += Time.unscaledDeltaTime;
+            txt.alpha = Mathf.Clamp01(1f - t / duracion);
+            yield return null;
+        }
 
+        txt.text = nuevo;
+
+        t = 0f;
+        while (t < duracion)
+        {
+            t += Time.unscaledDeltaTime;
+            txt.alpha = Mathf.Clamp01(t / duracion);
+            yield return null;
+        }
+
+        txt.alpha = 1f;
+    }
 }
