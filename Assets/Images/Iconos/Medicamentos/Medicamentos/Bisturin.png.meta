@@ -100,10 +100,10 @@ TextureImporter:
       name: Bisturin_0
       rect:
         serializedVersion: 2
-        x: 275
-        y: 101
-        width: 197
-        height: 24
+        x: 263
+        y: 14
+        width: 220
+        height: 220
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

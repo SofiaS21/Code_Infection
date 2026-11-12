@@ -215,6 +215,6 @@ public class SanidadManager : MonoBehaviour
 
     public void PacienteMuertoPorError() { CambiarSanidad(-10); }
     public void PacienteCurado() { CambiarSanidad(10); }
-    public void AnomaliaMuerta() { CambiarSanidad(5); }
+    public void AnomaliaMuerta() { CambiarSanidad(-5); }
     public void AtaqueAnomalia() { CambiarSanidad(-15); }
 }

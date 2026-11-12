@@ -429,8 +429,10 @@ public class EsperaNPC : MonoBehaviour
         if (esAnomalo && anomalia == null)
             Debug.LogWarning("Tocaba anomalía pero ElegirAnomalia() devolvió null. Revisá 'Anomalias Posibles' y el Dia Minimo de cada una.");
 
+        bool esCamara = anomalia != null && anomalia.tipo == TipoAnomalia.VisualCamara;
+
         Pacientes prefab = null;
-        if (anomalia != null && anomalia.tipo == TipoAnomalia.Visual)
+        if (anomalia != null && (anomalia.tipo == TipoAnomalia.Visual || esCamara))
             prefab = anomalia.ElegirPrefab();
 
         if (prefab == null)
@@ -438,6 +440,8 @@ public class EsperaNPC : MonoBehaviour
 
         currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
         currentVisitor.anomalia = anomalia;
+        if (esCamara)
+            currentVisitor.ConfigurarVisionCamara(prefabsPacientes[Random.Range(0, prefabsPacientes.Length)].gameObject);
         pacientesEnEscena++;
 
         var agent = currentVisitor.GetComponent<NavMeshAgent>();

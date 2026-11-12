@@ -22,18 +22,18 @@ public class Pacientes : MonoBehaviour, IInteractable
     public float tiempoPaciencia = 45f;
 
     [Header("Curación")]
-    public float tiempoCuracion = 10f;            // segundos que espera después de curarse antes de irse (o de atacar, si es anomalía)
-    public float tiempoDesaparecerMuerto = 3f;    // segundos que queda en la camilla si muere
+    public float tiempoCuracion = 10f;           
+    public float tiempoDesaparecerMuerto = 3f;   
 
     [Header("Ataque (anomalías)")]
     public float velocidadAtaque = 8f;
-    public float distanciaAtaque = 3f;            // a qué distancia del jugador frena (más alto = más lejos)
+    public float distanciaAtaque = 3f;            
     public float alturaAtaque = 1.2f;             // cuánto sube antes de atacar
     public float duracionSubida = 0.4f;           // cuánto tarda en subir y en bajar
     public string triggerAtaqueAnim = "Ataque";
     public float momentoDano = 0.8f;              // segundos desde que empieza la animación hasta que quita sanidad
-    public float duracionAtaque = 2f;             // cuánto tiempo dura la animación de ataque (el jugador queda quieto)
-    public float tiempoMaxCorrer = 15f;           // por seguridad: si no llega al jugador en este tiempo, desaparece
+    public float duracionAtaque = 2f;             
+    public float tiempoMaxCorrer = 15f;         
 
     [Header("Diálogo raro")]
     [Range(0f, 1f)] public float probabilidadCorromper = 0.3f;   // chance de que cada letra reemplazable cambie
@@ -49,12 +49,13 @@ public class Pacientes : MonoBehaviour, IInteractable
     private CuartoCamilla cuartoAsignado;
     private bool muerto = false;
 
+    public GameObject confetiPrefab;
+
     public string imagenCamara;
     public Texture dniImagen;
     public Texture[] dniImagenesAnomalas;
     private RawImage dniFotoRawImage;
     public string dniFechaVencimiento;
-
 
     // Tarjeta DNI (objetos de la escena)
     public GameObject tarjetaDNI;
@@ -86,6 +87,12 @@ public class Pacientes : MonoBehaviour, IInteractable
     private bool procesando = false;
     private NavMeshAgent agent;
 
+    private Renderer[] renderersInfectado;
+    private Renderer[] renderersCopia;
+    private MirarCamara mirar;
+    private bool tieneVisionCamara = false;
+    private bool visionActiva = false;
+
     public Enfermedad queEnfermedadtiene;
 
     public void OnFocus() { }
@@ -98,6 +105,12 @@ public class Pacientes : MonoBehaviour, IInteractable
         agent = GetComponent<NavMeshAgent>();
         if (anim == null) anim = GetComponentInChildren<Animator>();
         medicamentos = new int[6];
+        confetiPrefab = Resources.Load<GameObject>("Confetti");
+
+        if (confetiPrefab == null)
+            Debug.LogError("[Confeti] NO encontré el prefab 'Confeti' en Resources. Revisá el nombre y la carpeta.");
+        else
+            Debug.Log("[Confeti] Prefab cargado OK en " + gameObject.name);
     }
 
     public void Iniciar()
@@ -448,6 +461,9 @@ public class Pacientes : MonoBehaviour, IInteractable
             if (npcManager != null) npcManager.PacienteMurio();
         }
 
+        if (confetiPrefab != null)
+            Instantiate(confetiPrefab, transform.position + Vector3.up * 1f, Quaternion.identity);
+
         StartCoroutine(DesaparecerTrasMorir());
     }
 
@@ -517,6 +533,95 @@ public class Pacientes : MonoBehaviour, IInteractable
         }
 
         Salir();
+    }
+
+    public void ConfigurarVisionCamara(GameObject prefabNormal)
+    {
+        int capaInfectado = LayerMask.NameToLayer("ModeloInfectado");
+        int capaNormal = LayerMask.NameToLayer("ModeloNormal");
+
+        if (capaInfectado < 0 || capaNormal < 0)
+        {
+            Debug.LogError("Faltan las capas ModeloNormal / ModeloInfectado en Tags and Layers");
+            return;
+        }
+
+        // 1) Renderers del modelo infectado (hay que tomarlos ANTES de crear la copia)
+        var lista = new System.Collections.Generic.List<Renderer>();
+        foreach (var r in GetComponentsInChildren<Renderer>(true))
+            if (r.enabled) lista.Add(r);
+        renderersInfectado = lista.ToArray();
+
+        // 2) Copia del modelo normal como hijo, solo visual
+        GameObject copia = Instantiate(prefabNormal, transform.position, transform.rotation, transform);
+        copia.transform.localPosition = Vector3.zero;
+        copia.transform.localRotation = Quaternion.identity;
+
+        Vector3 escalaPadre = transform.lossyScale;
+        Vector3 escalaDeseada = prefabNormal.transform.lossyScale;
+        copia.transform.localScale = new Vector3(
+            escalaDeseada.x / escalaPadre.x,
+            escalaDeseada.y / escalaPadre.y,
+            escalaDeseada.z / escalaPadre.z);
+
+        foreach (var a in copia.GetComponentsInChildren<NavMeshAgent>()) DestroyImmediate(a);
+        foreach (var c in copia.GetComponentsInChildren<Collider>()) DestroyImmediate(c);
+        foreach (var rb in copia.GetComponentsInChildren<Rigidbody>()) DestroyImmediate(rb);
+        foreach (var p in copia.GetComponentsInChildren<Pacientes>()) DestroyImmediate(p);
+
+        renderersCopia = copia.GetComponentsInChildren<Renderer>(true);
+
+        // 3) El modelo normal copia la animación del infectado
+        Animator animCopia = copia.GetComponentInChildren<Animator>();
+        if (animCopia != null && anim != null)
+            animCopia.gameObject.AddComponent<EspejoAnimations>().origen = anim;
+
+        // 4) Mirada a cámara (solo se activa mientras espera)
+        if (anim != null)
+        {
+            mirar = anim.GetComponent<MirarCamara>();
+            if (mirar == null) mirar = anim.gameObject.AddComponent<MirarCamara>();
+            mirar.activo = false;
+        }
+
+        tieneVisionCamara = true;
+        visionActiva = false;
+        AplicarVisionCamara(false);   // al empezar camina: todo se ve normal
+    }
+
+    void AplicarVisionCamara(bool activa)
+    {
+        int capaInfectado = LayerMask.NameToLayer("ModeloInfectado");
+        int capaNormal = LayerMask.NameToLayer("ModeloNormal");
+
+        // Infectado: visible (solo para cámaras) únicamente mientras espera
+        foreach (var r in renderersInfectado)
+        {
+            if (r == null) continue;
+            r.gameObject.layer = capaInfectado;
+            r.enabled = activa;
+        }
+
+        // Normal: oculto a las cámaras mientras espera; el resto del tiempo lo ve todo el mundo
+        foreach (var r in renderersCopia)
+        {
+            if (r == null) continue;
+            r.gameObject.layer = activa ? capaNormal : 0;
+        }
+
+        if (mirar != null) mirar.activo = activa;
+    }
+
+    void Update()
+    {
+        if (!tieneVisionCamara) return;
+
+        bool esperando = llegoAlCounter && !procesando && !muerto;
+        if (esperando != visionActiva)
+        {
+            visionActiva = esperando;
+            AplicarVisionCamara(esperando);
+        }
     }
 
     IEnumerator AtacarJugador()

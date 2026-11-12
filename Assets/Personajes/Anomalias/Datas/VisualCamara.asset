@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0904caeff1bab41bea0e9b51842290, type: 3}
+  m_Name: VisualCamara
+  m_EditorClassIdentifier: 
+  nombreInterno: 
+  tipo: 4
+  diaMinimo: 1
+  prefabsAnomalos:
+  - {fileID: 2903480952607379457, guid: 0921f47e8e38e00439756fa222c43e5b, type: 3}
+  - {fileID: 1418282377531098362, guid: b1fbf2a1e18f2054eac279750555d10e, type: 3}
+  - {fileID: 5574187013799160905, guid: 99c51b7b797a00043b628c3a0f583fec, type: 3}
+  - {fileID: 467661312497956687, guid: e5bcd0e21fb23144b9b039e59e43b09f, type: 3}
+  frase: 
