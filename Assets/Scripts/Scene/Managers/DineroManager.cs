@@ -15,7 +15,7 @@ public class DineroManager : MonoBehaviour
     public int TotalDia { get { return GananciasDia - ComprasDia; } }
 
     [Header("UI")]
-    public TMP_Text textoDinero; 
+    public TMP_Text textoDinero;
 
     public int Dinero { get; private set; }
     public int GananciasDia { get; private set; }   // solo curados/errores, SIN compras

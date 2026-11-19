@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public enum TipoAnomalia
 {
     NombreIncorrecto,
     FotoDiferente,
     Visual,
     DialogoRaro,
-    VisualCamara,
 }
 
 [CreateAssetMenu(menuName = "Juego/Anomalia")]
@@ -19,11 +19,12 @@ public class AnomaliaData : ScriptableObject
     public int diaMinimo = 2;
 
     [Header("Visual (modelos infectados)")]
-    public Pacientes[] prefabsAnomalos;
+    public Pacientes[] prefabsAnomalos;   // los 4: 2 perros y 2 gatos infectados
 
     [Header("Secreto")]
     [TextArea] public string frase;
 
+    // Elige al azar uno de los modelos infectados cargados
     public Pacientes ElegirPrefab()
     {
         var lista = new List<Pacientes>();

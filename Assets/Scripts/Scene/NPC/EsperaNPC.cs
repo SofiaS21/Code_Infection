@@ -38,6 +38,10 @@ public class EsperaNPC : MonoBehaviour
     [Header("Medicamentos (los 6 ItemData: Bisturin, Corazon, Jeringa, Pastilla, Tijeras, Vendaje)")]
     public ItemData[] todosLosItems;
 
+    [Header("Game Over por rechazos")]
+    public int maxRechazosNormales = 3;
+    private int rechazosNormales = 0;
+
     [Header("Fin del dia")]
     public GameObject panelReloj;
     public GameObject panelFinalDia;
@@ -47,8 +51,6 @@ public class EsperaNPC : MonoBehaviour
     public float tiempoRelojVisible = 3f;
     public float retrasoPanelFinDia = 1.5f;
 
-    private bool juegoTerminado = false;
-
     private int pacientesEnEscena = 0;
     private bool diaTerminado = false;
     private int curadosHoy = 0;
@@ -57,10 +59,6 @@ public class EsperaNPC : MonoBehaviour
     [Header("Transiciones")]
     public float duracionFade = 0.8f;
     public float tiempoBloqueoClic = 3f;
-
-    [Header("Game Over por rechazos")]
-    public int maxRechazosNormales = 1;
-    private int rechazosNormales = 0;
 
     [Header("Referencias de escena que se le pasan al paciente")]
     public Transform counter;
@@ -72,7 +70,7 @@ public class EsperaNPC : MonoBehaviour
 
     [Header("Jugador (para el ataque de anomalías)")]
     public Transform jugador;
-    public MonoBehaviour controladorJugador;
+    public MonoBehaviour controladorJugador;   // el script del FPS controller (se congela durante el ataque)
 
     private int pacientesRestantes;
     private Pacientes currentVisitor;
@@ -88,6 +86,9 @@ public class EsperaNPC : MonoBehaviour
     public GameObject sanidadPanel;
     public GameObject tarjetaDNI;
     public Animator anim;
+
+    [Header("Aviso de cuarto")]
+    public AvisoCuarto avisoCuarto;
 
     [Header("Tiempos")]
     public float tiempoMensajeVisible = 5f;
@@ -156,44 +157,45 @@ public class EsperaNPC : MonoBehaviour
 
     public void DenegarAcceso()
     {
-        if (Time.timeScale == 0f) return;
-        if (juegoTerminado) return;
-
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
 
-        bool eraNormal = !currentVisitor.EsAnomalia;
-
-        if (currentVisitor.EsAnomalia && SanidadManager.Instance != null)
-            SanidadManager.Instance.RechazarAnomalia();
+        bool eraNormal = !currentVisitor.EsAnomalia;   // antes de rechazar
 
         tarjetaDNI.SetActive(false);
         currentVisitor.Rechazar();
 
-        if (DniDisplay.Instancia != null)
-            DniDisplay.Instancia.Ocultar();
-
         if (eraNormal)
         {
             rechazosNormales++;
-            Debug.Log("Rechazos de normales: " + rechazosNormales + "/" + maxRechazosNormales);
-
             if (rechazosNormales >= maxRechazosNormales)
             {
-                panelDialogue.SetActive(false);
-                inventario.SetActive(false);
-                SanidadManager.Instance.PerderPorRechazos();
-                return;   // no sigue con el próximo paciente
+                GameOverPorRechazos();
+                return;   // no seguir con el próximo paciente
             }
         }
 
         ProximoPaciente();
+
+        if (DniDisplay.Instancia != null)
+            DniDisplay.Instancia.Ocultar();
+    }
+
+    void GameOverPorRechazos()
+    {
+        diaTerminado = true;      
+        StopAllCoroutines();
+        currentVisitor = null;
+
+        panelDialogue.SetActive(false);
+        tarjetaDNI.SetActive(false);
+        inventario.SetActive(false);
+        if (DniDisplay.Instancia != null) DniDisplay.Instancia.Ocultar();
+
+        SanidadManager.Instance.PerderPorRechazos();
     }
 
     public void AceptarAcceso()
     {
-        if (juegoTerminado) return;
-        if (Time.timeScale == 0f) return;
-
         if (currentVisitor == null || !currentVisitor.llegoAlCounter) return;
 
         // Busca una camilla libre; si están todas ocupadas no lo deja pasar todavía
@@ -211,6 +213,9 @@ public class EsperaNPC : MonoBehaviour
             + " (" + cuarto.name + ")"
             + (currentVisitor.EsAnomalia ? " | ANOMALÍA: " + currentVisitor.anomalia.tipo : ""));
 
+        if (avisoCuarto != null) avisoCuarto.Mostrar(numeroCuarto);   
+
+        // Aceptar a cualquiera (anomalía o no): +5 de sanidad
         if (SanidadManager.Instance != null)
             SanidadManager.Instance.AceptarPaciente();
 
@@ -244,9 +249,24 @@ public class EsperaNPC : MonoBehaviour
 
     AnomaliaData ElegirAnomalia()
     {
+        if (anomaliasPosibles == null || anomaliasPosibles.Length == 0)
+        {
+            Debug.LogWarning("ElegirAnomalia: el array 'Anomalias Posibles' está VACÍO en " + name);
+            return null;
+        }
+
         var validas = new List<AnomaliaData>();
         foreach (var a in anomaliasPosibles)
-            if (a != null && a.diaMinimo <= diaActual) validas.Add(a);
+        {
+            if (a == null)
+            {
+                Debug.LogWarning("ElegirAnomalia: hay un elemento en None dentro de 'Anomalias Posibles'");
+                continue;
+            }
+
+            if (a.diaMinimo <= diaActual) validas.Add(a);
+            else Debug.Log("ElegirAnomalia: " + a.name + " descartada (diaMinimo " + a.diaMinimo + " > día actual " + diaActual + ")");
+        }
 
         if (validas.Count == 0) return null;
         return validas[Random.Range(0, validas.Count)];
@@ -254,6 +274,7 @@ public class EsperaNPC : MonoBehaviour
 
     public void ProximoPaciente()
     {
+        if (diaTerminado) return;
         StopAllCoroutines();
         pacienteHablando = false;
 
@@ -275,6 +296,8 @@ public class EsperaNPC : MonoBehaviour
 
     void ComprobarFinDelDia()
     {
+        Debug.Log("[FinDia] diaTerminado=" + diaTerminado + " restantes=" + pacientesRestantes + " enEscena=" + pacientesEnEscena);
+
         if (diaTerminado) return;
         if (pacientesRestantes > 0 || pacientesEnEscena > 0) return;
 
@@ -302,6 +325,8 @@ public class EsperaNPC : MonoBehaviour
 
     IEnumerator PanelesFinDelDia()
     {
+        Debug.Log("[FinDia] arranca la secuencia");
+
         yield return new WaitForSeconds(retrasoPanelFinDia);
         currentVisitor = null;
 
@@ -314,21 +339,15 @@ public class EsperaNPC : MonoBehaviour
 
         RellenarPanelFinal();
 
-        textoReloj.text = "8:59";
-        textoReloj.alpha = 1f;
-
         yield return UITransiciones.FadeIn(panelReloj, duracionFade);
         yield return UITransiciones.EsperarSegundosOClic(tiempoRelojVisible);
-
-        yield return UITransiciones.CambiarTextoConFade(textoReloj, "9:00", 0.2f);
-        yield return new WaitForSeconds(1.5f);
-
         yield return UITransiciones.FadeOut(panelReloj, duracionFade);
 
         yield return UITransiciones.FadeIn(panelFinalDia, duracionFade);
         yield return UITransiciones.EsperarClic(tiempoBloqueoClic);
         yield return UITransiciones.FadeOut(panelFinalDia, duracionFade);
 
+        // (se sacó el diaActual++ de acá: SiguienteDia() ya suma el día)
         AplicarEfectosCambioDeDia();
 
         SiguienteDia();
@@ -414,7 +433,7 @@ public class EsperaNPC : MonoBehaviour
 
         int numeroPaciente = totalDelDia - pacientesRestantes;
         pacientesRestantes--;
-            
+
         bool garantizado = indicesAnomalos.Contains(numeroPaciente);
         float dado = Random.value;
         bool esAnomalo = garantizado || dado < rangoActual.probabilidadAnomalia;
@@ -429,10 +448,9 @@ public class EsperaNPC : MonoBehaviour
         if (esAnomalo && anomalia == null)
             Debug.LogWarning("Tocaba anomalía pero ElegirAnomalia() devolvió null. Revisá 'Anomalias Posibles' y el Dia Minimo de cada una.");
 
-        bool esCamara = anomalia != null && anomalia.tipo == TipoAnomalia.VisualCamara;
-
+        // Anomalía visual: elige al azar uno de los modelos infectados; si no hay, usa uno normal
         Pacientes prefab = null;
-        if (anomalia != null && (anomalia.tipo == TipoAnomalia.Visual || esCamara))
+        if (anomalia != null && anomalia.tipo == TipoAnomalia.Visual)
             prefab = anomalia.ElegirPrefab();
 
         if (prefab == null)
@@ -440,8 +458,6 @@ public class EsperaNPC : MonoBehaviour
 
         currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
         currentVisitor.anomalia = anomalia;
-        if (esCamara)
-            currentVisitor.ConfigurarVisionCamara(prefabsPacientes[Random.Range(0, prefabsPacientes.Length)].gameObject);
         pacientesEnEscena++;
 
         var agent = currentVisitor.GetComponent<NavMeshAgent>();
@@ -494,8 +510,8 @@ public class EsperaNPC : MonoBehaviour
 
         tarjetaDNI.SetActive(true);
         panelDni.SetActive(true);
-        RellenarPanelFinal();  
-     }
+        RellenarPanelFinal();
+    }
 
     void Decir(string texto)
     {

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -17,26 +15,30 @@ public class SanidadManager : MonoBehaviour
     public GameObject panelGameOver;
 
     [Header("Game Over")]
-    public GameObject padreGameOver;       
-    public GameObject crosshair;            
+    public GameObject padreGameOver;
+    public GameObject crosshair;
     public MonoBehaviour controladorJugador;
 
     [Header("Drenaje por tiempo (puntos por minuto)")]
     public int drenajeMin = 10;
     public int drenajeMax = 15;
 
-    [Header("PostProcessing")]
-    public PostProcessVolume volume;               // arrastrá acá tu Post-process Volume
-    public float sanidadInicioEfectos = 1f;       // desde acá empiezan a subir
+    [Header("PostProcessing (el volumen de SANIDAD, no el del ataque)")]
+    public PostProcessVolume volume;               // arrastrá acá tu Post-process Volume de sanidad
+    public float sanidadInicioEfectos = 90f;       // desde acá empiezan a subir
     public float vignetteMax = 0.55f;
     public float ambientOcclusionMax = 2f;
     public float grainMax = 0.8f;
     public float chromaticMax = 1f;
     public float lensMax = 30f;
 
+    [Header("Curva de los efectos")]
+    [Tooltip("Más alto = los efectos fuertes aparecen más tarde (3 = el nivel fuerte llega cerca del 20%)")]
+    public float curvaEfectos = 3f;
+    [Tooltip("Intensidad que se nota cuando la sanidad está en 'Sanidad Inicio Efectos' (0 = nada)")]
+    [Range(0f, 0.2f)] public float intensidadMinima = 0.03f;
+
     public Button botonVolverMenu;
-    public void RechazarAnomalia() { CambiarSanidad(10); }
-    public void AceptarPaciente() { CambiarSanidad(5); }
 
     float sanidad = 90f;
     float drenaje;
@@ -53,6 +55,7 @@ public class SanidadManager : MonoBehaviour
     float occlusionBase;
     float grainBase;
     float intensidadEfectos;   // 0 a 1 (suavizada)
+    float tiempoLog;           // solo para el log de diagnóstico de los efectos
 
     void Awake()
     {
@@ -110,12 +113,6 @@ public class SanidadManager : MonoBehaviour
         volume.profile.TryGetSettings(out chromatic);
         volume.profile.TryGetSettings(out lens);
 
-        if (vignette == null) Debug.LogWarning("SanidadManager: el profile no tiene Vignette.");
-        if (occlusion == null) Debug.LogWarning("SanidadManager: el profile no tiene Ambient Occlusion.");
-        if (grain == null) Debug.LogWarning("SanidadManager: el profile no tiene Grain.");
-        if (chromatic == null) Debug.LogWarning("SanidadManager: el profile no tiene Chromatic Aberration.");
-        if (lens == null) Debug.LogWarning("SanidadManager: el profile no tiene Lens Distortion.");
-
         if (vignette != null) vignetteBase = vignette.intensity.value;
         if (occlusion != null) occlusionBase = occlusion.intensity.value;
         if (grain != null) grainBase = grain.intensity.value;
@@ -123,10 +120,11 @@ public class SanidadManager : MonoBehaviour
 
     void ActualizarEfectos()
     {
-        // 0 cuando sanidad >= sanidadInicioEfectos, 1 cuando sanidad = 0
-        float objetivo = Mathf.InverseLerp(sanidadInicioEfectos, 0f, sanidad);
+        // Curva: casi nada al principio y sube fuerte hacia el final.
+        // Como se recalcula con la sanidad actual, al subir la sanidad los efectos bajan solos.
+        float t = Mathf.InverseLerp(sanidadInicioEfectos, 0f, sanidad);
+        float objetivo = Mathf.Lerp(intensidadMinima, 1f, Mathf.Pow(t, curvaEfectos));
 
-        // suavizado para que no salte de golpe
         intensidadEfectos = Mathf.Lerp(intensidadEfectos, objetivo, Time.unscaledDeltaTime * 3f);
 
         if (vignette != null)
@@ -154,6 +152,17 @@ public class SanidadManager : MonoBehaviour
             lens.enabled.Override(true);
             lens.intensity.Override(lensMax * intensidadEfectos);
         }
+
+        tiempoLog += Time.unscaledDeltaTime;
+        if (tiempoLog >= 2f)
+        {
+            tiempoLog = 0f;
+            Debug.Log("[Efectos] sanidad: " + sanidad.ToString("F0")
+                + " | inicio: " + sanidadInicioEfectos
+                + " | intensidad: " + intensidadEfectos.ToString("F2")
+                + " | volumen: " + (volume != null ? volume.name + " (weight " + volume.weight + ")" : "NINGUNO")
+                + " | vignette: " + (vignette != null ? vignette.intensity.value.ToString("F2") : "NULL"));
+        }
     }
 
     // ---------- UI ----------
@@ -172,20 +181,18 @@ public class SanidadManager : MonoBehaviour
     }
 
     public void PerderPorRechazos()
-    {   
+    {
         GameOver();
     }
 
-    void GameOver() 
+    void GameOver()
     {
         if (muerto) return;
         muerto = true;
 
-        // Activa el padre primero, si no el panel no se ve
         if (padreGameOver != null) padreGameOver.SetActive(true);
         panelGameOver.SetActive(true);
 
-        // Apaga el crosshair y congela al jugador
         if (crosshair != null) crosshair.SetActive(false);
         if (controladorJugador != null) controladorJugador.enabled = false;
 
@@ -213,8 +220,10 @@ public class SanidadManager : MonoBehaviour
         SceneManager.LoadScene("Inicio");
     }
 
-    public void PacienteMuertoPorError() { CambiarSanidad(-10); }
-    public void PacienteCurado() { CambiarSanidad(10); }
-    public void AnomaliaMuerta() { CambiarSanidad(-5); }
-    public void AtaqueAnomalia() { CambiarSanidad(-15); }
+    public void PacienteCurado() { CambiarSanidad(15); }            // curar a un normal
+    public void PacienteMuertoPorError() { CambiarSanidad(-10); }  // normal muerto por medicación incorrecta
+    public void AnomaliaMuerta() { CambiarSanidad(5); }            // anomalía muerta por medicación incorrecta
+    public void AtaqueAnomalia() { CambiarSanidad(-17); }          // una anomalía te ataca
+    public void RechazarAnomalia() { CambiarSanidad(5); }         // rechazar una anomalía en el counter
+    public void AceptarPaciente() { CambiarSanidad(5); }           // aceptar a cualquiera en el counter
 }

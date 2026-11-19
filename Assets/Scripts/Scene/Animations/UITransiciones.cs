@@ -1,7 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public static class UITransiciones
 {
@@ -71,6 +70,7 @@ public static class UITransiciones
         yield return null;
     }
 
+    // El texto se desvanece, cambia al nuevo valor y vuelve a aparecer
     public static IEnumerator CambiarTextoConFade(TMP_Text txt, string nuevo, float duracion = 0.4f)
     {
         float t = 0f;

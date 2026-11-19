@@ -4,8 +4,8 @@ using TMPro;
 public class ControlCamaras : MonoBehaviour
 {
     public Camera[] camaras;
-    public GameObject panelCamaras; 
-    public GameObject panelInventario; 
+    public GameObject panelCamaras;
+    public GameObject panelInventario;
     public TextMeshProUGUI textoNombreCamara;
 
     int indiceActual = 0;
@@ -22,7 +22,7 @@ public class ControlCamaras : MonoBehaviour
     {
         if (!panelCamaras.activeSelf) return; // si el panel está cerrado, ignoramos flechas
 
-        if (Input.GetKeyDown(KeyCode.RightArrow)) 
+        if (Input.GetKeyDown(KeyCode.RightArrow))
             CambiarCamara(1);
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))

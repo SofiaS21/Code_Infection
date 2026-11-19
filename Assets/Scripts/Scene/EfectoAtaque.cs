@@ -2,6 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
+// Controla un Post-process Volume extra que solo se ve cuando una anomalía te ataca.
+// Los efectos (viñeta roja, aberración cromática, desenfoque...) se configuran en el perfil del volumen;
+// este script solo sube y baja el "Weight" del volumen de 0 a 1 y de vuelta a 0.
 public class EfectoAtaque : MonoBehaviour
 {
     public static EfectoAtaque Instance;
@@ -19,6 +22,7 @@ public class EfectoAtaque : MonoBehaviour
         if (volumen != null) volumen.weight = 0f;
     }
 
+    // 'sostener' = cuántos segundos queda al máximo antes de empezar a irse
     public void Reproducir(float sostener)
     {
         if (volumen == null) return;
