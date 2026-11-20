@@ -87,6 +87,10 @@ public class EsperaNPC : MonoBehaviour
     public GameObject tarjetaDNI;
     public Animator anim;
 
+    public TiendaUI tienda;
+    public MonoBehaviour[] scriptsADesactivar;
+    bool popupAbierto;
+
     public Transform camaraVigilancia;
 
     [Header("Cámaras de vigilancia")]
@@ -347,7 +351,8 @@ public class EsperaNPC : MonoBehaviour
 
         currentVisitor = null;
         panelDialogue.SetActive(false);
-        panelNoMasPacientes.SetActive(false);
+        if (popupAbierto) CerrarNoMasPacientes();
+        else panelNoMasPacientes.SetActive(false);
         tarjetaDNI.SetActive(false);
         sanidadPanel.SetActive(false);
         inventario.SetActive(false);
@@ -415,6 +420,19 @@ public class EsperaNPC : MonoBehaviour
     {
         yield return new WaitForSeconds(tiempoAntesDelPanel);
 
+        // Si la tienda está abierta, se cierra sola (el carrito se conserva)
+        if (tienda != null)
+        {
+            tienda.ForzarCierre();
+            tienda.bloqueada = true;
+        }
+
+        popupAbierto = true;
+        foreach (var s in scriptsADesactivar)
+            if (s != null) s.enabled = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         panelNoMasPacientes.SetActive(true);
         inventario.SetActive(false);
         noMasPacientes.text = "No hay mas pacientes por hoy. Termina de curar a los pacientes para comenzar el proximo dia.";
@@ -422,17 +440,18 @@ public class EsperaNPC : MonoBehaviour
 
     public void CerrarNoMasPacientes()
     {
+        popupAbierto = false;
+        if (tienda != null) tienda.bloqueada = false;
+
+        foreach (var s in scriptsADesactivar)
+            if (s != null) s.enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         panelNoMasPacientes.SetActive(false);
         inventario.SetActive(true);
     }
-
-    IEnumerator OcultarNoMasPacientes(float segundos)
-    {
-        yield return new WaitForSeconds(segundos);
-        panelNoMasPacientes.SetActive(false);
-        inventario.SetActive(true);
-    }
-
+    public
     IEnumerator SiguientePaciente()
     {
         currentVisitor = null;
@@ -556,5 +575,12 @@ public class EsperaNPC : MonoBehaviour
         }
 
         pacienteHablando = false;
+    }
+
+    void LateUpdate()
+    {
+        if (!popupAbierto) return;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

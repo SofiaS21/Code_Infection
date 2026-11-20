@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class TiendaUI : MonoBehaviour
 {
     [Header("Paneles")]
@@ -16,6 +15,8 @@ public class TiendaUI : MonoBehaviour
     [Header("Catálogo (6 items, mismo orden que los botones BUY)")]
     public ItemData[] items;
     public Button[] botonesComprar;
+
+    public bool bloqueada;
 
     [Header("Carrito (3 filas, en orden)")]
     public GameObject[] filasCarrito;     // la fila entera (fondo gris + texto + tacho)
@@ -134,6 +135,8 @@ public class TiendaUI : MonoBehaviour
 
     public void Abrir()
     {
+        if (bloqueada) return;
+
         EstaAbierta = true;
         if (canvasTienda != null) canvasTienda.SetActive(true);
 
@@ -144,6 +147,11 @@ public class TiendaUI : MonoBehaviour
             if (s != null) s.enabled = false;
 
         MostrarCarrito(false);
+    }
+
+    public void ForzarCierre()
+    {
+        if (EstaAbierta) Cerrar();
     }
 
     public void Cerrar()
