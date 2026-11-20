@@ -70,7 +70,7 @@ public class EsperaNPC : MonoBehaviour
 
     [Header("Jugador (para el ataque de anomalías)")]
     public Transform jugador;
-    public MonoBehaviour controladorJugador;   // el script del FPS controller (se congela durante el ataque)
+    public MonoBehaviour controladorJugador;
 
     private int pacientesRestantes;
     private Pacientes currentVisitor;
@@ -86,6 +86,21 @@ public class EsperaNPC : MonoBehaviour
     public GameObject sanidadPanel;
     public GameObject tarjetaDNI;
     public Animator anim;
+
+    public Transform camaraVigilancia;
+
+    [Header("Cámaras de vigilancia")]
+    public Camera[] camarasVigilancia; 
+
+    public Transform CamaraQueMiraElJugador()
+    {
+        if (camarasVigilancia != null)
+            foreach (var c in camarasVigilancia)
+                if (c != null && c.enabled && c.gameObject.activeInHierarchy)
+                    return c.transform;
+
+        return camaraVigilancia;
+    }
 
     [Header("Aviso de cuarto")]
     public AvisoCuarto avisoCuarto;

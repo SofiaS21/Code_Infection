@@ -270,6 +270,9 @@ MonoBehaviour:
   duracionAtaque: 2
   tiempoMaxCorrer: 15
   probabilidadCorromper: 0.3
+  giroExtraInfectado: 20
+  velocidadGiroInfectado: 6
+  escalaInfectado: 1
   offsetAcostado: {x: 0, y: 0, z: 0}
   rotacionExtraAcostado: {x: 0, y: 0, z: 0}
   imagenCamara: 

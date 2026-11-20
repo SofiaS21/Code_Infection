@@ -103,7 +103,6 @@ public class SanidadManager : MonoBehaviour
     {
         if (volume == null)
         {
-            Debug.LogWarning("SanidadManager: falta arrastrar el Post-process Volume.");
             return;
         }
 
@@ -157,11 +156,6 @@ public class SanidadManager : MonoBehaviour
         if (tiempoLog >= 2f)
         {
             tiempoLog = 0f;
-            Debug.Log("[Efectos] sanidad: " + sanidad.ToString("F0")
-                + " | inicio: " + sanidadInicioEfectos
-                + " | intensidad: " + intensidadEfectos.ToString("F2")
-                + " | volumen: " + (volume != null ? volume.name + " (weight " + volume.weight + ")" : "NINGUNO")
-                + " | vignette: " + (vignette != null ? vignette.intensity.value.ToString("F2") : "NULL"));
         }
     }
 

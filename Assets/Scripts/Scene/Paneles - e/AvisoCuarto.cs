@@ -2,24 +2,33 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-// Ponlo en un objeto vacío que SIEMPRE esté activo (por ejemplo hijo del Canvas),
-// NO en el panel, porque el panel se apaga.
 public class AvisoCuarto : MonoBehaviour
 {
-    public GameObject panel;        // el panelcito de arriba
+    public GameObject panel;
     public TMP_Text texto;
-    public float tiempoVisible = 2f;
+    public float tiempoVisible = 5f;
     public float duracionFade = 0.3f;
 
     private Coroutine actual;
 
     void Awake()
     {
+        if (panel == gameObject || transform.IsChildOf(panel.transform))
+            Debug.LogError("[AvisoCuarto] El campo Panel es este objeto o un PADRE de este objeto. Tiene que ser un HIJO.");
+
         panel.SetActive(false);
     }
 
     public void Mostrar(int numeroCuarto)
     {
+        Debug.Log("[AvisoCuarto] Mostrar(" + numeroCuarto + ") | script activo en jerarquía: " + gameObject.activeInHierarchy);
+
+        if (!gameObject.activeInHierarchy)
+        {
+            Debug.LogError("[AvisoCuarto] El objeto del script está apagado. Primer padre apagado: " + PrimerPadreApagado());
+            return;
+        }
+
         if (actual != null) StopCoroutine(actual);
         actual = StartCoroutine(Rutina(numeroCuarto));
     }
@@ -29,7 +38,21 @@ public class AvisoCuarto : MonoBehaviour
         texto.text = "Cuarto " + numeroCuarto;
 
         yield return UITransiciones.FadeIn(panel, duracionFade, false);
+
+        var cg = panel.GetComponent<CanvasGroup>();
+
         yield return new WaitForSeconds(tiempoVisible);
         yield return UITransiciones.FadeOut(panel, duracionFade);
+    }
+
+    string PrimerPadreApagado()
+    {
+        Transform t = transform;
+        while (t != null)
+        {
+            if (!t.gameObject.activeSelf) return t.name;
+            t = t.parent;
+        }
+        return "ninguno";
     }
 }

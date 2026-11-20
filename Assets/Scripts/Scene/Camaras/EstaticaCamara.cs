@@ -1,23 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Genera estatica de television (ruido) sobre la imagen de las camaras,
-/// al estilo FNAF: se ve mas o menos clara con el tiempo, con algun
-/// "glitch" ocasional, pero nunca tapa del todo la imagen de la camara.
-///
-/// COMO USARLO:
-/// 1) Dentro de tu panel de camaras (el mismo padre de "ImageCamara"),
-///    crea un nuevo objeto: click derecho > UI > Raw Image. Llamalo
-///    "EstaticaCamaras".
-/// 2) Ponelo como ULTIMO hijo dentro de ese padre (para que se dibuje
-///    encima de la imagen de la camara). Estira su RectTransform para
-///    que cubra el mismo rectangulo que "ImageCamara".
-/// 3) Agregale este script (Add Component > Estatica Camaras).
-/// 4) Arrastra ese mismo Raw Image al campo "Imagen Estatica" de abajo.
-/// 5) Jugá con "alphaMinimo" y "alphaMaximo" para decidir que tan visible
-///    queres que sea la estatica (por defecto es sutil).
-/// </summary>
 [RequireComponent(typeof(RawImage))]
 public class EstaticaCamara : MonoBehaviour
 {

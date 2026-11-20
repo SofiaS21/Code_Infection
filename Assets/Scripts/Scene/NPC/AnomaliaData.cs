@@ -9,6 +9,7 @@ public enum TipoAnomalia
     FotoDiferente,
     Visual,
     DialogoRaro,
+    VisualCamara,
 }
 
 [CreateAssetMenu(menuName = "Juego/Anomalia")]

@@ -252,12 +252,16 @@ MonoBehaviour:
   tiempoDesaparecerMuerto: 3
   velocidadAtaque: 8
   distanciaAtaque: 3
+  alturaAtaque: 1.2
+  duracionSubida: 0.4
   triggerAtaqueAnim: Ataque
   momentoDano: 0.8
   duracionAtaque: 2
   tiempoMaxCorrer: 15
-  puedeAtacar: 1
   probabilidadCorromper: 1
+  giroExtraInfectado: 20
+  velocidadGiroInfectado: 6
+  escalaInfectado: 1
   offsetAcostado: {x: 0.57, y: -2.65, z: 0}
   rotacionExtraAcostado: {x: -5.72, y: 0, z: 0}
   imagenCamara: 

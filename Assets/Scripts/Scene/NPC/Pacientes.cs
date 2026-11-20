@@ -8,37 +8,50 @@ public class Pacientes : MonoBehaviour, IInteractable
 {
     public static Pacientes Actual;
 
-    // Datos del paciente
     public string nombre;
     public string nombreEnDialogo;
     public AnomaliaData anomalia;
     public Transform anclaAnomalia;
     public bool EsAnomalia { get { return anomalia != null; } }
 
-    // Todas las anomalías atacan (visual, diálogo, nombre, foto)
     public bool Ataca { get { return anomalia != null; } }
 
     [Header("Paciencia")]
     public float tiempoPaciencia = 45f;
 
     [Header("Curación")]
-    public float tiempoCuracion = 10f;            // segundos que espera después de curarse antes de irse (o de atacar, si es anomalía)
-    public float tiempoDesaparecerMuerto = 3f;    // segundos que queda en la camilla si muere
+    public float tiempoCuracion = 10f;          
+    public float tiempoDesaparecerMuerto = 3f;   
 
     [Header("Ataque (anomalías)")]
     public float velocidadAtaque = 8f;
-    public float distanciaAtaque = 3f;            // a qué distancia del jugador frena (más alto = más lejos)
-    public float alturaAtaque = 1.2f;             // cuánto sube antes de atacar
-    public float duracionSubida = 0.4f;           // cuánto tarda en subir y en bajar
+    public float distanciaAtaque = 3f;          
+    public float alturaAtaque = 1.2f;            
+    public float duracionSubida = 0.4f;          
     public string triggerAtaqueAnim = "Ataque";
     public float momentoDano = 0.8f;              // segundos desde que empieza la animación hasta que quita sanidad
-    public float duracionAtaque = 2f;             // cuánto tiempo dura la animación de ataque (el jugador queda quieto)
-    public float tiempoMaxCorrer = 15f;           // por seguridad: si no llega al jugador en este tiempo, desaparece
+    public float duracionAtaque = 2f;             
+    public float tiempoMaxCorrer = 15f;           
 
     [Header("Diálogo raro")]
-    [Range(0f, 1f)] public float probabilidadCorromper = 0.3f;   // chance de que cada letra reemplazable cambie
+    [Range(0f, 1f)] public float probabilidadCorromper = 0.3f;   
     private string saludoAnomalo = "";
     private string repeticionAnomala = "";
+
+    [Header("Anomalía de cámara")]
+    public float giroExtraInfectado = 0f;        
+    public float escalaInfectado = 1f;
+    private Transform ultimaCamara;
+
+    // Layers que ya existen en el proyecto
+    const string layerSoloCamara = "ModeloInfectado";  
+    const string layerSoloJugador = "ModeloNormal";    
+
+    private bool esCamaraAnomalia = false;
+    private bool modoCamaraActivo = false;
+    private GameObject modeloInfectado;
+    private Renderer[] renderersNormales;
+    private int[] layersOriginales;
 
     [Header("Ajuste al acostarse (distinto por prefab)")]
     public Vector3 offsetAcostado = Vector3.zero;
@@ -56,18 +69,15 @@ public class Pacientes : MonoBehaviour, IInteractable
     public string dniFechaVencimiento;
 
 
-    // Tarjeta DNI (objetos de la escena)
     public GameObject tarjetaDNI;
     public TMP_Text textoNombre;
     public TMP_Text fechaVencimiento;
 
-    // Listas para elegir al azar
     public string[] textoNombrePosibles = { "QuiQui", "Pumis", "Kirk Charles", "Titi Liss", "Jeffrey", "Alfonso Amat", "Patrick Jane", "Gregory House", "Ted" };
     public string[] fechasVencimientoPosibles = { "03/23/28", "05/19/27", "07/01/30", "11/21/29", "09/25/31" };
 
-    // Lugares a los que camina
     public Transform puertaSalida;
-    public Transform cuartoFacil1;   // ya no se usa para acostarse (ahora va al cuarto asignado), se deja para no romper referencias
+    public Transform cuartoFacil1;   
     public Transform counter;
 
     private EsperaNPC npcManager;
@@ -81,7 +91,6 @@ public class Pacientes : MonoBehaviour, IInteractable
     public float velocidadCaminar = 3.5f;
     public Animator anim;
 
-    // EsperaNPC lee esto para saber si ya se pueden usar los botones
     public bool llegoAlCounter = false;
     public bool PuedeInteractuar { get { return llegoAlCounter && !procesando; } }
     private bool procesando = false;
@@ -126,7 +135,6 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        // Si está acostado esperando su medicina, se intenta curar con el ítem en mano
         if (enCuarto && !estaCurado && !muerto)
         {
             UsarItemEquipado();
@@ -142,7 +150,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (Inventario.instancia == null) return;
 
         ItemData item = Inventario.instancia.ItemEquipado;
-        if (item == null) return;   // no tiene nada en la mano
+        if (item == null) return;   
 
         Inventario.instancia.ConsumirEquipado();
 
@@ -178,6 +186,93 @@ public class Pacientes : MonoBehaviour, IInteractable
             case TipoAnomalia.Visual:
                 // El cambio es el modelo infectado: lo elige EsperaNPC al instanciar el prefab
                 break;
+
+            case TipoAnomalia.VisualCamara:
+                // Se ve normal a simple vista; la cámara de vigilancia ve el modelo infectado
+                PrepararModeloInfectado();
+                break;
+        }
+    }
+
+    // ---------- Anomalía de cámara ----------
+    void PrepararModeloInfectado()
+    {
+        Pacientes prefabInf = anomalia.ElegirPrefab();
+        if (prefabInf == null) return;
+
+        int layerCam = LayerMask.NameToLayer(layerSoloCamara);
+        if (layerCam < 0 || LayerMask.NameToLayer(layerSoloJugador) < 0)
+        {
+            Debug.LogError("Faltan los layers '" + layerSoloCamara + "' y/o '" + layerSoloJugador + "'");
+            return;
+        }
+
+        renderersNormales = GetComponentsInChildren<Renderer>(true);
+        layersOriginales = new int[renderersNormales.Length];
+        for (int i = 0; i < renderersNormales.Length; i++)
+            layersOriginales[i] = renderersNormales[i].gameObject.layer;
+
+        GameObject go = Instantiate(prefabInf.gameObject, transform);
+        go.transform.localPosition = Vector3.zero;
+        go.transform.localRotation = Quaternion.identity;
+
+        Vector3 escalaPadre = transform.lossyScale;
+        Vector3 escalaPrefab = prefabInf.transform.localScale * escalaInfectado;
+        go.transform.localScale = new Vector3(
+            escalaPadre.x != 0f ? escalaPrefab.x / escalaPadre.x : 1f,
+            escalaPadre.y != 0f ? escalaPrefab.y / escalaPadre.y : 1f,
+            escalaPadre.z != 0f ? escalaPrefab.z / escalaPadre.z : 1f);
+
+        foreach (var mb in go.GetComponentsInChildren<MonoBehaviour>(true)) Destroy(mb);
+        foreach (var ag in go.GetComponentsInChildren<NavMeshAgent>(true)) Destroy(ag);
+        foreach (var col in go.GetComponentsInChildren<Collider>(true)) Destroy(col);
+        foreach (var rb in go.GetComponentsInChildren<Rigidbody>(true)) Destroy(rb);
+
+        foreach (var r in go.GetComponentsInChildren<Renderer>(true))
+            r.gameObject.layer = layerCam;
+
+        go.SetActive(false);
+        modeloInfectado = go;
+        esCamaraAnomalia = true;
+    }
+
+    void CambiarModoCamara(bool activar)
+    {
+        modoCamaraActivo = activar;
+        int layerJugador = LayerMask.NameToLayer(layerSoloJugador);
+
+        // Modelo normal: con el infectado activo lo ve solo el jugador; si no, vuelve a su layer original
+        for (int i = 0; i < renderersNormales.Length; i++)
+            if (renderersNormales[i] != null)
+                renderersNormales[i].gameObject.layer = activar ? layerJugador : layersOriginales[i];
+
+        modeloInfectado.SetActive(activar);
+    }
+
+    void Update()
+    {
+        if (!esCamaraAnomalia || modeloInfectado == null) return;
+
+        bool debeVerse = llegoAlCounter && !procesando && !muerto;
+        if (debeVerse != modoCamaraActivo) CambiarModoCamara(debeVerse);
+
+        if (modoCamaraActivo && npcManager != null)
+        {
+            Transform cam = npcManager.CamaraQueMiraElJugador();
+            if (cam == null) return;
+
+            if (cam != ultimaCamara)
+            {
+                ultimaCamara = cam;
+                Debug.Log("[Infectado] ahora mira a: " + cam.name);
+            }
+
+            Vector3 dir = cam.position - modeloInfectado.transform.position;
+            dir.y = 0f;
+
+            if (dir.sqrMagnitude > 0.001f)
+                modeloInfectado.transform.rotation =
+                    Quaternion.LookRotation(dir) * Quaternion.Euler(0f, giroExtraInfectado, 0f);
         }
     }
 
@@ -211,8 +306,7 @@ public class Pacientes : MonoBehaviour, IInteractable
             dniFotoRawImage.texture = dniImagen;
     }
 
-    // Cambia solo ALGUNAS letras del texto (cada letra reemplazable tiene 'probabilidad' de cambiar).
-    // Si por azar no cambió ninguna, cambia una para que la anomalía siempre se note.
+    // solo cambia algunas letras
     string CorromperAlgunas(string texto, float probabilidad)
     {
         var sb = new System.Text.StringBuilder();
@@ -245,7 +339,6 @@ public class Pacientes : MonoBehaviour, IInteractable
                 posiciones.Add(i);
         }
 
-        // Si el nombre no tiene ninguna letra reemplazable, no hace nada
         if (posiciones.Count == 0) return texto;
 
         int elegida = posiciones[Random.Range(0, posiciones.Count)];
@@ -329,7 +422,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         StartCoroutine(EsperarAnimacionYCaminar(puertaSalida, Salir));
     }
 
-    // EsperaNPC le pasa el cuarto que le tocó
     public void Aceptar(CuartoCamilla cuarto)
     {
         if (procesando) return;
@@ -341,7 +433,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (anim != null)
             anim.SetTrigger("Bailar");
 
-        // Camina al cuarto y se queda ahí
         StartCoroutine(EsperarAnimacionYCaminar(cuarto.puntoAcostado, null));
     }
 
@@ -436,11 +527,13 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         if (EsAnomalia)
         {
+            // Matar a una anomalía te da +5 de sanidad y no cuenta como muerte de paciente
             if (SanidadManager.Instance != null)
                 SanidadManager.Instance.AnomaliaMuerta();
         }
         else
         {
+            // Paciente normal muerto por error: -10 de sanidad
             if (SanidadManager.Instance != null)
                 SanidadManager.Instance.PacienteMuertoPorError();
 
@@ -460,22 +553,6 @@ public class Pacientes : MonoBehaviour, IInteractable
 
             ParticleSystem ps = c.GetComponentInChildren<ParticleSystem>();
             if (ps != null) ps.Play();
-        }
-    }
-
-    IEnumerator DesaparecerTrasMorir()
-    {
-        yield return new WaitForSeconds(tiempoDesaparecerMuerto);
-
-        Vector3 pos = transform.position + Vector3.up * 1f;
-        GameObject prefab = confetiPrefab; 
-
-        Salir();                            
-
-        if (prefab != null)
-        {
-            Instantiate(prefab, pos, prefab.transform.rotation);
-            Debug.Log("[Confeti] instanciado en " + pos);
         }
     }
 
@@ -618,17 +695,17 @@ public class Pacientes : MonoBehaviour, IInteractable
 
     // Sube o baja el modelo suavemente (sin tocar el NavMeshAgent de lugar)
     IEnumerator CambiarAltura(float destino, float duracion)
+    {
+        float inicio = agent.baseOffset;
+        float t = 0f;
+        while (t < duracion)
         {
-            float inicio = agent.baseOffset;
-            float t = 0f;
-            while (t < duracion)
-            {
-                t += Time.deltaTime;
-                agent.baseOffset = Mathf.Lerp(inicio, destino, Mathf.SmoothStep(0f, 1f, t / duracion));
-                yield return null;
-            }
-            agent.baseOffset = destino;
+            t += Time.deltaTime;
+            agent.baseOffset = Mathf.Lerp(inicio, destino, Mathf.SmoothStep(0f, 1f, t / duracion));
+            yield return null;
         }
+        agent.baseOffset = destino;
+    }
 
     float DistanciaPlana(Vector3 a, Vector3 b)
     {
