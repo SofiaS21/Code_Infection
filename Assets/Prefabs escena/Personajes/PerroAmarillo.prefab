@@ -843,14 +843,15 @@ MonoBehaviour:
   tiempoDesaparecerMuerto: 3
   velocidadAtaque: 8
   distanciaAtaque: 3
+  alturaAtaque: 1.2
+  duracionSubida: 0.4
   triggerAtaqueAnim: Ataque
   momentoDano: 0.8
   duracionAtaque: 2
   tiempoMaxCorrer: 15
-  puedeAtacar: 1
   probabilidadCorromper: 0.3
-  offsetAcostado: {x: 0, y: 0, z: 0}
-  rotacionExtraAcostado: {x: -76.65, y: 0, z: 0}
+  offsetAcostado: {x: 0, y: -2.7, z: -0.2}
+  rotacionExtraAcostado: {x: -6, y: 0, z: 0}
   imagenCamara: 
   dniImagen: {fileID: 2800000, guid: 5701edc8c3e7ba8479c0e35a96210499, type: 3}
   dniImagenesAnomalas:

@@ -19,12 +19,40 @@ PrefabInstance:
         animation clip 'mixamo.com'"
       objectReference: {fileID: 0}
     - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
+      propertyPath: enCuarto
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
       propertyPath: dniImagen
       value: 
       objectReference: {fileID: 2800000, guid: 86a7a5c4d9a25d642a775215d5d2ac61, type: 3}
     - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
       propertyPath: distanciaAtaque
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
+      propertyPath: offsetAcostado.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
+      propertyPath: offsetAcostado.y
+      value: -2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
+      propertyPath: offsetAcostado.z
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
+      propertyPath: rotacionEnCounter.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
+      propertyPath: rotacionExtraAcostado.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
+      propertyPath: rotacionExtraAcostado.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4374217591839914528, guid: a3913f5042ab2054689513bbe0a4fe9a, type: 3}
       propertyPath: dniImagenesAnomalas.Array.data[0]
