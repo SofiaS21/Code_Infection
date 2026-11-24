@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class PosterMostrar : MonoBehaviour, IInteractable
 {
     [Header("Panel del póster")]
@@ -21,10 +22,9 @@ public class PosterMostrar : MonoBehaviour, IInteractable
     int frameCerrado = -1;
     float timeScaleAnterior = 1f;
 
-
     void Update()
     {
-        if (!abierto || jugador == null) return;
+        if (!abierto) return;
 
         if (Input.GetKeyDown(teclaCerrar) && Time.frameCount != frameAbierto)
         {
@@ -32,29 +32,35 @@ public class PosterMostrar : MonoBehaviour, IInteractable
             return;
         }
 
-        if (Vector3.Distance(jugador.position, transform.position) > distanciaMaxima)
+        if (jugador != null &&
+            Vector3.Distance(jugador.position, transform.position) > distanciaMaxima)
+        {
             Cerrar();
+        }
     }
 
     public void Interact()
     {
-        if (abierto) Cerrar();
+        // Evita reabrir en el mismo frame en que se cerró
         if (Time.frameCount == frameCerrado) return;
 
+        if (abierto) Cerrar();
         else Abrir();
     }
 
     void Abrir()
     {
-        inventarioUI.SetActive(false);
-        sanidadUI.SetActive(false);
+        if (inventarioUI != null) inventarioUI.SetActive(false);
+        if (sanidadUI != null) sanidadUI.SetActive(false);
         posterUI.SetActive(true);
 
         abierto = true;
+        PosterAbierto = true;          // <-- faltaba
+        frameAbierto = Time.frameCount; // <-- faltaba
 
         timeScaleAnterior = Time.timeScale;
         Time.timeScale = 0f;
-            
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -62,15 +68,14 @@ public class PosterMostrar : MonoBehaviour, IInteractable
     void Cerrar()
     {
         posterUI.SetActive(false);
-        inventarioUI.SetActive(true);
-        sanidadUI.SetActive(true);
-        abierto = false;
+        if (inventarioUI != null) inventarioUI.SetActive(true);
+        if (sanidadUI != null) sanidadUI.SetActive(true);
 
+        abierto = false;
         PosterAbierto = false;
         frameCerrado = Time.frameCount;
 
         Time.timeScale = timeScaleAnterior;
-
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

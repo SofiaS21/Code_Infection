@@ -10,16 +10,18 @@ public class DineroManager : MonoBehaviour
     [Header("Valores")]
     public int dineroInicial = 100;
     public int precioItem = 15;
-    public int premioCurar = 20;
+    public int premioCurar = 25;
     public int castigoError = 10;
     public int TotalDia { get { return GananciasDia - ComprasDia; } }
 
     [Header("UI")]
     public TMP_Text textoDinero;
 
+
     public int Dinero { get; private set; }
     public int GananciasDia { get; private set; }   // solo curados/errores, SIN compras
     public int ComprasDia { get; private set; }
+    public int ApuestasDia { get; private set; }
 
     void Awake()
     {
@@ -46,6 +48,22 @@ public class DineroManager : MonoBehaviour
         ActualizarUI();
     }
 
+    public bool Apostar(int cantidad)
+    {
+        if (cantidad <= 0 || !PuedePagar(cantidad)) return false;
+        Dinero -= cantidad;
+        ApuestasDia -= cantidad;
+        ActualizarUI();
+        return true;
+    }
+
+    public void CobrarApuesta(int cantidad)
+    {
+        Dinero += cantidad;
+        ApuestasDia += cantidad;
+        ActualizarUI();
+    }
+
     public bool PuedePagar(int total) => Dinero >= total;
 
     public bool Gastar(int total)
@@ -61,6 +79,7 @@ public class DineroManager : MonoBehaviour
     {
         GananciasDia = 0;
         ComprasDia = 0;
+        ApuestasDia = 0;
     }
 
     void ActualizarUI()

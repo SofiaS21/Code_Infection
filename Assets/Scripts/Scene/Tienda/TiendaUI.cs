@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +13,14 @@ public class TiendaUI : MonoBehaviour
     public GameObject panelCarrito;
     public GameObject inventarioUi;
     public GameObject sanidadUi;
+    public Button[] botonesSalir;   // las flechas de las páginas extra (casino, noticias)
+
+    [Header("Pestañas")]
+    public Button tabShop;
+    public Button tabNoticias;
+    public Button tabApuesto;
+    public GameObject panelNoticias;
+    public GameObject panelApuesto;
 
     [Header("Catálogo (6 items, mismo orden que los botones BUY)")]
     public ItemData[] items;
@@ -19,9 +29,9 @@ public class TiendaUI : MonoBehaviour
     public bool bloqueada;
 
     [Header("Carrito (3 filas, en orden)")]
-    public GameObject[] filasCarrito;     // la fila entera (fondo gris + texto + tacho)
-    public TMP_Text[] textosCarrito;      // el texto de cada fila
-    public Button[] botonesBasura;        // el tacho de CADA fila (todos distintos)
+    public GameObject[] filasCarrito;
+    public TMP_Text[] textosCarrito;
+    public Button[] botonesBasura;
     public int maxCarrito = 3;
 
     [Header("Canasta")]
@@ -54,16 +64,23 @@ public class TiendaUI : MonoBehaviour
     [Header("Plata")]
     public TMP_Text textoDineroTienda;
 
+
     [Header("Sin plata")]
     public GameObject panelSinPlata;
     public TMP_Text textoPlataQueFalta;
-    public Button botonCerrarSinPlata; 
+    public Button botonCerrarSinPlata;
 
     readonly List<ItemData> carrito = new List<ItemData>();
     public bool EstaAbierta { get; private set; }
 
     void Start()
     {
+        // Pestañas
+        if (tabShop != null) tabShop.onClick.AddListener(() => MostrarCarrito(false));
+        if (tabNoticias != null) tabNoticias.onClick.AddListener(() => MostrarPaginaExtra(panelNoticias));
+        if (tabApuesto != null) tabApuesto.onClick.AddListener(() => MostrarPaginaExtra(panelApuesto));
+        ApagarPaginasExtra();
+
         for (int i = 0; i < botonesComprar.Length; i++)
         {
             int idx = i;
@@ -79,8 +96,10 @@ public class TiendaUI : MonoBehaviour
 
             int idx = i;
             botonesBasura[i].onClick.AddListener(() => Quitar(idx));
-
         }
+
+        foreach (var b in botonesSalir)
+            if (b != null) b.onClick.AddListener(Cerrar);
 
         botonVerCarrito.onClick.AddListener(() => MostrarCarrito(true));
         botonVolverDeCarrito.onClick.AddListener(() => MostrarCarrito(false));
@@ -102,6 +121,24 @@ public class TiendaUI : MonoBehaviour
         if (popupLleno != null) popupLleno.SetActive(false);
     }
 
+    // ---------- Pestañas ----------
+
+    void MostrarPaginaExtra(GameObject pagina)
+    {
+        CerrarPopup();
+        panelTienda.SetActive(false);
+        panelCarrito.SetActive(false);
+        ApagarPaginasExtra();
+        if (pagina != null) pagina.SetActive(true);
+    }
+
+    void ApagarPaginasExtra()
+    {
+        if (panelNoticias != null) panelNoticias.SetActive(false);
+        if (panelApuesto != null) panelApuesto.SetActive(false);
+    }
+
+    // ---------- Cursor ----------
 
     void AgregarCursor(Button b)
     {
@@ -133,6 +170,8 @@ public class TiendaUI : MonoBehaviour
         Cursor.visible = true;
     }
 
+    // ---------- Abrir / cerrar ----------
+
     public void Abrir()
     {
         if (bloqueada) return;
@@ -162,6 +201,7 @@ public class TiendaUI : MonoBehaviour
         CerrarPopup();
         panelTienda.SetActive(false);
         panelCarrito.SetActive(false);
+        ApagarPaginasExtra();
 
         foreach (var s in scriptsADesactivar)
             if (s != null) s.enabled = true;
@@ -173,11 +213,15 @@ public class TiendaUI : MonoBehaviour
 
     void MostrarCarrito(bool verCarrito)
     {
+        ApagarPaginasExtra();
         CerrarPopup();
         panelTienda.SetActive(!verCarrito);
         panelCarrito.SetActive(verCarrito);
         Refrescar();
     }
+
+    // ---------- Pop-ups ----------
+
     void MostrarPopup(string mensaje = null)
     {
         if (popupLleno != null) popupLleno.SetActive(true);
@@ -196,6 +240,8 @@ public class TiendaUI : MonoBehaviour
         if (popupLleno != null) popupLleno.SetActive(false);
         if (panelSinPlata != null) panelSinPlata.SetActive(false);
     }
+
+    // ---------- Carrito ----------
 
     void Agregar(int idx)
     {
@@ -250,7 +296,6 @@ public class TiendaUI : MonoBehaviour
         {
             bool hay = i < carrito.Count;
 
-            // La fila entera aparece solo si hay un item en ese lugar
             if (filasCarrito[i] != null) filasCarrito[i].SetActive(hay);
 
             if (i < textosCarrito.Length && textosCarrito[i] != null)
@@ -260,7 +305,7 @@ public class TiendaUI : MonoBehaviour
         int totalCarrito = carrito.Count * DineroManager.instancia.precioItem;
 
         botonConfirmar.interactable = carrito.Count > 0 &&
-                                      DineroManager.instancia.PuedePagar(totalCarrito);
+                                      DineroManager.instancia.PuedePagar(totalCarrito); 
 
         if (textoDineroTienda != null) textoDineroTienda.text = "$" + DineroManager.instancia.Dinero;
     }

@@ -45,16 +45,19 @@ public class EsperaNPC : MonoBehaviour
     [Header("Fin del dia")]
     public GameObject panelReloj;
     public GameObject panelFinalDia;
+    public TMP_Text textoApuestas;   
     public TMP_Text textoReloj;
     public TMP_Text textoFinalDia;
     public TMP_Text textoIngresos, textoCompras, textoMuertes, textoTotal;
     public float tiempoRelojVisible = 3f;
+    public float tiempoReloj9 = 1.5f; 
     public float retrasoPanelFinDia = 1.5f;
 
     private int pacientesEnEscena = 0;
     private bool diaTerminado = false;
     private int curadosHoy = 0;
     private int muertosHoy = 0;
+
 
     [Header("Transiciones")]
     public float duracionFade = 0.8f;
@@ -337,6 +340,13 @@ public class EsperaNPC : MonoBehaviour
         if (textoCompras != null) textoCompras.text = FormatoDinero(-d.ComprasDia);
         if (textoMuertes != null) textoMuertes.text = muertosHoy.ToString();
         if (textoTotal != null) textoTotal.text = FormatoDinero(d.TotalDia);
+        if (textoApuestas != null)
+        {
+            int a = d.ApuestasDia;
+            textoApuestas.gameObject.SetActive(a != 0);   // si no jugaste, no aparece
+            textoApuestas.text = a > 0 ? "Casino: ganaste $" + a : "Casino: perdiste $" + (-a);
+            textoApuestas.color = a > 0 ? new Color(0.4f, 0.9f, 0.4f) : new Color(1f, 0.45f, 0.45f);
+        }
     }
 
     string FormatoDinero(int v)
@@ -345,12 +355,23 @@ public class EsperaNPC : MonoBehaviour
         return signo + "$" + Mathf.Abs(v);
     }
 
+    IEnumerator FadeTexto(TMP_Text t, float desde, float hasta, float duracion)
+    {
+        float x = 0f;
+        while (x < duracion)
+        {
+            x += Time.unscaledDeltaTime;
+            t.alpha = Mathf.Lerp(desde, hasta, x / duracion);
+            yield return null;
+        }
+        t.alpha = hasta;
+    }
+
     IEnumerator PanelesFinDelDia()
     {
         Debug.Log("[FinDia] arranca la secuencia");
 
         yield return new WaitForSeconds(retrasoPanelFinDia);
-        currentVisitor = null;
 
         currentVisitor = null;
         panelDialogue.SetActive(false);
@@ -362,17 +383,31 @@ public class EsperaNPC : MonoBehaviour
 
         RellenarPanelFinal();
 
+        // Reloj: 8:59 -> 9:00
+        if (textoReloj != null)
+        {
+            textoReloj.text = "8:59";
+            textoReloj.alpha = 1f;
+        }
+
         yield return UITransiciones.FadeIn(panelReloj, duracionFade);
-        yield return UITransiciones.EsperarSegundosOClic(tiempoRelojVisible);
+        yield return UITransiciones.EsperarSegundosOClic(tiempoRelojVisible);   // se ve el 8:59
+
+        if (textoReloj != null)
+        {
+            yield return FadeTexto(textoReloj, 1f, 0f, 0.5f);   // el 8:59 se desvanece
+            textoReloj.text = "9:00";
+            yield return FadeTexto(textoReloj, 0f, 1f, 0.5f);   // aparece el 9:00
+        }
+
+        yield return UITransiciones.EsperarSegundosOClic(tiempoReloj9);         // se ve el 9:00
         yield return UITransiciones.FadeOut(panelReloj, duracionFade);
 
         yield return UITransiciones.FadeIn(panelFinalDia, duracionFade);
         yield return UITransiciones.EsperarClic(tiempoBloqueoClic);
         yield return UITransiciones.FadeOut(panelFinalDia, duracionFade);
 
-        // (se sacó el diaActual++ de acá: SiguienteDia() ya suma el día)
         AplicarEfectosCambioDeDia();
-
         SiguienteDia();
     }
 
