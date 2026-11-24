@@ -31,7 +31,6 @@ public class GestorCuarto : MonoBehaviour
             }
         }
 
-        Debug.LogWarning("No hay cuartos libres");
         return null;
     }
 

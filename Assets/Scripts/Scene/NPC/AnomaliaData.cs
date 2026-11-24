@@ -35,7 +35,6 @@ public class AnomaliaData : ScriptableObject
 
         if (lista.Count == 0)
         {
-            Debug.LogWarning("AnomaliaData '" + name + "' es Visual pero 'Prefabs Anomalos' está vacío");
             return null;
         }
 

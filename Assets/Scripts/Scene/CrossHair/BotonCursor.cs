@@ -35,7 +35,7 @@ public class BotonCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         escalaObjetivo = escalaOriginal * escalaHover;
 
-        if (boton != null && !boton.interactable) { Debug.Log("Botón no interactable"); return; }
+        if (boton != null && !boton.interactable) { return; }
         Cursor.SetCursor(cursorManito, hotspot, CursorMode.ForceSoftware);
     }
 

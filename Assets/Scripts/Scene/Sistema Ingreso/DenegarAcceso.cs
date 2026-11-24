@@ -45,7 +45,6 @@ public class DenegarAcceso : MonoBehaviour, IInteractable
             animadorBoton.SetTrigger(triggerPresionar);
 
         esperaNPC.DenegarAcceso();
-        Debug.Log("Paciente rechazado");
     }
 
     IEnumerator Mostrar()

@@ -246,7 +246,6 @@ public class SanidadManager : MonoBehaviour
 
     public void VolverAlMenu()
     {
-        Debug.Log("BOTON APRETADO. Escena a cargar: Inicio");
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;

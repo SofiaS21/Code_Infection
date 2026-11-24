@@ -11,6 +11,8 @@ public class EsperaNPC : MonoBehaviour
     [Header("Spawn")]
     public Pacientes[] prefabsPacientes;
     public Transform puntoSpawn;
+    private List<Pacientes> bolsaPrefabs = new List<Pacientes>();
+    private Pacientes ultimoPrefab;
 
     [System.Serializable]
     public class RangoDia
@@ -143,6 +145,8 @@ public class EsperaNPC : MonoBehaviour
 
     public void IniciarDia()
     {
+        bolsaPrefabs.Clear();
+        ultimoPrefab = null;
         diaTerminado = false;
         pacientesEnEscena = 0;
         curadosHoy = 0;
@@ -224,16 +228,12 @@ public class EsperaNPC : MonoBehaviour
         CuartoCamilla cuarto = ObtenerCuartoLibre();
         if (cuarto == null)
         {
-            Debug.Log("No hay cuartos libres");
             return;
         }
 
         cuarto.Ocupar();
 
         int numeroCuarto = System.Array.IndexOf(cuartos, cuarto) + 1;
-        Debug.Log("Paciente " + currentVisitor.nombre + " fue al cuarto " + numeroCuarto
-            + " (" + cuarto.name + ")"
-            + (currentVisitor.EsAnomalia ? " | ANOMALÍA: " + currentVisitor.anomalia.tipo : ""));
 
         if (avisoCuarto != null) avisoCuarto.Mostrar(numeroCuarto);   
 
@@ -273,7 +273,6 @@ public class EsperaNPC : MonoBehaviour
     {
         if (anomaliasPosibles == null || anomaliasPosibles.Length == 0)
         {
-            Debug.LogWarning("ElegirAnomalia: el array 'Anomalias Posibles' está VACÍO en " + name);
             return null;
         }
 
@@ -282,12 +281,10 @@ public class EsperaNPC : MonoBehaviour
         {
             if (a == null)
             {
-                Debug.LogWarning("ElegirAnomalia: hay un elemento en None dentro de 'Anomalias Posibles'");
                 continue;
             }
 
             if (a.diaMinimo <= diaActual) validas.Add(a);
-            else Debug.Log("ElegirAnomalia: " + a.name + " descartada (diaMinimo " + a.diaMinimo + " > día actual " + diaActual + ")");
         }
 
         if (validas.Count == 0) return null;
@@ -367,9 +364,24 @@ public class EsperaNPC : MonoBehaviour
         t.alpha = hasta;
     }
 
+    Pacientes SiguientePrefabNormal()
+    {
+        if (bolsaPrefabs.Count == 0)
+            bolsaPrefabs.AddRange(prefabsPacientes);
+
+        int i = Random.Range(0, bolsaPrefabs.Count);
+
+        if (bolsaPrefabs.Count > 1 && bolsaPrefabs[i] == ultimoPrefab)
+            i = (i + 1) % bolsaPrefabs.Count;
+
+        Pacientes elegido = bolsaPrefabs[i];
+        bolsaPrefabs.RemoveAt(i);
+        ultimoPrefab = elegido;
+        return elegido;
+    }
+
     IEnumerator PanelesFinDelDia()
     {
-        Debug.Log("[FinDia] arranca la secuencia");
 
         yield return new WaitForSeconds(retrasoPanelFinDia);
 
@@ -511,22 +523,13 @@ public class EsperaNPC : MonoBehaviour
         bool esAnomalo = garantizado || dado < rangoActual.probabilidadAnomalia;
         AnomaliaData anomalia = esAnomalo ? ElegirAnomalia() : null;
 
-        Debug.Log("[Paciente " + (numeroPaciente + 1) + "/" + totalDelDia + "] Día " + diaActual
-            + " | garantizado: " + garantizado
-            + " | dado: " + dado.ToString("F2") + " vs prob: " + rangoActual.probabilidadAnomalia
-            + " | ¿anómalo?: " + esAnomalo
-            + " | anomalía: " + (anomalia != null ? anomalia.name + " (" + anomalia.tipo + ")" : "NINGUNA"));
-
-        if (esAnomalo && anomalia == null)
-            Debug.LogWarning("Tocaba anomalía pero ElegirAnomalia() devolvió null. Revisá 'Anomalias Posibles' y el Dia Minimo de cada una.");
-
         // Anomalía visual: elige al azar uno de los modelos infectados; si no hay, usa uno normal
         Pacientes prefab = null;
         if (anomalia != null && anomalia.tipo == TipoAnomalia.Visual)
             prefab = anomalia.ElegirPrefab();
 
         if (prefab == null)
-            prefab = prefabsPacientes[Random.Range(0, prefabsPacientes.Length)];
+            prefab = SiguientePrefabNormal();
 
         currentVisitor = Instantiate(prefab, puntoSpawn.position, puntoSpawn.rotation);
         currentVisitor.anomalia = anomalia;

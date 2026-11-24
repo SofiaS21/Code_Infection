@@ -108,7 +108,6 @@ public class Inventario : MonoBehaviour
 
     void MostrarInventarioLleno()
     {
-        Debug.Log("Entrando a mostrar inventario lleno");
         StopAllCoroutines();
         StartCoroutine(OcultarPanelLuegoDeTiempo());
     }

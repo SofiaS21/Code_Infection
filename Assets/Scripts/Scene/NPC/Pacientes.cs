@@ -143,7 +143,6 @@ public class Pacientes : MonoBehaviour, IInteractable
             return;
         }
 
-        Debug.Log("Interact llamado en " + name);
         npcManager.MostrarDNI(this);
     }
 
@@ -205,7 +204,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         int layerCam = LayerMask.NameToLayer(layerSoloCamara);
         if (layerCam < 0 || LayerMask.NameToLayer(layerSoloJugador) < 0)
         {
-            Debug.LogError("Faltan los layers '" + layerSoloCamara + "' y/o '" + layerSoloJugador + "'");
             return;
         }
 
@@ -266,7 +264,6 @@ public class Pacientes : MonoBehaviour, IInteractable
             if (cam != ultimaCamara)
             {
                 ultimaCamara = cam;
-                Debug.Log("[Infectado] ahora mira a: " + cam.name);
             }
 
             Vector3 dir = cam.position - modeloInfectado.transform.position;
@@ -568,7 +565,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (cuartoAsignado != null && cuartoAsignado.puntoLevantarse != null)
             origen = cuartoAsignado.puntoLevantarse.position;
         else
-            Debug.LogWarning("Falta asignar Punto Levantarse en " + (cuartoAsignado != null ? cuartoAsignado.name : "el cuarto"));
 
         acostado = false;
         enCuarto = false;
@@ -584,7 +580,6 @@ public class Pacientes : MonoBehaviour, IInteractable
 
             if (!agent.isOnNavMesh)
             {
-                Debug.LogError("El punto de levantarse no está sobre el NavMesh");
                 yield break;   // no se destruye: así se nota que hay que corregir el punto
             }
 
@@ -597,11 +592,6 @@ public class Pacientes : MonoBehaviour, IInteractable
             anim.SetBool("Caminando", true);
             anim.CrossFade("Caminata", 0.2f);
         }
-
-        Debug.Log("[" + name + "] terminó de curarse | EsAnomalia: " + EsAnomalia
-            + " | tipo: " + (anomalia != null ? anomalia.tipo.ToString() : "-")
-            + " | Ataca: " + Ataca
-            + " | jugador asignado: " + (npcManager != null && npcManager.jugador != null));
 
         if (Ataca && agent != null && npcManager != null && npcManager.jugador != null)
             yield return StartCoroutine(AtacarJugador());
@@ -635,7 +625,6 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         if (DistanciaPlana(transform.position, jugador.position) > distanciaAtaque)
         {
-            Debug.Log("[" + name + "] no llegó al jugador en " + tiempoMaxCorrer + "s, desaparece");
             Salir();
             yield break;
         }

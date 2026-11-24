@@ -45,7 +45,6 @@ public class AceptarAcceso : MonoBehaviour, IInteractable
             animadorBoton.SetTrigger(triggerPresionar);
 
         esperaNPC.AceptarAcceso();
-        Debug.Log("Paciente Aceptado");
     }
 
     IEnumerator Mostrar()
