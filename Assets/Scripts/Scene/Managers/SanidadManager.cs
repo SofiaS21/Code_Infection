@@ -38,6 +38,12 @@ public class SanidadManager : MonoBehaviour
     [Tooltip("Intensidad que se nota cuando la sanidad está en 'Sanidad Inicio Efectos' (0 = nada)")]
     [Range(0f, 0.2f)] public float intensidadMinima = 0.03f;
 
+    [Header("Pulso de susto (al matar, alucinaciones)")]
+    [Tooltip("Segundos que tarda el pulso en llegar a su punto máximo")]
+    public float subidaPulso = 1f;
+    [Tooltip("Segundos que tarda en bajar desde el máximo. Subida + bajada = duración total (1 + 2 = 3 segundos)")]
+    public float bajadaPulso = 2f;
+
     public Button botonVolverMenu;
 
     float sanidad = 90f;
@@ -55,7 +61,15 @@ public class SanidadManager : MonoBehaviour
     float occlusionBase;
     float grainBase;
     float intensidadEfectos;   // 0 a 1 (suavizada)
+    float pulso;               // 0 a 1, se suma a los efectos (sube y baja suave)
+    float pulsoPico;
+    float pulsoTiempo = 999f;
+    float pulsoSubida;
+    float pulsoBajada;
     float tiempoLog;           // solo para el log de diagnóstico de los efectos
+
+    // Lo leen AlucinacionManager y ParpadeoLuces
+    public float Sanidad { get { return sanidad; } }
 
     void Awake()
     {
@@ -117,39 +131,65 @@ public class SanidadManager : MonoBehaviour
         if (grain != null) grainBase = grain.intensity.value;
     }
 
+
+    public void PulsoSusto(float fuerza, float subida = -1f, float bajada = -1f)
+    {
+        fuerza = Mathf.Clamp01(fuerza);
+        if (fuerza <= pulso) return;   // ya hay un pulso más fuerte en curso
+
+        pulsoPico = fuerza;
+        pulsoSubida = Mathf.Max(0.01f, subida >= 0f ? subida : subidaPulso);
+        pulsoBajada = Mathf.Max(0.01f, bajada >= 0f ? bajada : bajadaPulso);
+        pulsoTiempo = 0f;
+    }
+
+    void ActualizarPulso()
+    {
+        pulsoTiempo += Time.unscaledDeltaTime;
+
+        if (pulsoTiempo < pulsoSubida)
+            pulso = pulsoPico * Mathf.SmoothStep(0f, 1f, pulsoTiempo / pulsoSubida);
+        else if (pulsoTiempo < pulsoSubida + pulsoBajada)
+            pulso = pulsoPico * (1f - Mathf.SmoothStep(0f, 1f, (pulsoTiempo - pulsoSubida) / pulsoBajada));
+        else
+            pulso = 0f;
+    }
+
     void ActualizarEfectos()
     {
-        // Curva: casi nada al principio y sube fuerte hacia el final.
-        // Como se recalcula con la sanidad actual, al subir la sanidad los efectos bajan solos.
+
         float t = Mathf.InverseLerp(sanidadInicioEfectos, 0f, sanidad);
         float objetivo = Mathf.Lerp(intensidadMinima, 1f, Mathf.Pow(t, curvaEfectos));
 
         intensidadEfectos = Mathf.Lerp(intensidadEfectos, objetivo, Time.unscaledDeltaTime * 3f);
 
+        ActualizarPulso();
+        float f = Mathf.Clamp01(intensidadEfectos + pulso);
+
         if (vignette != null)
         {
             vignette.enabled.Override(true);
-            vignette.intensity.Override(Mathf.Lerp(vignetteBase, vignetteMax, intensidadEfectos));
+            vignette.intensity.Override(Mathf.Lerp(vignetteBase, vignetteMax, f));
         }
         if (occlusion != null)
         {
             occlusion.enabled.Override(true);
-            occlusion.intensity.Override(Mathf.Lerp(occlusionBase, ambientOcclusionMax, intensidadEfectos));
+            occlusion.intensity.Override(Mathf.Lerp(occlusionBase, ambientOcclusionMax, f));
         }
         if (grain != null)
         {
             grain.enabled.Override(true);
-            grain.intensity.Override(Mathf.Lerp(grainBase, grainMax, intensidadEfectos));
+            grain.intensity.Override(Mathf.Lerp(grainBase, grainMax, f));
         }
         if (chromatic != null)
         {
             chromatic.enabled.Override(true);
-            chromatic.intensity.Override(chromaticMax * intensidadEfectos);
+            chromatic.intensity.Override(chromaticMax * f);
         }
         if (lens != null)
         {
             lens.enabled.Override(true);
-            lens.intensity.Override(lensMax * intensidadEfectos);
+            lens.intensity.Override(lensMax * f);
         }
 
         tiempoLog += Time.unscaledDeltaTime;
@@ -159,7 +199,6 @@ public class SanidadManager : MonoBehaviour
         }
     }
 
-    // ---------- UI ----------
     void ActualizarUI()
     {
         int valor = Mathf.CeilToInt(sanidad);
@@ -217,7 +256,8 @@ public class SanidadManager : MonoBehaviour
     public void PacienteCurado() { CambiarSanidad(15); }            // curar a un normal
     public void PacienteMuertoPorError() { CambiarSanidad(-10); }  // normal muerto por medicación incorrecta
     public void AnomaliaMuerta() { CambiarSanidad(5); }            // anomalía muerta por medicación incorrecta
-    public void AtaqueAnomalia() { CambiarSanidad(-17); }          // una anomalía te ataca
-    public void RechazarAnomalia() { CambiarSanidad(5); }         // rechazar una anomalía en el counter
+    public void AtaqueAnomalia() { CambiarSanidad(-15); }          // una anomalía te ataca
+    public void RechazarAnomalia() { CambiarSanidad(10); }         // rechazar una anomalía en el counter
     public void AceptarPaciente() { CambiarSanidad(5); }           // aceptar a cualquiera en el counter
+    public void BonusFinDeDia() { CambiarSanidad(20); }
 }

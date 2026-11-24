@@ -20,7 +20,7 @@ public class PantallaCamaras : MonoBehaviour
     {
         if (viendoCamaras)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.Q))
             {
                 SalirCamaras();
                 return;

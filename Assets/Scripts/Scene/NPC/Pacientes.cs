@@ -31,7 +31,9 @@ public class Pacientes : MonoBehaviour, IInteractable
     public string triggerAtaqueAnim = "Ataque";
     public float momentoDano = 0.8f;              // segundos desde que empieza la animación hasta que quita sanidad
     public float duracionAtaque = 2f;             
-    public float tiempoMaxCorrer = 15f;           
+    public float tiempoMaxCorrer = 15f;
+
+    public float duracionGiroCamara = 0.5f;   
 
     [Header("Diálogo raro")]
     [Range(0f, 1f)] public float probabilidadCorromper = 0.3f;   
@@ -533,7 +535,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         }
         else
         {
-            // Paciente normal muerto por error: -10 de sanidad
             if (SanidadManager.Instance != null)
                 SanidadManager.Instance.PacienteMuertoPorError();
 
@@ -545,7 +546,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (confetiPrefab == null)
             confetiPrefab = Resources.Load<GameObject>("Confetti");
 
-        Salir();   // libera el cuarto, avisa al manager y se destruye
+        Salir();   
 
         if (confetiPrefab != null)
         {
@@ -554,21 +555,21 @@ public class Pacientes : MonoBehaviour, IInteractable
             ParticleSystem ps = c.GetComponentInChildren<ParticleSystem>();
             if (ps != null) ps.Play();
         }
+
+        if (SanidadManager.Instance != null)
+            SanidadManager.Instance.PulsoSusto(0.8f);
     }
 
     IEnumerator EsperarYSalir()
     {
-        // Sigue acostado durante tiempoCuracion
         yield return new WaitForSeconds(tiempoCuracion);
 
-        // Punto del piso donde se levanta (hay que leerlo antes de liberar el cuarto)
         Vector3 origen = transform.position;
         if (cuartoAsignado != null && cuartoAsignado.puntoLevantarse != null)
             origen = cuartoAsignado.puntoLevantarse.position;
         else
             Debug.LogWarning("Falta asignar Punto Levantarse en " + (cuartoAsignado != null ? cuartoAsignado.name : "el cuarto"));
 
-        // Se levanta: la camilla queda libre para otro paciente
         acostado = false;
         enCuarto = false;
         LiberarCuarto();
@@ -602,7 +603,6 @@ public class Pacientes : MonoBehaviour, IInteractable
             + " | Ataca: " + Ataca
             + " | jugador asignado: " + (npcManager != null && npcManager.jugador != null));
 
-        // Si es una anomalía, antes de irse corre hacia el jugador y lo ataca
         if (Ataca && agent != null && npcManager != null && npcManager.jugador != null)
             yield return StartCoroutine(AtacarJugador());
 
@@ -610,7 +610,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         {
             agent.SetDestination(puertaSalida.position);
 
-            // Solo se destruye cuando llega de verdad a la puerta
             while (DistanciaPlana(transform.position, puertaSalida.position) > 0.8f)
                 yield return null;
         }
@@ -623,7 +622,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         Transform jugador = npcManager.jugador;
         float alturaOriginal = agent.baseOffset;
 
-        // Corre hacia el jugador
         agent.speed = velocidadAtaque;
         agent.isStopped = false;
 
@@ -635,7 +633,6 @@ public class Pacientes : MonoBehaviour, IInteractable
             yield return null;
         }
 
-        // Si se acabó el tiempo y todavía no llegó, desaparece sin atacar
         if (DistanciaPlana(transform.position, jugador.position) > distanciaAtaque)
         {
             Debug.Log("[" + name + "] no llegó al jugador en " + tiempoMaxCorrer + "s, desaparece");
@@ -649,7 +646,6 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (anim != null)
             anim.SetBool("Caminando", false);
 
-        // Congela al jugador
         if (npcManager.controladorJugador != null)
             npcManager.controladorJugador.enabled = false;
 
@@ -659,13 +655,13 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (dir.sqrMagnitude > 0.001f)
             transform.rotation = Quaternion.LookRotation(dir);
 
-        // Sube antes de atacar
+        Coroutine giro = StartCoroutine(GirarJugadorHaciaMi(duracionGiroCamara));
         yield return StartCoroutine(CambiarAltura(alturaOriginal + alturaAtaque, duracionSubida));
-
+        yield return giro;  
+        
         if (anim != null)
             anim.SetTrigger(triggerAtaqueAnim);
 
-        // El golpe quita sanidad y dispara los efectos en el momento justo de la animación
         yield return new WaitForSeconds(momentoDano);
         if (SanidadManager.Instance != null)
             SanidadManager.Instance.AtaqueAnomalia();
@@ -676,11 +672,12 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         yield return new WaitForSeconds(resto);
 
-        // Libera al jugador
         if (npcManager.controladorJugador != null)
             npcManager.controladorJugador.enabled = true;
 
-        // Baja de nuevo y vuelve a caminar a la puerta
+        if (npcManager.controladorJugador != null)
+            npcManager.controladorJugador.SendMessage("ResetearMirada", SendMessageOptions.DontRequireReceiver);
+
         StartCoroutine(CambiarAltura(alturaOriginal, duracionSubida));
 
         agent.speed = velocidadCaminar;
@@ -693,7 +690,35 @@ public class Pacientes : MonoBehaviour, IInteractable
         }
     }
 
-    // Sube o baja el modelo suavemente (sin tocar el NavMeshAgent de lugar)
+    IEnumerator GirarJugadorHaciaMi(float duracion)
+    {
+        Transform jugador = npcManager.jugador;
+        Transform cam = Camera.main != null ? Camera.main.transform : null;
+
+        Vector3 dir = transform.position - jugador.position;
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.001f) yield break;
+
+        Quaternion rotInicial = jugador.rotation;
+        Quaternion rotFinal = Quaternion.LookRotation(dir);
+
+        Quaternion camInicial = cam != null ? cam.localRotation : Quaternion.identity;
+        Quaternion camFinal = Quaternion.Euler(-10f, 0f, 0f);
+
+        float t = 0f;
+        while (t < duracion)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.SmoothStep(0f, 1f, t / duracion);
+            jugador.rotation = Quaternion.Slerp(rotInicial, rotFinal, k);
+            if (cam != null) cam.localRotation = Quaternion.Slerp(camInicial, camFinal, k);
+            yield return null;
+        }
+
+        jugador.rotation = rotFinal;
+        if (cam != null) cam.localRotation = camFinal;
+    }
+
     IEnumerator CambiarAltura(float destino, float duracion)
     {
         float inicio = agent.baseOffset;

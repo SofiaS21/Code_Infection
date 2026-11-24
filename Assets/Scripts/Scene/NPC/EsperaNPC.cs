@@ -315,12 +315,15 @@ public class EsperaNPC : MonoBehaviour
 
     void ComprobarFinDelDia()
     {
-        Debug.Log("[FinDia] diaTerminado=" + diaTerminado + " restantes=" + pacientesRestantes + " enEscena=" + pacientesEnEscena);
 
         if (diaTerminado) return;
         if (pacientesRestantes > 0 || pacientesEnEscena > 0) return;
 
         diaTerminado = true;
+
+        if (SanidadManager.Instance != null)
+            SanidadManager.Instance.BonusFinDeDia();
+
         StopAllCoroutines();
         StartCoroutine(PanelesFinDelDia());
     }
