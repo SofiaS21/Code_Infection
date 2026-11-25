@@ -21,7 +21,6 @@ public class AvisoCuarto : MonoBehaviour
 
     public void Mostrar(int numeroCuarto)
     {
-        Debug.Log("[AvisoCuarto] Mostrar(" + numeroCuarto + ") | script activo en jerarquía: " + gameObject.activeInHierarchy);
 
         if (!gameObject.activeInHierarchy)
         {
