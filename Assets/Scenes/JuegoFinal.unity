@@ -6918,7 +6918,7 @@ MonoBehaviour:
   - {fileID: 837063792}
   jugador: {fileID: 1699343872}
   camaraJugador: {fileID: 830403085}
-  sanidadMaxima: 50
+  sanidadMaxima: 90
   intervaloMax: 40
   intervaloMin: 8
   duracionMin: 0.7
