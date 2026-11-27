@@ -9,10 +9,13 @@ public class CuartoCamilla : MonoBehaviour
     [Header("Dónde aparece al levantarse (en el piso, al lado de la cama)")]
     public Transform puntoLevantarse;
 
+    [Header("Puerta de este cuarto")]
+    public PuertaAutomatica puerta;
+
     [Header("Burbuja de la camilla")]
-    public GameObject canvasBurbuja;     
-    public RawImage iconoImage;             
-    public RawImage iconoRawImage;       
+    public GameObject canvasBurbuja;
+    public RawImage iconoImage;
+    public RawImage iconoRawImage;
 
     public bool Ocupado { get; private set; }
 
@@ -36,9 +39,6 @@ public class CuartoCamilla : MonoBehaviour
     public void MostrarBurbuja(ItemData item)
     {
         if (item == null || item.icono == null) return;
-
-        if (iconoRawImage != null)
-            iconoRawImage.texture = item.icono.texture;
 
         if (iconoRawImage != null)
             iconoRawImage.texture = item.icono.texture;

@@ -20,34 +20,34 @@ public class Pacientes : MonoBehaviour, IInteractable
     public float tiempoPaciencia = 45f;
 
     [Header("Curación")]
-    public float tiempoCuracion = 10f;          
-    public float tiempoDesaparecerMuerto = 3f;   
+    public float tiempoCuracion = 10f;
+    public float tiempoDesaparecerMuerto = 3f;
 
     [Header("Ataque (anomalías)")]
     public float velocidadAtaque = 8f;
-    public float distanciaAtaque = 3f;          
-    public float alturaAtaque = 1.2f;            
-    public float duracionSubida = 0.4f;          
+    public float distanciaAtaque = 3f;
+    public float alturaAtaque = 1.2f;
+    public float duracionSubida = 0.4f;
     public string triggerAtaqueAnim = "Ataque";
     public float momentoDano = 0.8f;              // segundos desde que empieza la animación hasta que quita sanidad
-    public float duracionAtaque = 2f;             
+    public float duracionAtaque = 2f;
     public float tiempoMaxCorrer = 15f;
 
-    public float duracionGiroCamara = 0.5f;   
+    public float duracionGiroCamara = 0.5f;
 
     [Header("Diálogo raro")]
-    [Range(0f, 1f)] public float probabilidadCorromper = 0.3f;   
+    [Range(0f, 1f)] public float probabilidadCorromper = 0.3f;
     private string saludoAnomalo = "";
     private string repeticionAnomala = "";
 
     [Header("Anomalía de cámara")]
-    public float giroExtraInfectado = 0f;        
+    public float giroExtraInfectado = 0f;
     public float escalaInfectado = 1f;
     private Transform ultimaCamara;
 
     // Layers que ya existen en el proyecto
-    const string layerSoloCamara = "ModeloInfectado";  
-    const string layerSoloJugador = "ModeloNormal";    
+    const string layerSoloCamara = "ModeloInfectado";
+    const string layerSoloJugador = "ModeloNormal";
 
     private bool esCamaraAnomalia = false;
     private bool modoCamaraActivo = false;
@@ -62,6 +62,7 @@ public class Pacientes : MonoBehaviour, IInteractable
     private Transform puntoAcostado;
     private bool acostado = false;
     private CuartoCamilla cuartoAsignado;
+    private PuertaAutomatica puertaCuarto;   // puerta del cuarto asignado (solo esa se abre para este paciente)
     private bool muerto = false;
 
     public string imagenCamara;
@@ -79,7 +80,7 @@ public class Pacientes : MonoBehaviour, IInteractable
     public string[] fechasVencimientoPosibles = { "03/23/28", "05/19/27", "07/01/30", "11/21/29", "09/25/31" };
 
     public Transform puertaSalida;
-    public Transform cuartoFacil1;   
+    public Transform cuartoFacil1;
     public Transform counter;
 
     private EsperaNPC npcManager;
@@ -151,7 +152,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (Inventario.instancia == null) return;
 
         ItemData item = Inventario.instancia.ItemEquipado;
-        if (item == null) return;   
+        if (item == null) return;
 
         Inventario.instancia.ConsumirEquipado();
 
@@ -429,6 +430,10 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         cuartoAsignado = cuarto;
 
+        // Solo se abre la puerta del cuarto asignado
+        puertaCuarto = cuarto.puerta;
+        if (puertaCuarto != null) puertaCuarto.Autorizar(this);
+
         if (anim != null)
             anim.SetTrigger("Bailar");
 
@@ -490,6 +495,9 @@ public class Pacientes : MonoBehaviour, IInteractable
             acostado = true;
             enCuarto = true;
 
+            // Ya entró: la puerta deja de seguirlo mientras está acostado
+            if (puertaCuarto != null) puertaCuarto.Desautorizar(this);
+
             if (anim != null)
                 anim.CrossFade("Acostado", 0.2f);
 
@@ -543,7 +551,7 @@ public class Pacientes : MonoBehaviour, IInteractable
         if (confetiPrefab == null)
             confetiPrefab = Resources.Load<GameObject>("Confetti");
 
-        Salir();   
+        Salir();
 
         if (confetiPrefab != null)
         {
@@ -564,7 +572,9 @@ public class Pacientes : MonoBehaviour, IInteractable
         Vector3 origen = transform.position;
         if (cuartoAsignado != null && cuartoAsignado.puntoLevantarse != null)
             origen = cuartoAsignado.puntoLevantarse.position;
-        else
+
+        // Se levanta: la puerta de su cuarto vuelve a abrirse para que salga
+        if (puertaCuarto != null) puertaCuarto.Autorizar(this);
 
         acostado = false;
         enCuarto = false;
@@ -575,12 +585,16 @@ public class Pacientes : MonoBehaviour, IInteractable
             agent.enabled = true;
 
             UnityEngine.AI.NavMeshHit hit;
-            if (UnityEngine.AI.NavMesh.SamplePosition(origen, out hit, 2f, UnityEngine.AI.NavMesh.AllAreas))
+            if (UnityEngine.AI.NavMesh.SamplePosition(origen, out hit, 3f, UnityEngine.AI.NavMesh.AllAreas))
+            {
+                transform.position = hit.position;
                 agent.Warp(hit.position);
+            }
 
             if (!agent.isOnNavMesh)
             {
-                yield break;   // no se destruye: así se nota que hay que corregir el punto
+                Debug.LogWarning(name + ": puntoLevantarse no está sobre el NavMesh");
+                yield break;
             }
 
             agent.isStopped = false;
@@ -646,8 +660,8 @@ public class Pacientes : MonoBehaviour, IInteractable
 
         Coroutine giro = StartCoroutine(GirarJugadorHaciaMi(duracionGiroCamara));
         yield return StartCoroutine(CambiarAltura(alturaOriginal + alturaAtaque, duracionSubida));
-        yield return giro;  
-        
+        yield return giro;
+
         if (anim != null)
             anim.SetTrigger(triggerAtaqueAnim);
 
@@ -744,6 +758,8 @@ public class Pacientes : MonoBehaviour, IInteractable
     {
         if (yaSalio) return;
         yaSalio = true;
+
+        if (puertaCuarto != null) puertaCuarto.Desautorizar(this);
 
         LiberarCuarto();
         if (npcManager != null) npcManager.PacienteSalio();
